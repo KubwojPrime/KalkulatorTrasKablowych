@@ -1,0 +1,24 @@
+# Build outputs
+/build/
+/build-*/
+/release/
+/out/
+
+# IDE and local state
+/.vs/
+/.vscode/
+/.idea/
+*.user
+*.autosave
+
+# Runtime data and exports
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.xlsx
+*.log
+
+# Windows
+Thumbs.db
+Desktop.ini
+
