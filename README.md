@@ -1,5 +1,7 @@
 # Kalkulator Tras Kablowych
 
+Interfejs programu wykorzystuje spójny motyw ciemny o wysokim kontraście.
+
 Natywna aplikacja Windows do obliczania:
 
 - wypełnienia trasy według konserwatywnego wzoru `Σ(ilość × D²)`;

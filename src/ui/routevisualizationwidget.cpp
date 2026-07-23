@@ -32,12 +32,12 @@ void RouteVisualizationWidget::paintEvent(QPaintEvent *event)
 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.fillRect(rect(), QColor(QStringLiteral("#f8fafc")));
+    painter.fillRect(rect(), QColor(QStringLiteral("#0b1220")));
 
     const double widthMm = m_project.route.internalWidthMm;
     const double heightMm = m_project.route.internalHeightMm;
     if (widthMm <= 0.0 || heightMm <= 0.0) {
-        painter.setPen(QColor(QStringLiteral("#64748b")));
+        painter.setPen(QColor(QStringLiteral("#9aa9bf")));
         painter.drawText(rect(), Qt::AlignCenter, tr("Podaj dodatnie wymiary trasy."));
         return;
     }
@@ -51,23 +51,25 @@ void RouteVisualizationWidget::paintEvent(QPaintEvent *event)
         traySize.width(),
         traySize.height());
 
-    painter.setPen(QPen(QColor(QStringLiteral("#334155")), 3.0));
-    painter.setBrush(QColor(QStringLiteral("#ffffff")));
+    painter.setPen(QPen(QColor(QStringLiteral("#64748b")), 3.0));
+    painter.setBrush(QColor(QStringLiteral("#111827")));
     painter.drawRect(tray);
 
     const auto placed = layoutCables(tray);
     for (const auto &cable : placed) {
         painter.setBrush(cable.overflow
-                             ? QColor(QStringLiteral("#fecaca"))
+                             ? QColor(QStringLiteral("#7f1d1d"))
                              : cable.color);
         painter.setPen(QPen(cable.overflow
-                                ? QColor(QStringLiteral("#b91c1c"))
-                                : QColor(QStringLiteral("#1e293b")),
+                                ? QColor(QStringLiteral("#fca5a5"))
+                                : QColor(QStringLiteral("#cbd5e1")),
                             cable.overflow ? 2.5 : 1.0));
         painter.drawEllipse(cable.rectangle);
 
         if (cable.rectangle.width() >= 34.0) {
-            painter.setPen(QColor(QStringLiteral("#0f172a")));
+            painter.setPen(cable.overflow
+                               ? QColor(QStringLiteral("#fff1f2"))
+                               : QColor(QStringLiteral("#0b1220")));
             QFont font = painter.font();
             font.setPixelSize(std::clamp(
                 static_cast<int>(cable.rectangle.width() / 5.0), 8, 12));
@@ -77,7 +79,7 @@ void RouteVisualizationWidget::paintEvent(QPaintEvent *event)
         }
     }
 
-    painter.setPen(QColor(QStringLiteral("#475569")));
+    painter.setPen(QColor(QStringLiteral("#9aa9bf")));
     painter.drawText(
         QRectF(tray.left(), tray.bottom() + 10.0, tray.width(), 24.0),
         Qt::AlignCenter,

@@ -88,18 +88,18 @@ void MainWindow::recalculate()
     m_resultNotice->setText(notices.join(QStringLiteral("\n")));
     m_resultNotice->setStyleSheet(
         critical
-            ? QStringLiteral("QLabel { color: #991b1b; background: #fee2e2; "
-                             "border: 1px solid #fecaca; border-radius: 6px; padding: 10px; }")
-            : QStringLiteral("QLabel { color: #166534; background: #dcfce7; "
-                             "border: 1px solid #bbf7d0; border-radius: 6px; padding: 10px; }"));
+            ? QStringLiteral("QLabel { color: #fecaca; background: #3f1d24; "
+                             "border: 1px solid #7f1d1d; border-radius: 6px; padding: 10px; }")
+            : QStringLiteral("QLabel { color: #bbf7d0; background: #143322; "
+                             "border: 1px solid #166534; border-radius: 6px; padding: 10px; }"));
 
     m_fillResult->setStyleSheet(result.exceedsFillLimit
-                                    ? QStringLiteral("color: #b91c1c; font-weight: 700;")
-                                    : QStringLiteral("color: #0f172a; font-weight: 700;"));
+                                    ? QStringLiteral("color: #fca5a5; font-weight: 700;")
+                                    : QStringLiteral("color: #e2e8f0; font-weight: 700;"));
     m_fireLoadResult->setStyleSheet(
         result.exceedsFireLoadLimit || result.unknownFireLoadRows > 0
-            ? QStringLiteral("color: #b91c1c; font-weight: 700;")
-            : QStringLiteral("color: #0f172a; font-weight: 700;"));
+            ? QStringLiteral("color: #fca5a5; font-weight: 700;")
+            : QStringLiteral("color: #e2e8f0; font-weight: 700;"));
 
     m_visualization->setProject(project);
 }
@@ -296,7 +296,7 @@ QWidget *MainWindow::buildProjectTab()
            "(masa podpory + wysokość zwieszenia × masa elementów pionowych) / rozstaw podpór."),
         page);
     note->setWordWrap(true);
-    note->setStyleSheet(QStringLiteral("color: #475569; padding: 10px;"));
+    note->setStyleSheet(QStringLiteral("color: #9aa9bf; padding: 10px;"));
     layout->addWidget(note);
     layout->addStretch();
     return page;
@@ -341,7 +341,7 @@ QWidget *MainWindow::buildCablesTab()
            "brak danych, a nie jako zero."),
         page);
     note->setWordWrap(true);
-    note->setStyleSheet(QStringLiteral("color: #475569; padding: 6px;"));
+    note->setStyleSheet(QStringLiteral("color: #9aa9bf; padding: 6px;"));
     layout->addWidget(note);
 
     connect(catalogButton, &QPushButton::clicked, this, &MainWindow::addFromCatalog);

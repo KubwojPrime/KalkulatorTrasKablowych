@@ -36,9 +36,13 @@ QVariant CableTableModel::data(const QModelIndex &index, int role) const
     }
 
     const auto &cable = m_cables.at(index.row());
-    if (role == Qt::BackgroundRole
-        && (cable.quantity <= 0 || cable.outerDiameterMm <= 0.0 || cable.massKgPerKm < 0.0)) {
-        return QBrush(QColor(QStringLiteral("#ffe4e6")));
+    const bool invalid =
+        cable.quantity <= 0 || cable.outerDiameterMm <= 0.0 || cable.massKgPerKm < 0.0;
+    if (role == Qt::BackgroundRole && invalid) {
+        return QBrush(QColor(QStringLiteral("#3f1d24")));
+    }
+    if (role == Qt::ForegroundRole && invalid) {
+        return QBrush(QColor(QStringLiteral("#fecaca")));
     }
     if (role == Qt::ToolTipRole) {
         if (index.column() == FireLoad && !cable.fireLoadMjPerM.has_value()) {
@@ -172,7 +176,10 @@ bool CableTableModel::setData(const QModelIndex &index, const QVariant &value, i
         return false;
     }
 
-    emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole, Qt::BackgroundRole});
+    emit dataChanged(
+        index,
+        index,
+        {Qt::DisplayRole, Qt::EditRole, Qt::BackgroundRole, Qt::ForegroundRole});
     emit cablesChanged();
     return true;
 }

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 project(KalkulatorTrasKablowych
-    VERSION 0.1.0
+    VERSION 0.1.1
     DESCRIPTION "Kalkulator wypelnienia, masy i obciazenia ogniowego tras kablowych"
     LANGUAGES CXX
 )
@@ -57,6 +57,8 @@ add_executable(KalkulatorTrasKablowych WIN32
     src/ui/mainwindow.h
     src/ui/routevisualizationwidget.cpp
     src/ui/routevisualizationwidget.h
+    src/ui/theme.cpp
+    src/ui/theme.h
 )
 
 qt_add_resources(KalkulatorTrasKablowych "ktk_resources"
