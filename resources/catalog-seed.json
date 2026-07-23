@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "notice": "Dane startowe służą do uruchomienia projektu. Przed użyciem projektowym należy sprawdzić aktualną kartę producenta.",
+  "items": [
+    {
+      "manufacturer": "ELPAR",
+      "designation": "SOLPAR 1 x 4 mm²",
+      "catalogCode": "",
+      "outerDiameterMm": 5.7,
+      "massKgPerKm": 85.0,
+      "fireLoadMjPerM": null,
+      "cprClass": "Eca",
+      "source": "https://www.elpar.pl/produkt/solpar",
+      "sourceDate": "2026-07-23",
+      "notes": "Do obliczeń przyjęto maksymalną średnicę zewnętrzną z zakresu katalogowego.",
+      "verified": true
+    },
+    {
+      "manufacturer": "ELPAR",
+      "designation": "SOLPAR 1 x 6 mm²",
+      "catalogCode": "",
+      "outerDiameterMm": 6.3,
+      "massKgPerKm": 95.0,
+      "fireLoadMjPerM": null,
+      "cprClass": "Eca",
+      "source": "https://www.elpar.pl/produkt/solpar",
+      "sourceDate": "2026-07-23",
+      "notes": "Do obliczeń przyjęto maksymalną średnicę zewnętrzną z zakresu katalogowego.",
+      "verified": true
+    },
+    {
+      "manufacturer": "ELPAR",
+      "designation": "SOLPAR 1 x 10 mm²",
+      "catalogCode": "",
+      "outerDiameterMm": 7.3,
+      "massKgPerKm": 112.0,
+      "fireLoadMjPerM": null,
+      "cprClass": "Eca",
+      "source": "https://www.elpar.pl/produkt/solpar",
+      "sourceDate": "2026-07-23",
+      "notes": "Do obliczeń przyjęto maksymalną średnicę zewnętrzną z zakresu katalogowego.",
+      "verified": true
+    },
+    {
+      "manufacturer": "ELPAR",
+      "designation": "SOLPAR 1 x 16 mm²",
+      "catalogCode": "",
+      "outerDiameterMm": 9.3,
+      "massKgPerKm": 178.0,
+      "fireLoadMjPerM": null,
+      "cprClass": "Eca",
+      "source": "https://www.elpar.pl/produkt/solpar",
+      "sourceDate": "2026-07-23",
+      "notes": "Do obliczeń przyjęto maksymalną średnicę zewnętrzną z zakresu katalogowego.",
+      "verified": true
+    }
+  ]
+}

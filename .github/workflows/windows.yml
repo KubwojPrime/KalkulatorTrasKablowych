@@ -1,0 +1,31 @@
+name: Windows
+
+on:
+  push:
+    branches: [main, "agent/**"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.11.0"
+          arch: "win64_msvc2022_64"
+          cache: true
+
+      - name: Configure
+        run: cmake -S . -B build/ci -G Ninja -DCMAKE_BUILD_TYPE=Release -DKTK_BUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build/ci --parallel 4
+
+      - name: Test
+        run: ctest --test-dir build/ci --output-on-failure

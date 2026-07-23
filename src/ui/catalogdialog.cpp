@@ -1,0 +1,116 @@
+#include "ui/catalogdialog.h"
+
+#include <QDialogButtonBox>
+#include <QHeaderView>
+#include <QLabel>
+#include <QLineEdit>
+#include <QLocale>
+#include <QPushButton>
+#include <QTableWidget>
+#include <QVBoxLayout>
+
+namespace ktk {
+
+CatalogDialog::CatalogDialog(const QVector<CatalogItem> &items, QWidget *parent)
+    : QDialog(parent)
+    , m_items(items)
+{
+    setWindowTitle(tr("Dodaj kabel z katalogu"));
+    resize(900, 480);
+
+    auto *layout = new QVBoxLayout(this);
+    layout->addWidget(new QLabel(tr("Wyszukaj producenta, oznaczenie lub CPR:"), this));
+
+    m_filter = new QLineEdit(this);
+    m_filter->setClearButtonEnabled(true);
+    m_filter->setPlaceholderText(tr("np. ELPAR 1 x 10"));
+    layout->addWidget(m_filter);
+
+    m_table = new QTableWidget(this);
+    m_table->setColumnCount(7);
+    m_table->setHorizontalHeaderLabels({
+        tr("Producent"),
+        tr("Oznaczenie"),
+        tr("D [mm]"),
+        tr("Masa [kg/km]"),
+        tr("MJ/m"),
+        tr("CPR"),
+        tr("Weryfikacja")
+    });
+    m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    m_table->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_table->verticalHeader()->hide();
+    m_table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    layout->addWidget(m_table, 1);
+
+    auto *buttons = new QDialogButtonBox(
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
+    buttons->button(QDialogButtonBox::Ok)->setText(tr("Dodaj"));
+    layout->addWidget(buttons);
+
+    connect(m_filter, &QLineEdit::textChanged, this, &CatalogDialog::rebuildTable);
+    connect(buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
+    connect(m_table, &QTableWidget::cellDoubleClicked, this, [this] { accept(); });
+
+    rebuildTable({});
+}
+
+std::optional<CableRow> CatalogDialog::selectedCable() const
+{
+    const int row = m_table->currentRow();
+    if (row < 0) {
+        return std::nullopt;
+    }
+    const auto *item = m_table->item(row, 0);
+    if (!item) {
+        return std::nullopt;
+    }
+    const int sourceIndex = item->data(Qt::UserRole).toInt();
+    if (sourceIndex < 0 || sourceIndex >= m_items.size()) {
+        return std::nullopt;
+    }
+    return m_items.at(sourceIndex).cable;
+}
+
+void CatalogDialog::rebuildTable(const QString &filter)
+{
+    const QString needle = filter.trimmed();
+    m_table->setRowCount(0);
+
+    for (int i = 0; i < m_items.size(); ++i) {
+        const auto &entry = m_items.at(i);
+        const QString haystack =
+            entry.cable.manufacturer + ' ' + entry.cable.designation + ' '
+            + entry.cable.catalogCode + ' ' + entry.cable.cprClass;
+        if (!needle.isEmpty() && !haystack.contains(needle, Qt::CaseInsensitive)) {
+            continue;
+        }
+
+        const int row = m_table->rowCount();
+        m_table->insertRow(row);
+        auto *manufacturer = new QTableWidgetItem(entry.cable.manufacturer);
+        manufacturer->setData(Qt::UserRole, i);
+        manufacturer->setToolTip(entry.notes + QStringLiteral("\n") + entry.cable.source);
+        m_table->setItem(row, 0, manufacturer);
+        m_table->setItem(row, 1, new QTableWidgetItem(entry.cable.designation));
+        m_table->setItem(row, 2, new QTableWidgetItem(
+            QLocale().toString(entry.cable.outerDiameterMm, 'f', 2)));
+        m_table->setItem(row, 3, new QTableWidgetItem(
+            QLocale().toString(entry.cable.massKgPerKm, 'f', 2)));
+        m_table->setItem(row, 4, new QTableWidgetItem(
+            entry.cable.fireLoadMjPerM.has_value()
+                ? QLocale().toString(entry.cable.fireLoadMjPerM.value(), 'f', 3)
+                : tr("brak")));
+        m_table->setItem(row, 5, new QTableWidgetItem(entry.cable.cprClass));
+        m_table->setItem(row, 6, new QTableWidgetItem(
+            entry.verified ? tr("sprawdzone") : tr("do weryfikacji")));
+    }
+
+    if (m_table->rowCount() > 0) {
+        m_table->selectRow(0);
+    }
+}
+
+} // namespace ktk
