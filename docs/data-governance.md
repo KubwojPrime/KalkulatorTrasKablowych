@@ -12,3 +12,9 @@
 6. Automatyczny import z katalogu powinien kończyć się kolejką ręcznej weryfikacji.
 7. Dane producentów i systemów trasowych wymagają sprawdzenia zasad ich dalszego
    wykorzystania oraz publikacji.
+8. Oficjalne dokumenty źródłowe są wersjonowane w `source-materials`; każdy plik
+   ma zapisany URL, datę pobrania, rozmiar, liczbę stron i SHA-256.
+9. Rekord katalogowy wskazuje dokładny plik, stronę PDF i wariant tabeli.
+10. Aktualizacja źródła tworzy nowy plik i wpis manifestu. Nie nadpisuje źródła
+    użytego przez istniejące projekty.
+11. Integralność archiwum sprawdza `scripts/verify-source-materials.ps1`.

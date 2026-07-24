@@ -3,6 +3,7 @@
 /build-*/
 /release/
 /out/
+/tmp/
 
 # IDE and local state
 /.vs/
@@ -21,4 +22,3 @@
 # Windows
 Thumbs.db
 Desktop.ini
-

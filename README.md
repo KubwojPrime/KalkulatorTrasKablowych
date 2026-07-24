@@ -16,6 +16,22 @@ jedynie kilka zweryfikowanych pozycji demonstracyjnych ELPAR. Rozszerzenie katal
 TELE-FONIKA, ELPAR, Bitner, CobiCabling i BAKS jest osobnym, kontrolowanym strumieniem
 danych — każdy rekord musi mieć źródło i datę weryfikacji.
 
+## Materiały źródłowe
+
+Oficjalne katalogi TELE-FONIKI, ELPAR, BITNER i CobiCabling są przechowywane
+w katalogu [`source-materials`](source-materials/README.md). Manifest zawiera
+oryginalne adresy URL, datę pobrania, liczbę stron, rozmiar i SHA-256 każdego
+pliku. Integralność całego archiwum można sprawdzić poleceniem:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass `
+  -File .\scripts\verify-source-materials.ps1
+```
+
+Każda przyszła pozycja katalogowa programu powinna wskazywać dokładny plik i
+stronę źródłową. Pobrane dokumenty nie zawierają bezpośrednich wartości
+kaloryczności wszystkich kabli w `MJ/m`; CPR nie jest używane jako ich zamiennik.
+
 ## Zasady obliczeń
 
 Wypełnienie:

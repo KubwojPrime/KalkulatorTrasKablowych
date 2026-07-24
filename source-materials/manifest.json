@@ -1,0 +1,301 @@
+{
+  "schemaVersion": 1,
+  "generatedAtUtc": "2026-07-24T17:40:03Z",
+  "sourceCount": 13,
+  "totalBytes": 144565988,
+  "totalPages": 1999,
+  "verification": {
+    "pdfSignatureChecked": true,
+    "pdfInfoChecked": true,
+    "encryptedFiles": 0,
+    "textExtractionErrorsInSample": 0,
+    "visualSamples": [
+      {
+        "file": "source-materials/telefonika/TFKable_Katalog_elektroenergetyczny_2026.pdf",
+        "pdfPage": 12
+      },
+      {
+        "file": "source-materials/elpar/ELPAR_Katalog_elektroenergetyczny.pdf",
+        "pdfPage": 15
+      },
+      {
+        "file": "source-materials/bitner/BITNER_Katalog_kabli_i_przewodow_2025.pdf",
+        "pdfPage": 12
+      },
+      {
+        "file": "source-materials/cobicabling/CobiCabling_Product_Catalog_EN_2025.pdf",
+        "pdfPage": 6
+      }
+    ],
+    "fireLoadFinding": "W pobranych dokumentach nie znaleziono bezpośredniej wartości kaloryczności kabla w MJ/m. CPR nie może jej zastępować."
+  },
+  "sources": [
+    {
+      "id": "telefonika-power-2026",
+      "manufacturer": "TELE-FONIKA Kable",
+      "title": "Kable i przewody elektroenergetyczne - wydanie VIII",
+      "language": "pl",
+      "file": "source-materials/telefonika/TFKable_Katalog_elektroenergetyczny_2026.pdf",
+      "sourcePage": "https://www.tele-fonika.com/informacje-prasowe/katalogi",
+      "downloadUrl": "https://www.tele-fonika.com/storage/file/core_files/2026/4/29/85c6ab7b8b5e0923dc452c6d382c0217/kable-i-przewody-elektroenergetyczne-2026.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": null,
+      "contentType": "application/pdf",
+      "bytes": 7834350,
+      "pages": 153,
+      "sha256": "6d3333d29f0227dfe56828ea5c9003290897422d2ba197c473406725b47d4613",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "mass-kg-per-km",
+        "cpr-class"
+      ],
+      "limitations": "Wartości opisane jako przybliżone należy przechowywać z takim oznaczeniem."
+    },
+    {
+      "id": "telefonika-telecom-2025",
+      "manufacturer": "TELE-FONIKA Kable",
+      "title": "Kable telekomunikacyjne - edycja III",
+      "language": "pl",
+      "file": "source-materials/telefonika/TFKable_Katalog_telekomunikacyjny_2025.pdf",
+      "sourcePage": "https://www.tele-fonika.com/sektory-sprzedazy/telekomunikacja",
+      "downloadUrl": "https://www.tele-fonika.com/storage/file/core_files/2025/12/18/780541534c628e3dff8458791c7a6f7a/katalog-telekomunikacyjny-2025.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": null,
+      "contentType": "application/pdf",
+      "bytes": 6089104,
+      "pages": 76,
+      "sha256": "b34390118424ad9b4e0be80eaf6c5d69752fcaeecea747ccb593d4942a00a11d",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "mass-kg-per-km",
+        "cpr-class"
+      ],
+      "limitations": "Brak bezpośredniej wartości obciążenia ogniowego w MJ/m."
+    },
+    {
+      "id": "telefonika-cpr-2026",
+      "manufacturer": "TELE-FONIKA Kable",
+      "title": "Przewodnik kabli i przewodów objętych rozporządzeniem CPR - wydanie VII",
+      "language": "pl",
+      "file": "source-materials/telefonika/TFKable_Przewodnik_CPR_2026.pdf",
+      "sourcePage": "https://www.tele-fonika.com/informacje-prasowe/katalogi",
+      "downloadUrl": "https://www.tele-fonika.com/storage/file/core_files/2026/4/29/82611fe68b4e84b17aef8a1cf04bdf0a/przewodnik-kabli-i-przewodow-objetych-rozporzadzeniem-cpr.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": null,
+      "contentType": "application/pdf",
+      "bytes": 6270731,
+      "pages": 135,
+      "sha256": "d5ced59d124604a9d7a23e690bdfdfd5a5cbd9ddba6706179e5ecb8de886a808",
+      "evidenceFor": [
+        "cpr-class",
+        "cpr-product-scope"
+      ],
+      "limitations": "Przewodnik CPR nie jest źródłem kaloryczności w MJ/m."
+    },
+    {
+      "id": "elpar-power",
+      "manufacturer": "ELPAR",
+      "title": "Kable i przewody elektroenergetyczne",
+      "language": "pl-en",
+      "file": "source-materials/elpar/ELPAR_Katalog_elektroenergetyczny.pdf",
+      "sourcePage": "https://www.elpar.pl/dopobrania",
+      "downloadUrl": "https://www.elpar.pl/uploads/download/katalog_kable_i_przewody_elektroenergetyczne.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2024-11-05T14:47:06Z",
+      "contentType": "application/pdf",
+      "bytes": 5017926,
+      "pages": 248,
+      "sha256": "1738d2addb41d8c1e1efdc8af83222fab5fbfb5526d13a3d5e95f05a4c57272b",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "mass-kg-per-km"
+      ],
+      "limitations": "Katalog informuje, że dane mają charakter orientacyjny."
+    },
+    {
+      "id": "elpar-telecom",
+      "manufacturer": "ELPAR",
+      "title": "Kable i przewody telekomunikacyjne",
+      "language": "pl-en",
+      "file": "source-materials/elpar/ELPAR_Katalog_telekomunikacyjny.pdf",
+      "sourcePage": "https://www.elpar.pl/dopobrania",
+      "downloadUrl": "https://www.elpar.pl/uploads/download/katalog_kable_i_przewody_telekomunikacyjne.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2024-11-05T14:47:08Z",
+      "contentType": "application/pdf",
+      "bytes": 6419119,
+      "pages": 140,
+      "sha256": "f02fedb277fa8cb6cb118ffd5921ea42c6a6c8e49cc398fe38dc3979b5cca159",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "mass-kg-per-km"
+      ],
+      "limitations": "Brak bezpośredniej wartości obciążenia ogniowego w MJ/m."
+    },
+    {
+      "id": "elpar-control-special",
+      "manufacturer": "ELPAR",
+      "title": "Kable sterownicze, sygnalizacyjne oraz specjalne",
+      "language": "pl-en",
+      "file": "source-materials/elpar/ELPAR_Katalog_sterownicze_sygnalizacyjne_specjalne.pdf",
+      "sourcePage": "https://www.elpar.pl/dopobrania",
+      "downloadUrl": "https://www.elpar.pl/uploads/download/katalog_kable_sterownicze_sygnalizacyjne_oraz_specjalne.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2024-11-05T14:47:16Z",
+      "contentType": "application/pdf",
+      "bytes": 8106219,
+      "pages": 208,
+      "sha256": "926c10b5ced96e20391a098efa6df2418e54dad1315f754e34d272a0e91868d0",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "mass-kg-per-km"
+      ],
+      "limitations": "Wariant i przekrój muszą być identyfikowane dokładnie według tabeli."
+    },
+    {
+      "id": "elpar-safe-halogen-free",
+      "manufacturer": "ELPAR",
+      "title": "Kable bezpieczne i bezhalogenowe",
+      "language": "pl-en",
+      "file": "source-materials/elpar/ELPAR_Katalog_bezpieczne_bezhalogenowe.pdf",
+      "sourcePage": "https://www.elpar.pl/dopobrania",
+      "downloadUrl": "https://www.elpar.pl/uploads/download/katalog_kable_bezpieczne_i_bezhalogenowe.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2024-11-05T14:47:05Z",
+      "contentType": "application/pdf",
+      "bytes": 6447349,
+      "pages": 161,
+      "sha256": "9041afeb662bf87ed770b042061db5a660b10cd4558e0c1733d779c2a3977a98",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "mass-kg-per-km",
+        "fire-resistance",
+        "halogen-free-properties"
+      ],
+      "limitations": "Odporność ogniowa nie jest wartością kaloryczności w MJ/m."
+    },
+    {
+      "id": "elpar-power-technical-parameters",
+      "manufacturer": "ELPAR",
+      "title": "Parametry techniczne kabli elektroenergetycznych",
+      "language": "pl",
+      "file": "source-materials/elpar/ELPAR_Parametry_techniczne_kabli_elektroenergetycznych.pdf",
+      "sourcePage": "https://www.elpar.pl/dopobrania",
+      "downloadUrl": "https://www.elpar.pl/uploads/download/parametry_techniczne_kabli_elektroenergetycznych.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2026-03-04T14:21:43Z",
+      "contentType": "application/pdf",
+      "bytes": 4338890,
+      "pages": 44,
+      "sha256": "7a2915a238708bcbe82cbba6bb9fab1e84709c911485bcc1eb120d79f85b43f9",
+      "evidenceFor": [
+        "engineering-context",
+        "cable-selection"
+      ],
+      "limitations": "Materiał pomocniczy; parametry konkretnego wariantu należy potwierdzić w tabeli katalogowej."
+    },
+    {
+      "id": "elpar-fire-safety-parameters",
+      "manufacturer": "ELPAR",
+      "title": "Parametry techniczne bezpieczeństwa pożarowego oraz kabli bezhalogenowych",
+      "language": "pl",
+      "file": "source-materials/elpar/ELPAR_Parametry_bezpieczenstwa_pozarowego.pdf",
+      "sourcePage": "https://www.elpar.pl/dopobrania",
+      "downloadUrl": "https://www.elpar.pl/uploads/download/parametry_techniczne_bezpieczenstwa_pozarowego_oraz_kabli_bezhalogenowych.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2024-05-20T09:34:27Z",
+      "contentType": "application/pdf",
+      "bytes": 5419533,
+      "pages": 36,
+      "sha256": "cc08b275b42e8f5e7b3d8da64cd8f07b993332824d6f64c6263dd92d1768f973",
+      "evidenceFor": [
+        "fire-safety-context",
+        "halogen-free-properties"
+      ],
+      "limitations": "Nie znaleziono bezpośredniej wartości MJ/m; nie wolno wyprowadzać jej z CPR."
+    },
+    {
+      "id": "bitner-general-2025",
+      "manufacturer": "BITNER",
+      "title": "Katalog kabli i przewodów 2025",
+      "language": "pl",
+      "file": "source-materials/bitner/BITNER_Katalog_kabli_i_przewodow_2025.pdf",
+      "sourcePage": "https://bitner.com.pl/katalogi-i-ulotki/",
+      "downloadUrl": "https://bitner.com.pl/wp-content/uploads/2025/06/Katalog_Kabli_i_Przewodow.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2025-06-27T12:51:26Z",
+      "contentType": "application/pdf",
+      "bytes": 50806964,
+      "pages": 583,
+      "sha256": "62d96a1bb6af3c0f128bd37f0976382e02e781c49b9cb375218576d99aa331f6",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "mass-kg-per-km",
+        "cpr-class"
+      ],
+      "limitations": "Warstwa tekstowa ma miejscami niestandardowe kodowanie; dane tabelaryczne wymagają kontroli wizualnej."
+    },
+    {
+      "id": "bitner-bitlan-2025",
+      "manufacturer": "BITNER",
+      "title": "BiTLAN - kable do transmisji danych, dźwięku i obrazu",
+      "language": "pl",
+      "file": "source-materials/bitner/BITNER_Ulotka_BiTLAN_2025.pdf",
+      "sourcePage": "https://bitner.com.pl/katalogi-i-ulotki/",
+      "downloadUrl": "https://bitner.com.pl/wp-content/uploads/2025/06/Ulotka_BiTLAN.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2025-06-27T12:44:52Z",
+      "contentType": "application/pdf",
+      "bytes": 1876815,
+      "pages": 4,
+      "sha256": "6b9b605649f6f72b53df6126f5c7e27b976916ca80745d26b118975f17c7d5ba",
+      "evidenceFor": [
+        "telecommunication-product-family",
+        "cpr-class"
+      ],
+      "limitations": "Ulotka przeglądowa; wartości średnicy i masy należy pobierać z pełnego katalogu lub karty produktu."
+    },
+    {
+      "id": "cobicabling-catalog-pl",
+      "manufacturer": "CobiCabling",
+      "title": "Katalog produktów CobiCabling - wydanie 2024",
+      "language": "pl",
+      "file": "source-materials/cobicabling/CobiCabling_Katalog_produktow_PL.pdf",
+      "sourcePage": "https://cobicabling.com/pl",
+      "downloadUrl": "https://cobicabling.com/static-sites/15/katalog-produktow-cobicabling.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2025-06-23T13:19:40Z",
+      "contentType": "application/pdf",
+      "bytes": 11351916,
+      "pages": 140,
+      "sha256": "9574b47fa413ef1b55a89f0a390be603be25946dcdc57a9f82ca018d8dbd17dd",
+      "evidenceFor": [
+        "telecommunication-product-family",
+        "catalog-number",
+        "cpr-class"
+      ],
+      "limitations": "Starsze wydanie polskie; pierwszeństwo dla aktualniejszego katalogu angielskiego i kart produktu."
+    },
+    {
+      "id": "cobicabling-catalog-en-2025",
+      "manufacturer": "CobiCabling",
+      "title": "CobiCabling product catalog 2025",
+      "language": "en",
+      "file": "source-materials/cobicabling/CobiCabling_Product_Catalog_EN_2025.pdf",
+      "sourcePage": "https://cobicabling.com/en",
+      "downloadUrl": "https://cobicabling.com/static-sites/15/cobicabling-product-catalog.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2025-08-05T13:18:37Z",
+      "contentType": "application/pdf",
+      "bytes": 24587072,
+      "pages": 71,
+      "sha256": "cdd57704d199f34d55525b8cd349e25dbe01b7f98980316a3162ed68fe17ea2a",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "catalog-number",
+        "cpr-class"
+      ],
+      "limitations": "Katalog nie zapewnia kompletnej masy kg/km ani kaloryczności MJ/m dla wszystkich pozycji."
+    }
+  ]
+}
