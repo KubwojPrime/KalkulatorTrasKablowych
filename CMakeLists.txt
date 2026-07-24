@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 project(KalkulatorTrasKablowych
-    VERSION 0.2.0
+    VERSION 0.3.0
     DESCRIPTION "Kalkulator wypelnienia, masy i obciazenia ogniowego tras kablowych"
     LANGUAGES CXX
 )
@@ -36,6 +36,8 @@ configure_file(
 add_library(ktk_core STATIC
     src/domain/calculator.cpp
     src/domain/calculator.h
+    src/domain/catalogfilter.cpp
+    src/domain/catalogfilter.h
     src/domain/types.h
 )
 target_link_libraries(ktk_core PUBLIC Qt6::Core)

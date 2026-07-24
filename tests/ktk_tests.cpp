@@ -1,4 +1,5 @@
 #include "domain/calculator.h"
+#include "domain/catalogfilter.h"
 #include "data/catalogrepository.h"
 #include "io/xlsxprojectio.h"
 
@@ -78,6 +79,90 @@ void testCalculator()
     require(result.exceedsFireLoadLimit, "fire load limit");
 }
 
+void testCatalogFilter()
+{
+    ktk::CatalogItem yky;
+    yky.cable.manufacturer = QStringLiteral("TELE-FONIKA Kable");
+    yky.cable.designation =
+        QStringLiteral("YKYżo 0,6/1 kV 3 x 2,5 mm²");
+    yky.cable.catalogCode = QStringLiteral("TFK-ABC-123");
+    yky.cable.cprClass = QStringLiteral("Dca-s2,d2");
+
+    require(
+        ktk::CatalogFilter::tokenizedMatch(
+            QStringLiteral("YKY 3 x 2,5"),
+            yky.cable.designation),
+        "outlook-style tokens");
+    require(
+        ktk::CatalogFilter::tokenizedMatch(
+            QStringLiteral("2.5 yky 3"),
+            yky.cable.designation),
+        "token order and decimal separator");
+    require(
+        ktk::CatalogFilter::tokenizedMatch(
+            QStringLiteral("YKYzo 3x2.50"),
+            yky.cable.designation),
+        "compact conductor configuration");
+    require(
+        !ktk::CatalogFilter::tokenizedMatch(
+            QStringLiteral("YKY 4 x 2,5"),
+            yky.cable.designation),
+        "all tokens required");
+    require(
+        !ktk::CatalogFilter::tokenizedMatch(
+            QStringLiteral("YKY 30"),
+            yky.cable.designation),
+        "numeric tokens are exact");
+    require(
+        ktk::CatalogFilter::cableFamily(yky)
+            == QStringLiteral("YKYżo 0,6/1 kV"),
+        "cable family");
+    require(
+        ktk::CatalogFilter::insulationTags(yky).contains(
+            QStringLiteral("PVC")),
+        "PVC classification");
+
+    ktk::CatalogFilterCriteria criteria;
+    criteria.query = QStringLiteral("YKY 3 2,5");
+    criteria.manufacturer = QStringLiteral("TELE-FONIKA Kable");
+    criteria.cableType = QStringLiteral("YKY 0,6");
+    criteria.insulation = QStringLiteral("PVC");
+    criteria.cprClass = QStringLiteral("Dca-s2,d2");
+    require(
+        ktk::CatalogFilter::matches(yky, criteria),
+        "combined catalog filters");
+    criteria.manufacturer = QStringLiteral("BITNER");
+    require(
+        !ktk::CatalogFilter::matches(yky, criteria),
+        "manufacturer filter");
+
+    ktk::CatalogItem fireResistant;
+    fireResistant.cable.designation =
+        QStringLiteral("N2XH-J FE180/PH90/E90 5G10 mm²");
+    const auto materialTags =
+        ktk::CatalogFilter::insulationTags(fireResistant);
+    require(
+        materialTags.contains(
+            QStringLiteral("XLPE / polietylen sieciowany")),
+        "XLPE classification");
+    require(
+        materialTags.contains(QStringLiteral("bezhalogenowa (LSZH)")),
+        "LSZH classification");
+    const auto fireTags =
+        ktk::CatalogFilter::fireResistanceTags(fireResistant);
+    require(fireTags.contains(QStringLiteral("FE180")), "FE180 filter");
+    require(fireTags.contains(QStringLiteral("PH90")), "PH90 filter");
+    require(fireTags.contains(QStringLiteral("E90")), "E90 filter");
+
+    ktk::CatalogItem falseE30;
+    falseE30.cable.designation =
+        QStringLiteral("INFORMACJE TECHNICZNE 30 x 2,5 mm²");
+    require(
+        !ktk::CatalogFilter::fireResistanceTags(falseE30).contains(
+            QStringLiteral("E30")),
+        "avoid false E30 from technical text");
+}
+
 void createLegacyCatalog(const QString &databasePath)
 {
     const QString connection = QStringLiteral("legacy-test-setup");
@@ -126,8 +211,15 @@ void testCatalog(const QString &databasePath)
     bool cobiMissingMass = false;
     bool tfkDirectFireLoad = false;
     bool legacyItemPreserved = false;
+    int realYkyMatches = 0;
+    ktk::CatalogFilterCriteria realQuery;
+    realQuery.query = QStringLiteral("YKY 3 x 2,5");
+    const ktk::CatalogFilter realMatcher(realQuery);
     for (const auto &item : items) {
         manufacturers.insert(item.cable.manufacturer);
+        if (realMatcher.matches(item)) {
+            ++realYkyMatches;
+        }
         if (item.cable.manufacturer == QStringLiteral("CobiCabling")
             && !item.cable.massKgPerKm.has_value()) {
             cobiMissingMass = true;
@@ -149,6 +241,7 @@ void testCatalog(const QString &databasePath)
     require(cobiMissingMass, "Cobi missing mass remains unknown");
     require(tfkDirectFireLoad, "TFK direct heat of combustion");
     require(legacyItemPreserved, "legacy custom catalog item preserved");
+    require(realYkyMatches > 0, "real catalog Outlook-style YKY query");
 }
 
 } // namespace
@@ -159,6 +252,8 @@ int main(int argc, char *argv[])
     QCoreApplication application(argc, argv);
     testCalculator();
     std::cerr << "calculator: passed\n";
+    testCatalogFilter();
+    std::cerr << "catalog filter: passed\n";
     QTemporaryDir directory;
     require(directory.isValid(), "temporary directory");
     std::cerr << "xlsx: temporary directory ready\n";

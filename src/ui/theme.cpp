@@ -54,6 +54,10 @@ void Theme::applyDark(QApplication &application)
             background: transparent;
         }
 
+        QLabel[role="muted"] {
+            color: #94a3b8;
+        }
+
         QGroupBox {
             color: #f1f5f9;
             font-weight: 600;

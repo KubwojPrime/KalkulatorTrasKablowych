@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QStyleFactory>
+#include <QTemporaryDir>
 
 int main(int argc, char *argv[])
 {
@@ -33,7 +34,13 @@ int main(int argc, char *argv[])
     }
 
     if (application.arguments().contains(QStringLiteral("--smoke-test"))) {
-        ktk::CatalogRepository repository;
+        QTemporaryDir smokeDirectory;
+        if (!smokeDirectory.isValid()) {
+            qCritical() << "cannot create smoke-test directory";
+            return 30;
+        }
+        ktk::CatalogRepository repository(
+            smokeDirectory.filePath(QStringLiteral("catalog.sqlite")));
         QString error;
         if (!repository.open(&error)) {
             qCritical().noquote() << error;

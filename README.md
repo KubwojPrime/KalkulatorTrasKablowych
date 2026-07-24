@@ -11,6 +11,11 @@ Natywna aplikacja Windows do obliczania:
 - schematycznego ułożenia kabli od największej średnicy;
 - importu i eksportu projektu oraz raportu w formacie XLSX.
 
+Katalog obsługuje wyszukiwanie tokenowe z logiką AND (np. `YKY 3 x 2,5`)
+oraz filtry producenta, typu/rodziny kabla, izolacji lub powłoki, klasy CPR
+i odporności ogniowej (np. `PH90`). Separatory `x`, `×` i `G` oraz zapis
+dziesiętny z przecinkiem lub kropką są traktowane równoważnie.
+
 Wersjonowana baza aplikacji jest generowana z oficjalnych katalogów TELE-FONIKA,
 ELPAR, BITNER i CobiCabling. Każdy rekord zachowuje producenta, wariant, kod
 katalogowy, dokładny plik i stronę PDF, adres źródłowy oraz metodę ekstrakcji.
