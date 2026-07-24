@@ -43,8 +43,12 @@ python .\tools\verify_catalog_dataset.py
 ```
 
 Dla części wariantów TELE-FONIKA katalog podaje ciepło spalania w `kWh/m`;
-program przelicza je jednostkowo przez `3,6` na `MJ/m`. Dla pozostałych kabli
-brak pozostaje brakiem danych. CPR nie jest używane jako zamiennik.
+program przelicza je jednostkowo przez `3,6` na `MJ/m`. Gdy producent nie podał
+tej wartości, program może wykonać konserwatywne oszacowanie dla rozpoznanego
+materiału izolacji/powłoki. Każde takie oszacowanie jest oznaczone `*`, zachowuje
+opis przyjętej metody i nie zastępuje danych producenta. CPR nie jest używane
+jako zamiennik. Szczegóły i ograniczenia opisano w
+[`docs/fire-load-estimation.md`](docs/fire-load-estimation.md).
 
 ## Zasady obliczeń
 
@@ -71,11 +75,13 @@ oznaczona jako wartość minimalna.
 Obciążenie ogniowe:
 
 ```text
-obciążenie ogniowe [MJ/m] = Σ(ilość × wartość katalogowa kabla [MJ/m])
+obciążenie ogniowe [MJ/m] =
+  Σ(ilość × wartość producenta lub oznaczone * oszacowanie kabla [MJ/m])
 ```
 
-Brak wartości `MJ/m` nie jest traktowany jako zero. Raport wyraźnie oznacza wynik
-niepełny. Klasa CPR nie jest przeliczana na obciążenie ogniowe.
+Brak wartości `MJ/m` i brak możliwości wiarygodnego oszacowania nie są traktowane
+jako zero. Raport oddziela część potwierdzoną, oszacowaną `*` i nadal nieznaną.
+Klasa CPR nie jest przeliczana na obciążenie ogniowe.
 
 ## Aktualizacja katalogu aplikacji
 

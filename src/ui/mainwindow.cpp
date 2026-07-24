@@ -60,6 +60,9 @@ void MainWindow::recalculate()
     setResultLabel(m_supportMassResult, result.supportSystemMassKgPerM, 3, tr("kg/m"));
     setResultLabel(m_totalMassResult, result.totalInstalledMassKgPerM, 3, tr("kg/m"));
     setResultLabel(m_fireLoadResult, result.knownFireLoadMjPerM, 3, tr("MJ/m"));
+    if (result.estimatedFireLoadRows > 0) {
+        m_fireLoadResult->setText(m_fireLoadResult->text() + QStringLiteral("*"));
+    }
     if (result.unknownMassRows > 0) {
         m_cableMassResult->setText(
             QStringLiteral("≥ %1").arg(m_cableMassResult->text()));
@@ -69,6 +72,7 @@ void MainWindow::recalculate()
 
     QStringList notices;
     bool critical = false;
+    bool caution = false;
     if (result.invalidRows > 0) {
         notices << tr("%n nieprawidłowy wiersz został pominięty.",
                       nullptr, result.invalidRows);
@@ -90,6 +94,15 @@ void MainWindow::recalculate()
                       nullptr, result.unknownFireLoadRows);
         critical = true;
     }
+    if (result.estimatedFireLoadRows > 0) {
+        notices << tr("* %n wiersz ma obciążenie ogniowe oszacowane z materiału "
+                      "izolacji/powłoki i geometrii kabla. To wartość pomocnicza — "
+                      "nie może być jedyną podstawą do rezygnacji z ochrony "
+                      "przeciwpożarowej; potwierdź ją kartą producenta lub z "
+                      "projektantem zabezpieczeń ppoż.",
+                      nullptr, result.estimatedFireLoadRows);
+        caution = true;
+    }
     if (result.exceedsFireLoadLimit) {
         notices << tr("Przekroczono ustawiony limit obciążenia ogniowego.");
         critical = true;
@@ -103,6 +116,9 @@ void MainWindow::recalculate()
         critical
             ? QStringLiteral("QLabel { color: #fecaca; background: #3f1d24; "
                              "border: 1px solid #7f1d1d; border-radius: 6px; padding: 10px; }")
+            : caution
+                ? QStringLiteral("QLabel { color: #fde68a; background: #3b2f17; "
+                                 "border: 1px solid #a16207; border-radius: 6px; padding: 10px; }")
             : QStringLiteral("QLabel { color: #bbf7d0; background: #143322; "
                              "border: 1px solid #166534; border-radius: 6px; padding: 10px; }"));
 
@@ -112,6 +128,8 @@ void MainWindow::recalculate()
     m_fireLoadResult->setStyleSheet(
         result.exceedsFireLoadLimit || result.unknownFireLoadRows > 0
             ? QStringLiteral("color: #fca5a5; font-weight: 700;")
+            : result.estimatedFireLoadRows > 0
+                ? QStringLiteral("color: #fde68a; font-weight: 700;")
             : QStringLiteral("color: #e2e8f0; font-weight: 700;"));
     const QString massStyle =
         result.unknownMassRows > 0
@@ -402,7 +420,7 @@ QWidget *MainWindow::buildResultsTab()
     auto *fireGroup = new QGroupBox(tr("Ochrona przeciwpożarowa"), summary);
     auto *fireForm = new QFormLayout(fireGroup);
     m_fireLoadResult = new QLabel(fireGroup);
-    fireForm->addRow(tr("Znane obciążenie ogniowe:"), m_fireLoadResult);
+    fireForm->addRow(tr("Łączne obciążenie ogniowe:"), m_fireLoadResult);
     summaryLayout->addWidget(fireGroup);
 
     m_resultNotice = new QLabel(summary);

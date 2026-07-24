@@ -1,5 +1,7 @@
 #include "data/catalogrepository.h"
 
+#include "domain/fireloadestimator.h"
+
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -102,6 +104,7 @@ QVector<CatalogItem> CatalogRepository::allItems(QString *errorMessage) const
         item.sourcePage = query.value(14).toInt();
         item.sourceUrl = query.value(15).toString();
         item.extractionMethod = query.value(16).toString();
+        FireLoadEstimator::applyIfMissing(&item.cable);
         items.append(item);
     }
 

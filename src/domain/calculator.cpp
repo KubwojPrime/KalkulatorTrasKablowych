@@ -29,7 +29,14 @@ CalculationResult Calculator::calculate(const ProjectData &project)
         }
 
         if (cable.fireLoadMjPerM.has_value() && cable.fireLoadMjPerM.value() >= 0.0) {
-            result.knownFireLoadMjPerM += count * cable.fireLoadMjPerM.value();
+            const double rowFireLoad = count * cable.fireLoadMjPerM.value();
+            result.knownFireLoadMjPerM += rowFireLoad;
+            if (cable.fireLoadEstimated) {
+                result.estimatedFireLoadMjPerM += rowFireLoad;
+                ++result.estimatedFireLoadRows;
+            } else {
+                result.confirmedFireLoadMjPerM += rowFireLoad;
+            }
         } else {
             ++result.unknownFireLoadRows;
         }

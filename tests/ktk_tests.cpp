@@ -1,7 +1,10 @@
 #include "domain/calculator.h"
 #include "domain/catalogfilter.h"
+#include "domain/fireloadestimator.h"
 #include "data/catalogrepository.h"
 #include "io/xlsxprojectio.h"
+
+#include <xlsxdocument.h>
 
 #include <QCoreApplication>
 #include <QFile>
@@ -57,6 +60,8 @@ void testCalculator()
     second.outerDiameterMm = 20.0;
     second.massKgPerKm = 500.0;
     second.fireLoadMjPerM = 2.5;
+    second.fireLoadEstimated = true;
+    second.fireLoadBasis = QStringLiteral("test estimate");
 
     ktk::CableRow unknown;
     unknown.quantity = 1;
@@ -73,10 +78,53 @@ void testCalculator()
     requireNear(result.supportSystemMassKgPerM, 3.3, "support mass");
     requireNear(result.totalInstalledMassKgPerM, 4.0, "known total mass");
     requireNear(result.knownFireLoadMjPerM, 5.5, "fire load");
+    requireNear(result.confirmedFireLoadMjPerM, 3.0, "confirmed fire load");
+    requireNear(result.estimatedFireLoadMjPerM, 2.5, "estimated fire load");
     require(result.unknownMassRows == 1, "unknown mass count");
     require(result.unknownFireLoadRows == 1, "unknown fire load count");
+    require(result.estimatedFireLoadRows == 1, "estimated fire load rows");
     require(result.exceedsFillLimit, "fill limit");
     require(result.exceedsFireLoadLimit, "fire load limit");
+}
+
+void testFireLoadEstimator()
+{
+    ktk::CableRow yky;
+    yky.designation = QStringLiteral("YKYżo 0,6/1 kV 3 x 2,5 mm²");
+    yky.outerDiameterMm = 11.0;
+    yky.massKgPerKm = 200.0;
+
+    const auto estimate = ktk::FireLoadEstimator::estimate(yky);
+    require(estimate.has_value(), "YKY fire load estimate");
+    requireNear(estimate->fireLoadMjPerM, 3.32, "YKY conservative estimate");
+    require(
+        estimate->material.contains(QStringLiteral("PVC")),
+        "YKY estimated material");
+    require(
+        estimate->basis.contains(QStringLiteral("Oszacowanie materiałowe*")),
+        "estimate basis");
+
+    require(
+        ktk::FireLoadEstimator::applyIfMissing(&yky),
+        "apply fire load estimate");
+    require(yky.fireLoadEstimated, "estimated marker");
+    require(yky.fireLoadMjPerM.has_value(), "estimated value assigned");
+
+    yky.fireLoadMjPerM = 0.75;
+    yky.fireLoadEstimated = false;
+    yky.fireLoadBasis.clear();
+    require(
+        !ktk::FireLoadEstimator::applyIfMissing(&yky),
+        "manufacturer value is not overwritten");
+    requireNear(yky.fireLoadMjPerM.value(), 0.75, "manufacturer fire load");
+
+    ktk::CableRow unsupported;
+    unsupported.designation = QStringLiteral("Kabel specjalny 3 x 2,5 mm²");
+    unsupported.outerDiameterMm = 10.0;
+    unsupported.massKgPerKm = 150.0;
+    require(
+        !ktk::FireLoadEstimator::estimate(unsupported).has_value(),
+        "unknown material remains unknown");
 }
 
 void testCatalogFilter()
@@ -211,6 +259,8 @@ void testCatalog(const QString &databasePath)
     bool cobiMissingMass = false;
     bool tfkDirectFireLoad = false;
     bool legacyItemPreserved = false;
+    int estimatedFireLoads = 0;
+    int directEstimateBenchmarks = 0;
     int realYkyMatches = 0;
     ktk::CatalogFilterCriteria realQuery;
     realQuery.query = QStringLiteral("YKY 3 x 2,5");
@@ -224,9 +274,22 @@ void testCatalog(const QString &databasePath)
             && !item.cable.massKgPerKm.has_value()) {
             cobiMissingMass = true;
         }
+        if (item.cable.fireLoadEstimated) {
+            ++estimatedFireLoads;
+        }
         if (item.cable.manufacturer == QStringLiteral("TELE-FONIKA Kable")
-            && item.cable.fireLoadMjPerM.value_or(0.0) > 0.0) {
+            && item.cable.fireLoadMjPerM.value_or(0.0) > 0.0
+            && !item.cable.fireLoadEstimated) {
             tfkDirectFireLoad = true;
+            const auto benchmark =
+                ktk::FireLoadEstimator::estimate(item.cable);
+            if (benchmark.has_value()) {
+                ++directEstimateBenchmarks;
+                require(
+                    benchmark->fireLoadMjPerM + 1e-9
+                        >= item.cable.fireLoadMjPerM.value(),
+                    "estimate is conservative against TFK value");
+            }
         }
         if (item.cable.manufacturer == QStringLiteral("Własny")
             && item.cable.designation == QStringLiteral("Zachowany wpis")
@@ -240,6 +303,10 @@ void testCatalog(const QString &databasePath)
     require(manufacturers.contains(QStringLiteral("CobiCabling")), "Cobi catalog");
     require(cobiMissingMass, "Cobi missing mass remains unknown");
     require(tfkDirectFireLoad, "TFK direct heat of combustion");
+    require(estimatedFireLoads > 10000, "material fire load estimates");
+    require(
+        directEstimateBenchmarks >= 100,
+        "TFK direct-value estimate benchmarks");
     require(legacyItemPreserved, "legacy custom catalog item preserved");
     require(realYkyMatches > 0, "real catalog Outlook-style YKY query");
 }
@@ -254,6 +321,8 @@ int main(int argc, char *argv[])
     std::cerr << "calculator: passed\n";
     testCatalogFilter();
     std::cerr << "catalog filter: passed\n";
+    testFireLoadEstimator();
+    std::cerr << "fire load estimator: passed\n";
     QTemporaryDir directory;
     require(directory.isValid(), "temporary directory");
     std::cerr << "xlsx: temporary directory ready\n";
@@ -292,6 +361,15 @@ int main(int argc, char *argv[])
     unknown.fireLoadMjPerM.reset();
     original.cables.append(unknown);
 
+    ktk::CableRow estimated = cable;
+    estimated.designation = QStringLiteral("YKYżo 3 x 2,5 mm²");
+    estimated.quantity = 1;
+    estimated.fireLoadMjPerM = 0.95;
+    estimated.fireLoadEstimated = true;
+    estimated.fireLoadBasis =
+        QStringLiteral("Oszacowanie materiałowe*: test");
+    original.cables.append(estimated);
+
     const auto result = ktk::Calculator::calculate(original);
     const QString path = directory.filePath(QStringLiteral("projekt.xlsx"));
     QString error;
@@ -302,6 +380,18 @@ int main(int argc, char *argv[])
     }
     require(QFile::exists(path), "xlsx exists");
     std::cerr << "xlsx: export ready\n";
+    QXlsx::Document exportedWorkbook(path);
+    require(exportedWorkbook.load(), "load exported workbook");
+    require(
+        exportedWorkbook.selectSheet(QStringLiteral("Kable")),
+        "select exported cable sheet");
+    require(
+        exportedWorkbook.read(4, 7).toString().endsWith(QLatin1Char('*')),
+        "estimated XLSX value has star");
+    require(
+        exportedWorkbook.read(4, 8).toString().contains(
+            QStringLiteral("oszacowanie")),
+        "estimated XLSX origin");
 
     ktk::ProjectData loaded;
     const bool imported = ktk::XlsxProjectIo::importProject(path, &loaded, &error);
@@ -314,7 +404,7 @@ int main(int argc, char *argv[])
     require(loaded.route.projectName == original.route.projectName, "project name");
     requireNear(loaded.route.internalWidthMm, 200.0, "width");
     requireNear(loaded.route.suspensionHeightM, 0.8, "suspension height");
-    require(loaded.cables.size() == 2, "cable count");
+    require(loaded.cables.size() == 3, "cable count");
     require(loaded.cables.at(0).manufacturer == cable.manufacturer, "manufacturer");
     require(loaded.cables.at(0).designation == cable.designation, "designation");
     require(loaded.cables.at(0).quantity == 7, "quantity");
@@ -323,6 +413,16 @@ int main(int argc, char *argv[])
     requireNear(loaded.cables.at(0).fireLoadMjPerM.value_or(-1.0), 0.82, "fire load");
     require(!loaded.cables.at(1).massKgPerKm.has_value(), "missing mass");
     require(!loaded.cables.at(1).fireLoadMjPerM.has_value(), "missing fire load");
+    require(
+        loaded.cables.at(2).fireLoadEstimated,
+        "estimated fire load marker roundtrip");
+    requireNear(
+        loaded.cables.at(2).fireLoadMjPerM.value_or(-1.0),
+        0.95,
+        "estimated fire load roundtrip");
+    require(
+        loaded.cables.at(2).fireLoadBasis == estimated.fireLoadBasis,
+        "estimate basis roundtrip");
 
     std::cout << "xlsx roundtrip passed\n";
     return EXIT_SUCCESS;

@@ -1,6 +1,9 @@
 #include "ui/cabletablemodel.h"
 
+#include "domain/fireloadestimator.h"
+
 #include <QBrush>
+#include <QColor>
 #include <QLocale>
 
 namespace ktk {
@@ -45,6 +48,16 @@ QVariant CableTableModel::data(const QModelIndex &index, int role) const
     if (role == Qt::ForegroundRole && invalid) {
         return QBrush(QColor(QStringLiteral("#fecaca")));
     }
+    if (role == Qt::BackgroundRole
+        && index.column() == FireLoad
+        && cable.fireLoadEstimated) {
+        return QBrush(QColor(QStringLiteral("#3b2f17")));
+    }
+    if (role == Qt::ForegroundRole
+        && index.column() == FireLoad
+        && cable.fireLoadEstimated) {
+        return QBrush(QColor(QStringLiteral("#fde68a")));
+    }
     if (role == Qt::ToolTipRole) {
         if (index.column() == Mass && !cable.massKgPerKm.has_value()) {
             return tr("Brak masy w katalogu producenta. Wiersz nie jest dodawany do "
@@ -53,6 +66,9 @@ QVariant CableTableModel::data(const QModelIndex &index, int role) const
         if (index.column() == FireLoad && !cable.fireLoadMjPerM.has_value()) {
             return tr("Brak potwierdzonej wartości MJ/m. Wiersz nie jest dodawany do sumy "
                       "obciążenia ogniowego.");
+        }
+        if (index.column() == FireLoad && cable.fireLoadEstimated) {
+            return cable.fireLoadBasis;
         }
         if (index.column() == Source) {
             return cable.source;
@@ -83,7 +99,11 @@ QVariant CableTableModel::data(const QModelIndex &index, int role) const
             return edit ? QVariant() : QVariant(tr("brak danych"));
         }
         return edit ? QVariant(cable.fireLoadMjPerM.value())
-                    : QVariant(displayNumber(cable.fireLoadMjPerM.value(), 3));
+                    : QVariant(
+                        displayNumber(cable.fireLoadMjPerM.value(), 3)
+                        + (cable.fireLoadEstimated
+                               ? QStringLiteral("*")
+                               : QString()));
     case CprClass:
         return cable.cprClass;
     case Source:
@@ -140,6 +160,7 @@ bool CableTableModel::setData(const QModelIndex &index, const QVariant &value, i
     }
 
     auto &cable = m_cables[index.row()];
+    const bool estimateWasGenerated = cable.fireLoadEstimated;
     bool ok = true;
     switch (index.column()) {
     case Manufacturer:
@@ -177,6 +198,8 @@ bool CableTableModel::setData(const QModelIndex &index, const QVariant &value, i
                 cable.fireLoadMjPerM = parsed;
             }
         }
+        cable.fireLoadEstimated = false;
+        cable.fireLoadBasis.clear();
         break;
     case CprClass:
         cable.cprClass = value.toString().trimmed();
@@ -192,10 +215,28 @@ bool CableTableModel::setData(const QModelIndex &index, const QVariant &value, i
         return false;
     }
 
+    const bool estimationInputChanged =
+        index.column() == Designation
+        || index.column() == Diameter
+        || index.column() == Mass;
+    if (estimationInputChanged && estimateWasGenerated) {
+        cable.fireLoadMjPerM.reset();
+        cable.fireLoadEstimated = false;
+        cable.fireLoadBasis.clear();
+    }
+    if ((estimationInputChanged || index.column() == FireLoad)
+        && !cable.fireLoadMjPerM.has_value()) {
+        FireLoadEstimator::applyIfMissing(&cable);
+    }
+
     emit dataChanged(
-        index,
-        index,
-        {Qt::DisplayRole, Qt::EditRole, Qt::BackgroundRole, Qt::ForegroundRole});
+        this->index(index.row(), 0),
+        this->index(index.row(), ColumnCount - 1),
+        {Qt::DisplayRole,
+         Qt::EditRole,
+         Qt::ToolTipRole,
+         Qt::BackgroundRole,
+         Qt::ForegroundRole});
     emit cablesChanged();
     return true;
 }
@@ -217,7 +258,9 @@ void CableTableModel::addCable(const CableRow &cable)
 {
     const int row = m_cables.size();
     beginInsertRows({}, row, row);
-    m_cables.append(cable);
+    CableRow enriched = cable;
+    FireLoadEstimator::applyIfMissing(&enriched);
+    m_cables.append(enriched);
     endInsertRows();
     emit cablesChanged();
 }
@@ -226,6 +269,9 @@ void CableTableModel::setCables(const QVector<CableRow> &cables)
 {
     beginResetModel();
     m_cables = cables;
+    for (auto &cable : m_cables) {
+        FireLoadEstimator::applyIfMissing(&cable);
+    }
     endResetModel();
     emit cablesChanged();
 }

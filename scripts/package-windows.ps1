@@ -1,6 +1,6 @@
 param(
     [string]$Preset = "windows-release",
-    [string]$Version = "0.3.0"
+    [string]$Version = "0.4.0"
 )
 
 $ErrorActionPreference = "Stop"
@@ -40,7 +40,13 @@ if (-not (Test-Path -LiteralPath $executable)) {
 
 Copy-Item -LiteralPath $executable -Destination $stageRoot
 Copy-Item -LiteralPath (Join-Path $projectRoot "LICENSE.md") -Destination $stageRoot
+Copy-Item -LiteralPath (Join-Path $projectRoot "README.md") -Destination $stageRoot
 Copy-Item -LiteralPath (Join-Path $projectRoot "THIRD_PARTY_NOTICES.md") -Destination $stageRoot
+
+$docsDirectory = Join-Path $stageRoot "docs"
+New-Item -ItemType Directory -Path $docsDirectory -Force | Out-Null
+Copy-Item -LiteralPath (Join-Path $projectRoot "docs\fire-load-estimation.md") `
+    -Destination $docsDirectory
 
 $licenseDirectory = Join-Path $stageRoot "licenses"
 New-Item -ItemType Directory -Path $licenseDirectory -Force | Out-Null

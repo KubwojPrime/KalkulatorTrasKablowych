@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 project(KalkulatorTrasKablowych
-    VERSION 0.3.0
+    VERSION 0.4.0
     DESCRIPTION "Kalkulator wypelnienia, masy i obciazenia ogniowego tras kablowych"
     LANGUAGES CXX
 )
@@ -38,6 +38,8 @@ add_library(ktk_core STATIC
     src/domain/calculator.h
     src/domain/catalogfilter.cpp
     src/domain/catalogfilter.h
+    src/domain/fireloadestimator.cpp
+    src/domain/fireloadestimator.h
     src/domain/types.h
 )
 target_link_libraries(ktk_core PUBLIC Qt6::Core)
@@ -93,8 +95,13 @@ endif()
 install(TARGETS KalkulatorTrasKablowych RUNTIME DESTINATION .)
 install(FILES
     LICENSE.md
+    README.md
     THIRD_PARTY_NOTICES.md
     DESTINATION .
+)
+install(FILES
+    docs/fire-load-estimation.md
+    DESTINATION docs
 )
 install(FILES
     third_party/QXlsx/LICENSE

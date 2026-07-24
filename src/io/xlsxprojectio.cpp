@@ -4,13 +4,14 @@
 #include <xlsxformat.h>
 
 #include <QFileInfo>
+#include <QLocale>
 #include <QStringList>
 
 namespace ktk {
 
 namespace {
 
-constexpr int SchemaVersion = 2;
+constexpr int SchemaVersion = 3;
 
 void setError(QString *target, const QString &message)
 {
@@ -97,6 +98,8 @@ bool XlsxProjectIo::exportProject(
         QStringLiteral("D [mm]"),
         QStringLiteral("Masa [kg/km]"),
         QStringLiteral("Obciążenie ogniowe [MJ/m/szt.]"),
+        QStringLiteral("Pochodzenie MJ/m"),
+        QStringLiteral("Podstawa oszacowania"),
         QStringLiteral("CPR"),
         QStringLiteral("Źródło")
     };
@@ -110,8 +113,10 @@ bool XlsxProjectIo::exportProject(
     document.setColumnWidth(5, 12);
     document.setColumnWidth(6, 15);
     document.setColumnWidth(7, 26);
-    document.setColumnWidth(8, 18);
-    document.setColumnWidth(9, 54);
+    document.setColumnWidth(8, 24);
+    document.setColumnWidth(9, 70);
+    document.setColumnWidth(10, 18);
+    document.setColumnWidth(11, 54);
 
     for (int index = 0; index < project.cables.size(); ++index) {
         const int row = index + 2;
@@ -125,10 +130,27 @@ bool XlsxProjectIo::exportProject(
             document.write(row, 6, cable.massKgPerKm.value());
         }
         if (cable.fireLoadMjPerM.has_value()) {
-            document.write(row, 7, cable.fireLoadMjPerM.value());
+            if (cable.fireLoadEstimated) {
+                document.write(
+                    row,
+                    7,
+                    QString::number(cable.fireLoadMjPerM.value(), 'f', 3)
+                        + QStringLiteral("*"));
+            } else {
+                document.write(row, 7, cable.fireLoadMjPerM.value());
+            }
         }
-        document.write(row, 8, cable.cprClass);
-        document.write(row, 9, cable.source);
+        document.write(
+            row,
+            8,
+            cable.fireLoadMjPerM.has_value()
+                ? (cable.fireLoadEstimated
+                       ? QStringLiteral("oszacowanie materiałowe*")
+                       : QStringLiteral("wartość podana / producent"))
+                : QStringLiteral("brak"));
+        document.write(row, 9, cable.fireLoadBasis);
+        document.write(row, 10, cable.cprClass);
+        document.write(row, 11, cable.source);
     }
 
     document.addSheet(QStringLiteral("Raport"));
@@ -147,9 +169,20 @@ bool XlsxProjectIo::exportProject(
                   result.totalInstalledMassKgPerM);
     writeKeyValue(document, 8, QStringLiteral("Wiersze bez danych masowych"),
                   result.unknownMassRows);
-    writeKeyValue(document, 9, QStringLiteral("Znane obciążenie ogniowe [MJ/m]"),
-                  result.knownFireLoadMjPerM);
-    writeKeyValue(document, 10, QStringLiteral("Wiersze bez danych ogniowych"),
+    writeKeyValue(
+        document,
+        9,
+        result.estimatedFireLoadRows > 0
+            ? QStringLiteral("Łączne obciążenie ogniowe* [MJ/m]")
+            : QStringLiteral("Łączne obciążenie ogniowe [MJ/m]"),
+        result.knownFireLoadMjPerM);
+    writeKeyValue(document, 10, QStringLiteral("Wartości bez * [MJ/m]"),
+                  result.confirmedFireLoadMjPerM);
+    writeKeyValue(document, 11, QStringLiteral("Oszacowane materiałowo* [MJ/m]"),
+                  result.estimatedFireLoadMjPerM);
+    writeKeyValue(document, 12, QStringLiteral("Wiersze z oszacowaniem*"),
+                  result.estimatedFireLoadRows);
+    writeKeyValue(document, 13, QStringLiteral("Wiersze bez danych ogniowych"),
                   result.unknownFireLoadRows);
     QStringList completeness;
     if (result.unknownMassRows > 0) {
@@ -158,9 +191,15 @@ bool XlsxProjectIo::exportProject(
     if (result.unknownFireLoadRows > 0) {
         completeness << QStringLiteral("Wynik obciążenia ogniowego jest niepełny.");
     }
+    if (result.estimatedFireLoadRows > 0) {
+        completeness
+            << QStringLiteral(
+                   "* Wynik zawiera oszacowania materiałowe. Nie zastępują one "
+                   "wartości z karty producenta ani uzgodnienia z projektantem ppoż.");
+    }
     writeKeyValue(
         document,
-        12,
+        15,
         QStringLiteral("Wniosek"),
         completeness.isEmpty()
             ? QStringLiteral("Wszystkie wiersze mają dane masowe i ogniowe.")
@@ -174,6 +213,13 @@ bool XlsxProjectIo::exportProject(
     document.write(2, 2, SchemaVersion);
     document.write(3, 1, QStringLiteral("formula"));
     document.write(3, 2, QStringLiteral("sum(quantity * outerDiameterMm^2)"));
+    document.write(4, 1, QStringLiteral("fireLoadEstimate"));
+    document.write(
+        4,
+        2,
+        QStringLiteral(
+            "* = konserwatywne oszacowanie materiałowo-geometryczne; "
+            "docs/fire-load-estimation.md"));
 
     if (!document.saveAs(path)) {
         setError(errorMessage,
@@ -260,15 +306,35 @@ bool XlsxProjectIo::importProject(
             }
         }
         const QVariant fireLoad = document.read(row, 7);
-        if (fireLoad.isValid() && !fireLoad.toString().trimmed().isEmpty()) {
+        QString fireLoadText = fireLoad.toString().trimmed();
+        const bool starMarker = fireLoadText.endsWith(QLatin1Char('*'));
+        fireLoadText.remove(QLatin1Char('*'));
+        if (fireLoad.isValid() && !fireLoadText.isEmpty()) {
             bool ok = false;
-            const double value = fireLoad.toDouble(&ok);
+            double value = fireLoad.toDouble(&ok);
+            if (!ok) {
+                value = QLocale::c().toDouble(
+                    QString(fireLoadText).replace(',', '.'),
+                    &ok);
+            }
             if (ok) {
                 cable.fireLoadMjPerM = value;
             }
         }
-        cable.cprClass = document.read(row, 8).toString();
-        cable.source = document.read(row, 9).toString();
+        if (schemaVersion >= 3) {
+            const QString origin = document.read(row, 8).toString();
+            cable.fireLoadEstimated =
+                starMarker
+                || origin.contains(
+                    QStringLiteral("oszacowanie"),
+                    Qt::CaseInsensitive);
+            cable.fireLoadBasis = document.read(row, 9).toString();
+            cable.cprClass = document.read(row, 10).toString();
+            cable.source = document.read(row, 11).toString();
+        } else {
+            cable.cprClass = document.read(row, 8).toString();
+            cable.source = document.read(row, 9).toString();
+        }
         loaded.cables.append(cable);
     }
 

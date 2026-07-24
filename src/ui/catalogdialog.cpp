@@ -4,6 +4,7 @@
 
 #include <QComboBox>
 #include <QCompleter>
+#include <QColor>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QHeaderView>
@@ -109,7 +110,8 @@ CatalogDialog::CatalogDialog(const QVector<CatalogItem> &items, QWidget *parent)
     auto *help = new QLabel(
         tr("Wyszukiwanie łączy słowa operatorem AND. Materiał izolacji/powłoki "
            "jest rozpoznawany z oznaczenia kabla i powinien być potwierdzony "
-           "w karcie producenta."),
+           "w karcie producenta. * w kolumnie MJ/m oznacza konserwatywne "
+           "oszacowanie materiałowe, a nie wartość producenta."),
         this);
     help->setWordWrap(true);
     help->setProperty("role", QStringLiteral("muted"));
@@ -286,10 +288,19 @@ void CatalogDialog::rebuildTable()
             entry.cable.massKgPerKm.has_value()
                 ? QLocale().toString(entry.cable.massKgPerKm.value(), 'f', 2)
                 : tr("brak")));
-        m_table->setItem(row, 5, new QTableWidgetItem(
+        auto *fireLoad = new QTableWidgetItem(
             entry.cable.fireLoadMjPerM.has_value()
                 ? QLocale().toString(entry.cable.fireLoadMjPerM.value(), 'f', 3)
-                : tr("brak")));
+                    + (entry.cable.fireLoadEstimated
+                           ? QStringLiteral("*")
+                           : QString())
+                : tr("brak"));
+        if (entry.cable.fireLoadEstimated) {
+            fireLoad->setToolTip(entry.cable.fireLoadBasis);
+            fireLoad->setForeground(QColor(QStringLiteral("#fde68a")));
+            fireLoad->setBackground(QColor(QStringLiteral("#3b2f17")));
+        }
+        m_table->setItem(row, 5, fireLoad);
         m_table->setItem(row, 6, new QTableWidgetItem(entry.cable.cprClass));
         m_table->setItem(row, 7, new QTableWidgetItem(
             entry.verified ? tr("sprawdzone") : tr("do weryfikacji")));

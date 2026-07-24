@@ -95,9 +95,9 @@ bool tokenListsMatch(const QStringList &required, const QString &text)
         });
 }
 
-QString normalizedMaterialText(const CatalogItem &item)
+QString normalizedMaterialText(const CableRow &cable)
 {
-    return folded(item.cable.designation).toUpper().replace(
+    return folded(cable.designation).toUpper().replace(
         QRegularExpression(QStringLiteral(R"([^A-Z0-9]+)")),
         QStringLiteral(" "));
 }
@@ -148,29 +148,32 @@ QString CatalogFilter::cableFamily(const CatalogItem &item)
     return family.isEmpty() ? item.cable.designation.trimmed() : family;
 }
 
-QStringList CatalogFilter::insulationTags(const CatalogItem &item)
+QStringList CatalogFilter::insulationTags(const CableRow &cable)
 {
-    const QString text = normalizedMaterialText(item);
+    const QString text = normalizedMaterialText(cable);
     QStringList tags;
 
     static const QRegularExpression pvcPattern(
         QStringLiteral(
-            R"(\b(?:YKY|YAKY|YDY|YADY|YKSY|YKSLY|YSLY|YLY|YTKSY|LIYY|H0[357]VV|H0[57]V|OMY|OWY)[A-Z0-9]*\b)"),
+            R"(\b(?:YKY|YNKY|YAKY|YDY|YADY|YKSY|YKSLY|YSLY|YLY|YLGY|YTKSY|YSTY|NYY|NYCY|LIY|H0[357]VV|H0[57]V|OMY|OWY)[A-Z0-9]*\b)"),
         QRegularExpression::CaseInsensitiveOption);
     static const QRegularExpression xlpePattern(
         QStringLiteral(
-            R"(\b(?:N2X|NA2X|N2XH|N2XCH|NHXH|NHXCH|YKXS|YAKXS|XRUHA|A2XS|AALXS)[A-Z0-9]*\b)"),
+            R"(\b(?:N2X|NA2X|N2XH|N2XCH|NHXH|NHXCH|YKXS|YNKXS|XNKXS|YAKXS|XRUHA|A2XS|AALXS)[A-Z0-9]*\b)"),
         QRegularExpression::CaseInsensitiveOption);
     static const QRegularExpression polyethylenePattern(
         QStringLiteral(R"(\b(?:LI2Y|2Y|XzTKMXpw|XzTKMXpwn)[A-Z0-9]*\b)"),
         QRegularExpression::CaseInsensitiveOption);
     static const QRegularExpression halogenFreePattern(
         QStringLiteral(
-            R"(\b(?:N2XH|N2XCH|NHXH|NHXCH|H0[157]Z|HTKSH|HDGS|JE H|LSZH|LSOH|LS0H)[A-Z0-9]*\b)"),
+            R"(\b(?:N2XH|N2XCH|NHXH|NHXCH|H0[157]Z|HTKSH|HDGS|JE H|LIHCH|LIHH|HKSLH|LSZH|LSOH|LS0H)[A-Z0-9]*\b)"),
         QRegularExpression::CaseInsensitiveOption);
     static const QRegularExpression rubberPattern(
         QStringLiteral(
             R"(\b(?:H0[57]RN|H07BB|NSSH|NSHT|NSGAF|H01N2|ONPD|OGL)[A-Z0-9]*\b)"),
+        QRegularExpression::CaseInsensitiveOption);
+    static const QRegularExpression polyurethanePattern(
+        QStringLiteral(R"(\b[A-Z0-9]*(?:CPUR|PUR)\b)"),
         QRegularExpression::CaseInsensitiveOption);
 
     const bool pvc = pvcPattern.match(text).hasMatch();
@@ -178,6 +181,7 @@ QStringList CatalogFilter::insulationTags(const CatalogItem &item)
     const bool polyethylene = polyethylenePattern.match(text).hasMatch();
     const bool halogenFree = halogenFreePattern.match(text).hasMatch();
     const bool rubber = rubberPattern.match(text).hasMatch();
+    const bool polyurethane = polyurethanePattern.match(text).hasMatch();
 
     if (pvc) {
         tags.append(QStringLiteral("PVC"));
@@ -194,7 +198,15 @@ QStringList CatalogFilter::insulationTags(const CatalogItem &item)
     if (rubber) {
         tags.append(QStringLiteral("guma / elastomer"));
     }
+    if (polyurethane) {
+        tags.append(QStringLiteral("PUR / poliuretan"));
+    }
     return tags;
+}
+
+QStringList CatalogFilter::insulationTags(const CatalogItem &item)
+{
+    return insulationTags(item.cable);
 }
 
 QStringList CatalogFilter::fireResistanceTags(const CatalogItem &item)

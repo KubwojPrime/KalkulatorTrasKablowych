@@ -29,6 +29,7 @@ public:
     [[nodiscard]] static QStringList queryTokens(const QString &text);
 
     [[nodiscard]] static QString cableFamily(const CatalogItem &item);
+    [[nodiscard]] static QStringList insulationTags(const CableRow &cable);
     [[nodiscard]] static QStringList insulationTags(const CatalogItem &item);
     [[nodiscard]] static QStringList fireResistanceTags(const CatalogItem &item);
 

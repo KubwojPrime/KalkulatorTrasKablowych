@@ -15,6 +15,8 @@ struct CableRow {
     double outerDiameterMm = 0.0;
     std::optional<double> massKgPerKm;
     std::optional<double> fireLoadMjPerM;
+    bool fireLoadEstimated = false;
+    QString fireLoadBasis;
     QString cprClass;
     QString source;
 };
@@ -49,8 +51,11 @@ struct CalculationResult {
     double totalInstalledMassKgPerM = 0.0;
 
     double knownFireLoadMjPerM = 0.0;
+    double confirmedFireLoadMjPerM = 0.0;
+    double estimatedFireLoadMjPerM = 0.0;
     int unknownMassRows = 0;
     int unknownFireLoadRows = 0;
+    int estimatedFireLoadRows = 0;
     int invalidRows = 0;
 
     bool exceedsFillLimit = false;
