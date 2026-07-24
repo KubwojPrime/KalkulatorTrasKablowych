@@ -4,12 +4,13 @@
 #include <xlsxformat.h>
 
 #include <QFileInfo>
+#include <QStringList>
 
 namespace ktk {
 
 namespace {
 
-constexpr int SchemaVersion = 1;
+constexpr int SchemaVersion = 2;
 
 void setError(QString *target, const QString &message)
 {
@@ -120,7 +121,9 @@ bool XlsxProjectIo::exportProject(
         document.write(row, 3, cable.catalogCode);
         document.write(row, 4, cable.quantity);
         document.write(row, 5, cable.outerDiameterMm);
-        document.write(row, 6, cable.massKgPerKm);
+        if (cable.massKgPerKm.has_value()) {
+            document.write(row, 6, cable.massKgPerKm.value());
+        }
         if (cable.fireLoadMjPerM.has_value()) {
             document.write(row, 7, cable.fireLoadMjPerM.value());
         }
@@ -136,19 +139,32 @@ bool XlsxProjectIo::exportProject(
                   result.reservedCableAreaMm2);
     writeKeyValue(document, 2, QStringLiteral("Pole trasy [mm²]"), result.routeAreaMm2);
     writeKeyValue(document, 3, QStringLiteral("Wypełnienie [%]"), result.fillPercent);
-    writeKeyValue(document, 5, QStringLiteral("Masa kabli [kg/m]"), result.cableMassKgPerM);
+    writeKeyValue(document, 5, QStringLiteral("Znana masa kabli [kg/m]"),
+                  result.cableMassKgPerM);
     writeKeyValue(document, 6, QStringLiteral("Masa trasy i zawieszeń [kg/m]"),
                   result.supportSystemMassKgPerM);
-    writeKeyValue(document, 7, QStringLiteral("Masa kompletna [kg/m]"),
+    writeKeyValue(document, 7, QStringLiteral("Znana masa kompletna [kg/m]"),
                   result.totalInstalledMassKgPerM);
+    writeKeyValue(document, 8, QStringLiteral("Wiersze bez danych masowych"),
+                  result.unknownMassRows);
     writeKeyValue(document, 9, QStringLiteral("Znane obciążenie ogniowe [MJ/m]"),
                   result.knownFireLoadMjPerM);
     writeKeyValue(document, 10, QStringLiteral("Wiersze bez danych ogniowych"),
                   result.unknownFireLoadRows);
-    writeKeyValue(document, 12, QStringLiteral("Wniosek"),
-                  result.unknownFireLoadRows > 0
-                      ? QStringLiteral("Wynik obciążenia ogniowego jest niepełny.")
-                      : QStringLiteral("Wszystkie wiersze mają dane ogniowe."));
+    QStringList completeness;
+    if (result.unknownMassRows > 0) {
+        completeness << QStringLiteral("Wynik masy jest niepełny.");
+    }
+    if (result.unknownFireLoadRows > 0) {
+        completeness << QStringLiteral("Wynik obciążenia ogniowego jest niepełny.");
+    }
+    writeKeyValue(
+        document,
+        12,
+        QStringLiteral("Wniosek"),
+        completeness.isEmpty()
+            ? QStringLiteral("Wszystkie wiersze mają dane masowe i ogniowe.")
+            : completeness.join(QLatin1Char(' ')));
 
     document.addSheet(QStringLiteral("Meta"));
     document.selectSheet(QStringLiteral("Meta"));
@@ -235,7 +251,14 @@ bool XlsxProjectIo::importProject(
         cable.catalogCode = document.read(row, 3).toString();
         cable.quantity = document.read(row, 4).toInt();
         cable.outerDiameterMm = readDouble(document, row, 5, 0.0);
-        cable.massKgPerKm = readDouble(document, row, 6, 0.0);
+        const QVariant mass = document.read(row, 6);
+        if (mass.isValid() && !mass.toString().trimmed().isEmpty()) {
+            bool ok = false;
+            const double value = mass.toDouble(&ok);
+            if (ok) {
+                cable.massKgPerKm = value;
+            }
+        }
         const QVariant fireLoad = document.read(row, 7);
         if (fireLoad.isValid() && !fireLoad.toString().trimmed().isEmpty()) {
             bool ok = false;

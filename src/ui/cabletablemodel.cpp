@@ -37,7 +37,8 @@ QVariant CableTableModel::data(const QModelIndex &index, int role) const
 
     const auto &cable = m_cables.at(index.row());
     const bool invalid =
-        cable.quantity <= 0 || cable.outerDiameterMm <= 0.0 || cable.massKgPerKm < 0.0;
+        cable.quantity <= 0 || cable.outerDiameterMm <= 0.0
+        || (cable.massKgPerKm.has_value() && cable.massKgPerKm.value() < 0.0);
     if (role == Qt::BackgroundRole && invalid) {
         return QBrush(QColor(QStringLiteral("#3f1d24")));
     }
@@ -45,6 +46,10 @@ QVariant CableTableModel::data(const QModelIndex &index, int role) const
         return QBrush(QColor(QStringLiteral("#fecaca")));
     }
     if (role == Qt::ToolTipRole) {
+        if (index.column() == Mass && !cable.massKgPerKm.has_value()) {
+            return tr("Brak masy w katalogu producenta. Wiersz nie jest dodawany do "
+                      "sumy masy kabli.");
+        }
         if (index.column() == FireLoad && !cable.fireLoadMjPerM.has_value()) {
             return tr("Brak potwierdzonej wartości MJ/m. Wiersz nie jest dodawany do sumy "
                       "obciążenia ogniowego.");
@@ -68,7 +73,11 @@ QVariant CableTableModel::data(const QModelIndex &index, int role) const
     case Diameter:
         return edit ? QVariant(cable.outerDiameterMm) : QVariant(displayNumber(cable.outerDiameterMm, 2));
     case Mass:
-        return edit ? QVariant(cable.massKgPerKm) : QVariant(displayNumber(cable.massKgPerKm, 2));
+        if (!cable.massKgPerKm.has_value()) {
+            return edit ? QVariant() : QVariant(tr("brak danych"));
+        }
+        return edit ? QVariant(cable.massKgPerKm.value())
+                    : QVariant(displayNumber(cable.massKgPerKm.value(), 2));
     case FireLoad:
         if (!cable.fireLoadMjPerM.has_value()) {
             return edit ? QVariant() : QVariant(tr("brak danych"));
@@ -150,7 +159,14 @@ bool CableTableModel::setData(const QModelIndex &index, const QVariant &value, i
         cable.outerDiameterMm = localizedDouble(value, &ok);
         break;
     case Mass:
-        cable.massKgPerKm = localizedDouble(value, &ok);
+        if (value.toString().trimmed().isEmpty()) {
+            cable.massKgPerKm.reset();
+        } else {
+            const double parsed = localizedDouble(value, &ok);
+            if (ok) {
+                cable.massKgPerKm = parsed;
+            }
+        }
         break;
     case FireLoad:
         if (value.toString().trimmed().isEmpty()) {

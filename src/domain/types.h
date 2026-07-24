@@ -13,7 +13,7 @@ struct CableRow {
     QString catalogCode;
     int quantity = 1;
     double outerDiameterMm = 0.0;
-    double massKgPerKm = 0.0;
+    std::optional<double> massKgPerKm;
     std::optional<double> fireLoadMjPerM;
     QString cprClass;
     QString source;
@@ -49,6 +49,7 @@ struct CalculationResult {
     double totalInstalledMassKgPerM = 0.0;
 
     double knownFireLoadMjPerM = 0.0;
+    int unknownMassRows = 0;
     int unknownFireLoadRows = 0;
     int invalidRows = 0;
 
@@ -61,6 +62,10 @@ struct CatalogItem {
     CableRow cable;
     QString sourceDate;
     QString notes;
+    QString sourceFile;
+    int sourcePage = 0;
+    QString sourceUrl;
+    QString extractionMethod;
     bool verified = false;
 };
 

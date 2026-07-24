@@ -11,10 +11,12 @@ Natywna aplikacja Windows do obliczania:
 - schematycznego ułożenia kabli od największej średnicy;
 - importu i eksportu projektu oraz raportu w formacie XLSX.
 
-Projekt jest na etapie pierwszego działającego kamienia milowego. Startowa baza zawiera
-jedynie kilka zweryfikowanych pozycji demonstracyjnych ELPAR. Rozszerzenie katalogów
-TELE-FONIKA, ELPAR, Bitner, CobiCabling i BAKS jest osobnym, kontrolowanym strumieniem
-danych — każdy rekord musi mieć źródło i datę weryfikacji.
+Wersjonowana baza aplikacji jest generowana z oficjalnych katalogów TELE-FONIKA,
+ELPAR, BITNER i CobiCabling. Każdy rekord zachowuje producenta, wariant, kod
+katalogowy, dokładny plik i stronę PDF, adres źródłowy oraz metodę ekstrakcji.
+Zestaw `2026-07-24.1` zawiera 25 065 wariantów: 13 525 BITNER, 8 616 ELPAR,
+2 896 TELE-FONIKA Kable i 28 CobiCabling. Rekordy pozyskane automatycznie mają
+status „do weryfikacji”.
 
 ## Materiały źródłowe
 
@@ -28,9 +30,16 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass `
   -File .\scripts\verify-source-materials.ps1
 ```
 
-Każda przyszła pozycja katalogowa programu powinna wskazywać dokładny plik i
-stronę źródłową. Pobrane dokumenty nie zawierają bezpośrednich wartości
-kaloryczności wszystkich kabli w `MJ/m`; CPR nie jest używane jako ich zamiennik.
+Spójność wygenerowanego zestawu danych i jego powiązanie z archiwum można
+sprawdzić poleceniem:
+
+```powershell
+python .\tools\verify_catalog_dataset.py
+```
+
+Dla części wariantów TELE-FONIKA katalog podaje ciepło spalania w `kWh/m`;
+program przelicza je jednostkowo przez `3,6` na `MJ/m`. Dla pozostałych kabli
+brak pozostaje brakiem danych. CPR nie jest używane jako zamiennik.
 
 ## Zasady obliczeń
 
@@ -51,6 +60,9 @@ masa podpór [kg/m] =
 masa kompletna = kable + koryto + pokrywa + podpory
 ```
 
+Brak masy katalogowej nie jest traktowany jako zero. Pokazana suma jest wtedy
+oznaczona jako wartość minimalna.
+
 Obciążenie ogniowe:
 
 ```text
@@ -59,6 +71,20 @@ obciążenie ogniowe [MJ/m] = Σ(ilość × wartość katalogowa kabla [MJ/m])
 
 Brak wartości `MJ/m` nie jest traktowany jako zero. Raport wyraźnie oznacza wynik
 niepełny. Klasa CPR nie jest przeliczana na obciążenie ogniowe.
+
+## Aktualizacja katalogu aplikacji
+
+Po dodaniu lub zmianie oficjalnych materiałów:
+
+```powershell
+python -m pip install -r .\tools\requirements.txt
+python .\tools\extract_cable_catalogs.py
+python .\tools\verify_catalog_dataset.py
+```
+
+Generator zapisuje dane aplikacji w `resources/catalog-seed.json`, pełne
+podsumowanie w `source-materials/extraction-report.json` oraz odrzucone,
+niejednoznaczne wiersze w `source-materials/extraction-rejects.json`.
 
 ## Budowanie na Windows
 

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 project(KalkulatorTrasKablowych
-    VERSION 0.1.1
+    VERSION 0.2.0
     DESCRIPTION "Kalkulator wypelnienia, masy i obciazenia ogniowego tras kablowych"
     LANGUAGES CXX
 )
@@ -104,8 +104,16 @@ include(CTest)
 if(BUILD_TESTING AND KTK_BUILD_TESTS)
     add_executable(ktk_tests
         tests/ktk_tests.cpp
+        src/data/catalogrepository.cpp
+        src/data/catalogrepository.h
         src/io/xlsxprojectio.cpp
         src/io/xlsxprojectio.h
+    )
+    qt_add_resources(ktk_tests "ktk_test_resources"
+        PREFIX "/"
+        BASE "${CMAKE_CURRENT_SOURCE_DIR}/resources"
+        FILES
+            resources/catalog-seed.json
     )
     target_include_directories(ktk_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
     target_link_libraries(ktk_tests PRIVATE
@@ -113,6 +121,7 @@ if(BUILD_TESTING AND KTK_BUILD_TESTS)
         QXlsx::QXlsx
         Qt6::Core
         Qt6::Gui
+        Qt6::Sql
     )
     add_test(NAME core_and_xlsx COMMAND ktk_tests)
 endif()

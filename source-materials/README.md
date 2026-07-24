@@ -11,6 +11,11 @@ Stan archiwum na 2026-07-24:
 - 1999 stron;
 - 144 565 988 bajtów (137,87 MiB).
 
+Wygenerowany zestaw `2026-07-24.1` zawiera 25 065 wariantów. Raport zachowuje
+cztery odrzucone wiersze BITNER: dwa bez parametrów liczbowych i dwa z podaną
+przez katalog, fizycznie niespójną średnicą `106 mm`. Nie wprowadzono korekt
+opartych na domyśle.
+
 Szczegółowe adresy URL, daty pobrania, liczby stron, rozmiary i skróty SHA-256
 znajdują się w pliku [`manifest.json`](manifest.json).
 
@@ -23,6 +28,8 @@ source-materials/
   bitner/
   cobicabling/
   manifest.json
+  extraction-report.json
+  extraction-rejects.json
   SHA256SUMS.txt
 ```
 
@@ -40,13 +47,13 @@ SHA-256 względem manifestu. Zmiana choćby jednego bajtu powoduje błąd.
 
 ## Zasady użycia danych w programie
 
-Każdy rekord katalogowy w aplikacji powinien wskazywać:
+Każdy rekord katalogowy w aplikacji wskazuje:
 
 1. producenta;
 2. dokładny plik z tego katalogu;
 3. numer strony PDF;
 4. oznaczenie kabla i wariant/przekrój z tabeli;
-5. datę weryfikacji;
+5. datę pozyskania źródła i status weryfikacji;
 6. informację, czy parametr jest wartością dokładną, przybliżoną lub zakresem.
 
 Dla średnicy zewnętrznej używanej we wzorze `ilość × D²` należy przyjmować
@@ -55,16 +62,18 @@ Masa musi pochodzić bezpośrednio z tabeli producenta i zachowywać jednostkę
 `kg/km`.
 
 Klasa CPR, odporność ogniowa i obciążenie ogniowe są różnymi danymi.
-W obecnym zestawie nie znaleziono bezpośrednich wartości kaloryczności w
-`MJ/m`. Nie wolno obliczać `MJ/m` z klasy CPR ani wpisywać zera w miejsce
-brakującej wartości. Takie dane wymagają odrębnej karty producenta, raportu
-badawczego albo pisemnego potwierdzenia producenta.
+Dla części wariantów TELE-FONIKA katalog podaje ciepło spalania w `kWh/m`;
+zapis w aplikacji powstaje wyłącznie przez przeliczenie jednostek `1 kWh =
+3,6 MJ`. Nie wolno obliczać `MJ/m` z klasy CPR ani wpisywać zera w miejsce
+brakującej wartości. Pozostałe dane wymagają odrębnej karty producenta,
+raportu badawczego albo pisemnego potwierdzenia producenta.
 
 ## Zakres i ograniczenia źródeł
 
 - **TELE-FONIKA Kable**: aktualny katalog elektroenergetyczny 2026, katalog
   telekomunikacyjny 2025 oraz przewodnik CPR. Katalogi zawierają tabele średnic,
-  mas i klasy reakcji na ogień.
+  mas i klasy reakcji na ogień. Część tabel katalogu elektroenergetycznego
+  zawiera również ciepło spalania w `kWh/m`.
 - **ELPAR**: katalogi elektroenergetyczne, telekomunikacyjne, sterownicze oraz
   bezhalogenowe, a także dwa materiały projektowe. Główne katalogi zawierają
   średnice i masy.
@@ -74,6 +83,20 @@ badawczego albo pisemnego potwierdzenia producenta.
 - **CobiCabling**: katalog polski oraz nowszy katalog angielski 2025. Katalog
   angielski zawiera średnice zewnętrzne kabli sieciowych i klasy CPR, ale nie
   zapewnia kompletnej masy `kg/km` dla wszystkich pozycji.
+
+## Ekstrakcja i kontrola
+
+`tools/extract_cable_catalogs.py` skanuje źródła podstawowe, zachowuje
+pochodzenie każdego wariantu, przy tolerancji średnicy wybiera maksimum i nie
+zamienia braków masy lub `MJ/m` na zero. Niejednoznaczne wiersze trafiają do
+`extraction-rejects.json`, a wszystkie rekordy automatyczne pozostają oznaczone
+jako nieweryfikowane. Zależność ekstraktora jest przypięta w
+`tools/requirements.txt` (pdfplumber, licencja MIT). Kontrola bez ponownego
+czytania plików PDF:
+
+```powershell
+python .\tools\verify_catalog_dataset.py
+```
 
 ## Aktualizacje
 

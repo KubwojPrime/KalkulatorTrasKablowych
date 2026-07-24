@@ -15,6 +15,10 @@
         "pdfPage": 12
       },
       {
+        "file": "source-materials/telefonika/TFKable_Katalog_elektroenergetyczny_2026.pdf",
+        "pdfPage": 81
+      },
+      {
         "file": "source-materials/elpar/ELPAR_Katalog_elektroenergetyczny.pdf",
         "pdfPage": 15
       },
@@ -25,9 +29,13 @@
       {
         "file": "source-materials/cobicabling/CobiCabling_Product_Catalog_EN_2025.pdf",
         "pdfPage": 6
+      },
+      {
+        "file": "source-materials/cobicabling/CobiCabling_Katalog_produktow_PL.pdf",
+        "pdfPage": 10
       }
     ],
-    "fireLoadFinding": "W pobranych dokumentach nie znaleziono bezpośredniej wartości kaloryczności kabla w MJ/m. CPR nie może jej zastępować."
+    "fireLoadFinding": "Dla części wariantów w katalogu elektroenergetycznym TELE-FONIKA znaleziono bezpośrednie ciepło spalania w kWh/m; aplikacja przelicza je jednostkowo przez 3,6 na MJ/m. Dla pozostałych wariantów brak pozostaje brakiem danych. CPR nie może zastępować tej wartości."
   },
   "sources": [
     {
@@ -47,9 +55,10 @@
       "evidenceFor": [
         "outer-diameter-mm",
         "mass-kg-per-km",
+        "heat-of-combustion-kwh-per-m",
         "cpr-class"
       ],
-      "limitations": "Wartości opisane jako przybliżone należy przechowywać z takim oznaczeniem."
+      "limitations": "Wartości opisane jako przybliżone należy przechowywać z takim oznaczeniem. Ciepło spalania występuje tylko dla części wariantów i jest przeliczane z kWh/m na MJ/m współczynnikiem 3,6."
     },
     {
       "id": "telefonika-telecom-2025",

@@ -8,7 +8,7 @@ namespace ktk {
 
 class CatalogRepository final {
 public:
-    CatalogRepository();
+    explicit CatalogRepository(QString databasePath = {});
     ~CatalogRepository();
 
     CatalogRepository(const CatalogRepository &) = delete;
@@ -20,7 +20,7 @@ public:
 
 private:
     [[nodiscard]] bool createSchema(QString *errorMessage);
-    [[nodiscard]] bool seedIfEmpty(QString *errorMessage);
+    [[nodiscard]] bool synchronizeSeed(QString *errorMessage);
     [[nodiscard]] bool importSeed(QString *errorMessage);
 
     QString m_connectionName;

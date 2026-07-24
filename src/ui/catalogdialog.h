@@ -5,6 +5,7 @@
 #include <QDialog>
 
 class QLineEdit;
+class QLabel;
 class QTableWidget;
 
 namespace ktk {
@@ -21,6 +22,7 @@ private:
 
     QVector<CatalogItem> m_items;
     QLineEdit *m_filter = nullptr;
+    QLabel *m_summary = nullptr;
     QTableWidget *m_table = nullptr;
 };
 

@@ -21,6 +21,12 @@ Biblioteka odczytu i zapisu XLSX, Copyright 2017-,
 Pełny tekst jest dostarczany w `third_party/QXlsx/LICENSE` i kopiowany do katalogu
 `licenses` paczki Windows.
 
+## pdfplumber 0.11.9 (narzędzie deweloperskie)
+
+Generator danych katalogowych w `tools` korzysta z biblioteki pdfplumber
+(<https://github.com/jsvine/pdfplumber>), udostępnianej na licencji MIT.
+Biblioteka i jej zależności nie są dołączane do pliku wykonywalnego aplikacji.
+
 ## MinGW-w64 / GCC runtime
 
 Wersja Windows budowana MinGW może zawierać biblioteki uruchomieniowe GCC i MinGW-w64.

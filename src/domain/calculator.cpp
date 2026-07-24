@@ -13,7 +13,8 @@ CalculationResult Calculator::calculate(const ProjectData &project)
         std::max(0.0, route.internalWidthMm) * std::max(0.0, route.internalHeightMm);
 
     for (const auto &cable : project.cables) {
-        if (cable.quantity <= 0 || cable.outerDiameterMm <= 0.0 || cable.massKgPerKm < 0.0) {
+        if (cable.quantity <= 0 || cable.outerDiameterMm <= 0.0
+            || (cable.massKgPerKm.has_value() && cable.massKgPerKm.value() < 0.0)) {
             ++result.invalidRows;
             continue;
         }
@@ -21,7 +22,11 @@ CalculationResult Calculator::calculate(const ProjectData &project)
         const double count = static_cast<double>(cable.quantity);
         result.reservedCableAreaMm2 +=
             count * cable.outerDiameterMm * cable.outerDiameterMm;
-        result.cableMassKgPerM += count * cable.massKgPerKm / 1000.0;
+        if (cable.massKgPerKm.has_value()) {
+            result.cableMassKgPerM += count * cable.massKgPerKm.value() / 1000.0;
+        } else {
+            ++result.unknownMassRows;
+        }
 
         if (cable.fireLoadMjPerM.has_value() && cable.fireLoadMjPerM.value() >= 0.0) {
             result.knownFireLoadMjPerM += count * cable.fireLoadMjPerM.value();

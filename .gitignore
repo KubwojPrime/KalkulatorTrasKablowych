@@ -18,6 +18,8 @@
 *.sqlite-wal
 *.xlsx
 *.log
+__pycache__/
+*.py[cod]
 
 # Windows
 Thumbs.db

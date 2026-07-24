@@ -1,8 +1,12 @@
 #include "domain/calculator.h"
+#include "data/catalogrepository.h"
 #include "io/xlsxprojectio.h"
 
 #include <QCoreApplication>
 #include <QFile>
+#include <QSet>
+#include <QSqlDatabase>
+#include <QSqlQuery>
 #include <QTemporaryDir>
 
 #include <cmath>
@@ -56,7 +60,7 @@ void testCalculator()
     ktk::CableRow unknown;
     unknown.quantity = 1;
     unknown.outerDiameterMm = 5.0;
-    unknown.massKgPerKm = 25.0;
+    unknown.massKgPerKm.reset();
 
     project.cables = {first, second, unknown};
     const auto result = ktk::Calculator::calculate(project);
@@ -64,13 +68,87 @@ void testCalculator()
     requireNear(result.reservedCableAreaMm2, 625.0, "reserved area");
     requireNear(result.routeAreaMm2, 5000.0, "route area");
     requireNear(result.fillPercent, 12.5, "fill");
-    requireNear(result.cableMassKgPerM, 0.725, "cable mass");
+    requireNear(result.cableMassKgPerM, 0.7, "known cable mass");
     requireNear(result.supportSystemMassKgPerM, 3.3, "support mass");
-    requireNear(result.totalInstalledMassKgPerM, 4.025, "total mass");
+    requireNear(result.totalInstalledMassKgPerM, 4.0, "known total mass");
     requireNear(result.knownFireLoadMjPerM, 5.5, "fire load");
+    require(result.unknownMassRows == 1, "unknown mass count");
     require(result.unknownFireLoadRows == 1, "unknown fire load count");
     require(result.exceedsFillLimit, "fill limit");
     require(result.exceedsFireLoadLimit, "fire load limit");
+}
+
+void createLegacyCatalog(const QString &databasePath)
+{
+    const QString connection = QStringLiteral("legacy-test-setup");
+    {
+        auto database = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), connection);
+        database.setDatabaseName(databasePath);
+        require(database.open(), "open legacy SQLite");
+        QSqlQuery query(database);
+        require(query.exec(QStringLiteral(
+                    "CREATE TABLE cable_catalog ("
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    "manufacturer TEXT NOT NULL,"
+                    "designation TEXT NOT NULL,"
+                    "catalog_code TEXT NOT NULL DEFAULT '',"
+                    "diameter_mm REAL NOT NULL,"
+                    "mass_kg_km REAL NOT NULL,"
+                    "fire_load_mj_m REAL NULL,"
+                    "cpr_class TEXT NOT NULL DEFAULT '',"
+                    "source TEXT NOT NULL DEFAULT '',"
+                    "source_date TEXT NOT NULL DEFAULT '',"
+                    "notes TEXT NOT NULL DEFAULT '',"
+                    "verified INTEGER NOT NULL DEFAULT 0,"
+                    "UNIQUE(manufacturer, designation, catalog_code))")),
+                "create legacy schema");
+        require(query.exec(QStringLiteral(
+                    "INSERT INTO cable_catalog("
+                    "manufacturer, designation, diameter_mm, mass_kg_km"
+                    ") VALUES('Własny', 'Zachowany wpis', 9.5, 123.0)")),
+                "insert legacy item");
+        database.close();
+    }
+    QSqlDatabase::removeDatabase(connection);
+}
+
+void testCatalog(const QString &databasePath)
+{
+    createLegacyCatalog(databasePath);
+    ktk::CatalogRepository repository(databasePath);
+    QString error;
+    require(repository.open(&error), qPrintable(error));
+    const auto items = repository.allItems(&error);
+    require(error.isEmpty(), qPrintable(error));
+    require(items.size() >= 15000, "catalog item count");
+
+    QSet<QString> manufacturers;
+    bool cobiMissingMass = false;
+    bool tfkDirectFireLoad = false;
+    bool legacyItemPreserved = false;
+    for (const auto &item : items) {
+        manufacturers.insert(item.cable.manufacturer);
+        if (item.cable.manufacturer == QStringLiteral("CobiCabling")
+            && !item.cable.massKgPerKm.has_value()) {
+            cobiMissingMass = true;
+        }
+        if (item.cable.manufacturer == QStringLiteral("TELE-FONIKA Kable")
+            && item.cable.fireLoadMjPerM.value_or(0.0) > 0.0) {
+            tfkDirectFireLoad = true;
+        }
+        if (item.cable.manufacturer == QStringLiteral("Własny")
+            && item.cable.designation == QStringLiteral("Zachowany wpis")
+            && item.cable.massKgPerKm.value_or(0.0) == 123.0) {
+            legacyItemPreserved = true;
+        }
+    }
+    require(manufacturers.contains(QStringLiteral("TELE-FONIKA Kable")), "TFK catalog");
+    require(manufacturers.contains(QStringLiteral("ELPAR")), "ELPAR catalog");
+    require(manufacturers.contains(QStringLiteral("BITNER")), "BITNER catalog");
+    require(manufacturers.contains(QStringLiteral("CobiCabling")), "Cobi catalog");
+    require(cobiMissingMass, "Cobi missing mass remains unknown");
+    require(tfkDirectFireLoad, "TFK direct heat of combustion");
+    require(legacyItemPreserved, "legacy custom catalog item preserved");
 }
 
 } // namespace
@@ -84,6 +162,8 @@ int main(int argc, char *argv[])
     QTemporaryDir directory;
     require(directory.isValid(), "temporary directory");
     std::cerr << "xlsx: temporary directory ready\n";
+    testCatalog(directory.filePath(QStringLiteral("catalog.sqlite")));
+    std::cerr << "catalog: passed\n";
 
     ktk::ProjectData original;
     original.route.projectName = QStringLiteral("Test ąęł");
@@ -113,6 +193,7 @@ int main(int argc, char *argv[])
     ktk::CableRow unknown = cable;
     unknown.designation = QStringLiteral("Bez MJ/m");
     unknown.quantity = 2;
+    unknown.massKgPerKm.reset();
     unknown.fireLoadMjPerM.reset();
     original.cables.append(unknown);
 
@@ -143,7 +224,9 @@ int main(int argc, char *argv[])
     require(loaded.cables.at(0).designation == cable.designation, "designation");
     require(loaded.cables.at(0).quantity == 7, "quantity");
     requireNear(loaded.cables.at(0).outerDiameterMm, 12.4, "diameter");
+    requireNear(loaded.cables.at(0).massKgPerKm.value_or(-1.0), 450.0, "mass");
     requireNear(loaded.cables.at(0).fireLoadMjPerM.value_or(-1.0), 0.82, "fire load");
+    require(!loaded.cables.at(1).massKgPerKm.has_value(), "missing mass");
     require(!loaded.cables.at(1).fireLoadMjPerM.has_value(), "missing fire load");
 
     std::cout << "xlsx roundtrip passed\n";

@@ -60,6 +60,12 @@ void MainWindow::recalculate()
     setResultLabel(m_supportMassResult, result.supportSystemMassKgPerM, 3, tr("kg/m"));
     setResultLabel(m_totalMassResult, result.totalInstalledMassKgPerM, 3, tr("kg/m"));
     setResultLabel(m_fireLoadResult, result.knownFireLoadMjPerM, 3, tr("MJ/m"));
+    if (result.unknownMassRows > 0) {
+        m_cableMassResult->setText(
+            QStringLiteral("≥ %1").arg(m_cableMassResult->text()));
+        m_totalMassResult->setText(
+            QStringLiteral("≥ %1").arg(m_totalMassResult->text()));
+    }
 
     QStringList notices;
     bool critical = false;
@@ -72,12 +78,19 @@ void MainWindow::recalculate()
         notices << tr("Przekroczono ustawiony limit wypełnienia.");
         critical = true;
     }
+    if (result.unknownMassRows > 0) {
+        notices << tr("%n wiersz nie ma masy katalogowej — pokazana masa jest "
+                      "wartością minimalną, a nie pełną sumą.",
+                      nullptr, result.unknownMassRows);
+        critical = true;
+    }
     if (result.unknownFireLoadRows > 0) {
         notices << tr("%n wiersz nie ma wartości obciążenia ogniowego — wynik MJ/m jest "
                       "wartością minimalną, a nie pełną sumą.",
                       nullptr, result.unknownFireLoadRows);
         critical = true;
-    } else if (result.exceedsFireLoadLimit) {
+    }
+    if (result.exceedsFireLoadLimit) {
         notices << tr("Przekroczono ustawiony limit obciążenia ogniowego.");
         critical = true;
     }
@@ -100,6 +113,12 @@ void MainWindow::recalculate()
         result.exceedsFireLoadLimit || result.unknownFireLoadRows > 0
             ? QStringLiteral("color: #fca5a5; font-weight: 700;")
             : QStringLiteral("color: #e2e8f0; font-weight: 700;"));
+    const QString massStyle =
+        result.unknownMassRows > 0
+            ? QStringLiteral("color: #fca5a5; font-weight: 700;")
+            : QStringLiteral("color: #e2e8f0; font-weight: 700;");
+    m_cableMassResult->setStyleSheet(massStyle);
+    m_totalMassResult->setStyleSheet(massStyle);
 
     m_visualization->setProject(project);
 }
