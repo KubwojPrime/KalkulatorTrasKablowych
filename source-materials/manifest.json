@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "generatedAtUtc": "2026-07-24T17:40:03Z",
-  "sourceCount": 13,
-  "totalBytes": 144565988,
-  "totalPages": 1999,
+  "generatedAtUtc": "2026-07-24T21:16:00Z",
+  "sourceCount": 24,
+  "totalBytes": 235961741,
+  "totalPages": 2208,
   "verification": {
     "pdfSignatureChecked": true,
     "pdfInfoChecked": true,
@@ -305,6 +305,231 @@
         "cpr-class"
       ],
       "limitations": "Katalog nie zapewnia kompletnej masy kg/km ani kaloryczności MJ/m dla wszystkich pozycji."
+    },
+    {
+      "id": "baks-trays-2024",
+      "manufacturer": "BAKS",
+      "title": "Katalog 2024/25 - Korytka kablowe",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_Korytka_kablowe_2024.pdf",
+      "sourcePage": "https://www.baks.com.pl/wsparcie-techniczne/katalogi-do-pobrania/",
+      "downloadUrl": "https://www.baks.com.pl/wp-content/uploads/2015/08/KATALOG-2024_PL-01-Korytka-kablowe-low.pdf",
+      "retrievedAtUtc": "2026-07-24T21:06:00Z",
+      "httpLastModified": null,
+      "contentType": "application/pdf",
+      "bytes": 89342345,
+      "pages": 209,
+      "sha256": "dc4cc30c75774bf5095319172721cd25dfd5b0e05787f9b50bab3dd5d79ea982",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "cover-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Wbudowana baza obejmuje wybrane popularne warianty. Przed użyciem należy sprawdzić zgodność powłoki, nośności i rozstawu podpór z projektem."
+    },
+    {
+      "id": "baks-online-dkp-h60-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online DKP...H60N Drabinka",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_DKP_H60_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/dkph60n-drabinka_929.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/dkph60n-drabinka_929.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 339942,
+      "pages": 0,
+      "sha256": "5f754264681fe64ba8c5fe08a4eec6c39eafa7ee855cdf6f02dee4c8a1f11ecc",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    },
+    {
+      "id": "baks-online-dup-h100-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online DUP...H100N Drabinka",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_DUP_H100_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/duph100n-drabinka_1004.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/duph100n-drabinka_1004.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 326430,
+      "pages": 0,
+      "sha256": "2667c59820564515e88210f7df05e460f9901634c5b46c61b9d4336638943acc",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    },
+    {
+      "id": "baks-online-pkl-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online PKL... Pokrywa korytka",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_PKL_pokrywy_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/pkl-pokrywa-korytka_4267.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/pkl-pokrywa-korytka_4267.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 150997,
+      "pages": 0,
+      "sha256": "be956db47614d5e9f446ac337ea1e9ed23f6c8b841df74c056dd189aeb976ce4",
+      "evidenceFor": [
+        "cover-mass-kg-per-m",
+        "catalog-number"
+      ],
+      "limitations": "Migawka karty online; zgodność pokrywy z konkretnym systemem trasy należy potwierdzić w dokumentacji montażowej."
+    },
+    {
+      "id": "baks-online-ws-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online WS... Wysięgnik",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_WS_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/ws-wysignik_1366.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/ws-wysignik_1366.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 175965,
+      "pages": 0,
+      "sha256": "a88b934bc093297064c9de767cdfa609d319310638d0b23676e8f670194f33e9",
+      "evidenceFor": [
+        "component-mass-kg-per-piece",
+        "catalog-number"
+      ],
+      "limitations": "Masa elementu nie zastępuje kontroli dopuszczalnego obciążenia i sposobu zamocowania."
+    },
+    {
+      "id": "baks-online-wpl-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online WPL... Wysięgnik",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_WPL_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/wpl-wysignik_1358.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/wpl-wysignik_1358.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 175313,
+      "pages": 0,
+      "sha256": "b2da585cd772d8a8983424199fc01e242450050fe453cb9a49883c1aa84a396e",
+      "evidenceFor": [
+        "component-mass-kg-per-piece",
+        "catalog-number"
+      ],
+      "limitations": "Masa elementu nie zastępuje kontroli dopuszczalnego obciążenia i sposobu zamocowania."
+    },
+    {
+      "id": "baks-online-wws-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online WWS/WWSO Wysięgnik wzmocniony",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_WWS_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/wws-wwso-wysignik-wzmocniony_1357.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/wws-wwso-wysignik-wzmocniony_1357.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 217584,
+      "pages": 0,
+      "sha256": "ee7aca667d43d52d7065def89e65c2ece5b72403217a5f770b2ab5806892956a",
+      "evidenceFor": [
+        "component-mass-kg-per-piece",
+        "catalog-number"
+      ],
+      "limitations": "Masa elementu nie zastępuje kontroli dopuszczalnego obciążenia i sposobu zamocowania."
+    },
+    {
+      "id": "baks-online-psddn-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online PSDDN Podstawa sufitowa",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_PSDDN_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/psddn-podstawa-sufitowa-_2683.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/psddn-podstawa-sufitowa-_2683.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 111870,
+      "pages": 0,
+      "sha256": "53c300ab836f0f8e8fb0adc20b74c0913da5d0034c0c2e6f905af95a51d10926",
+      "evidenceFor": [
+        "component-mass-kg-per-piece",
+        "catalog-number"
+      ],
+      "limitations": "Masa elementu nie zastępuje doboru konstrukcyjnego kompletnego zawieszenia."
+    },
+    {
+      "id": "baks-online-wpv-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online WPV Wieszak pręta",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_WPV_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/wpv-wieszak-prta_1447.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/wpv-wieszak-prta_1447.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 165625,
+      "pages": 0,
+      "sha256": "58e77a4af07e56f14c6eb813abdc0525c8d9be6ee7c81f9f9293ec5118d76083",
+      "evidenceFor": [
+        "component-mass-kg-per-piece",
+        "catalog-number"
+      ],
+      "limitations": "Masa elementu nie zastępuje doboru konstrukcyjnego kompletnego zawieszenia."
+    },
+    {
+      "id": "baks-online-pgm-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online PGM Pręt gwintowany",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_PGM_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/pgm-prt-gwintowany_1596.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/pgm-prt-gwintowany_1596.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 259006,
+      "pages": 0,
+      "sha256": "c33255a38003dcae9ce24979815b37ee5f318f1347fc3e09e7daa8079d993c6b",
+      "evidenceFor": [
+        "component-mass-kg-per-piece",
+        "component-length",
+        "catalog-number"
+      ],
+      "limitations": "Aplikacja dzieli masę katalogową odcinka przez jego długość i mnoży przez wysokość zwieszenia oraz liczbę prętów."
+    },
+    {
+      "id": "baks-online-zs-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online ZS/ZSO Zacisk śrubowy",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_ZS_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/zs-zso-zacisk-rubowy-komplet_1847.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/zs-zso-zacisk-rubowy-komplet_1847.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 130676,
+      "pages": 0,
+      "sha256": "d9e6711412a77834acd22e8691563d3baa86dc9713cad911b1a77fdbbd82265f",
+      "evidenceFor": [
+        "component-mass-kg-per-piece",
+        "catalog-number"
+      ],
+      "limitations": "Do zestawu należy dodać rzeczywistą liczbę zacisków przypadającą na jeden punkt podparcia."
     }
   ]
 }

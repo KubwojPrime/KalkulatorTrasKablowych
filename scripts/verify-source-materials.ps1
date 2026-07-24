@@ -52,8 +52,21 @@ foreach ($source in $manifest.sources) {
     }
     $hash = (Get-FileHash -LiteralPath $targetPath -Algorithm SHA256).Hash.ToLowerInvariant()
 
-    if ($signature -ne "%PDF-") {
+    $contentType = [string]$source.contentType
+    if ($contentType -eq "application/pdf" -and $signature -ne "%PDF-") {
         $failures.Add("${relativePath}: nieprawidlowa sygnatura PDF.")
+    } elseif ($contentType -eq "text/html") {
+        $prefixLength = [Math]::Min(256, $bytes.Length)
+        $prefix = [System.Text.Encoding]::UTF8.GetString(
+            $bytes,
+            0,
+            $prefixLength).ToLowerInvariant()
+        if (-not $prefix.Contains("<!doctype html") -and
+            -not $prefix.Contains("<html")) {
+            $failures.Add("${relativePath}: nieprawidlowa sygnatura HTML.")
+        }
+    } elseif ($contentType -ne "application/pdf") {
+        $failures.Add("${relativePath}: nieobslugiwany typ $contentType.")
     }
     if ($file.Length -ne [int64]$source.bytes) {
         $failures.Add(
@@ -91,6 +104,6 @@ if ($failures.Count -gt 0) {
 }
 
 Write-Output ""
-$successMessage = "Zweryfikowano {0} plikow PDF, {1} bajtow. " `
+$successMessage = "Zweryfikowano {0} plikow zrodlowych, {1} bajtow. " `
     + "Wszystkie skroty SHA-256 sa zgodne."
 Write-Output ($successMessage -f $verified.Count, $totalBytes)

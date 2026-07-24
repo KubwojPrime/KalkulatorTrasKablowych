@@ -6,10 +6,10 @@ aplikacji.
 
 Stan archiwum na 2026-07-24:
 
-- 13 plików PDF;
-- 4 producentów;
-- 1999 stron;
-- 144 565 988 bajtów (137,87 MiB).
+- 24 pliki źródłowe: 14 PDF i 10 migawek HTML;
+- 5 producentów;
+- 2208 stron PDF;
+- 235 961 741 bajtów (225,03 MiB).
 
 Wygenerowany zestaw `2026-07-24.1` zawiera 25 065 wariantów. Raport zachowuje
 cztery odrzucone wiersze BITNER: dwa bez parametrów liczbowych i dwa z podaną
@@ -27,6 +27,7 @@ source-materials/
   elpar/
   bitner/
   cobicabling/
+  baks/
   manifest.json
   extraction-report.json
   extraction-rejects.json
@@ -42,7 +43,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass `
   -File .\scripts\verify-source-materials.ps1
 ```
 
-Skrypt sprawdza obecność każdego pliku, sygnaturę `%PDF-`, rozmiar oraz
+Skrypt sprawdza obecność każdego pliku, sygnaturę PDF albo HTML, rozmiar oraz
 SHA-256 względem manifestu. Zmiana choćby jednego bajtu powoduje błąd.
 
 ## Zasady użycia danych w programie
@@ -68,6 +69,12 @@ zapis w aplikacji powstaje wyłącznie przez przeliczenie jednostek `1 kWh =
 brakującej wartości. Pozostałe dane wymagają odrębnej karty producenta,
 raportu badawczego albo pisemnego potwierdzenia producenta.
 
+Dla produktów BAKS rekord zachowuje rolę elementu w zestawie, symbol, numer
+katalogowy, masę i jednostkę `kg/m` albo `kg/szt.`. Pręty gwintowane są
+normalizowane do `kg/m zwieszenia` przez podzielenie masy katalogowej odcinka
+przez jego długość. Dane masowe nie zastępują doboru nośności, powłoki,
+zamocowań, rozstawu podpór ani wymagań E30/E60/E90.
+
 ## Zakres i ograniczenia źródeł
 
 - **TELE-FONIKA Kable**: aktualny katalog elektroenergetyczny 2026, katalog
@@ -83,6 +90,10 @@ raportu badawczego albo pisemnego potwierdzenia producenta.
 - **CobiCabling**: katalog polski oraz nowszy katalog angielski 2025. Katalog
   angielski zawiera średnice zewnętrzne kabli sieciowych i klasy CPR, ale nie
   zapewnia kompletnej masy `kg/km` dla wszystkich pozycji.
+- **BAKS**: dział PDF katalogu 2024/25 dla koryt i pokryw oraz niezmienione
+  migawki aktualnych kart online 2026 dla drabinek i elementów montażowych.
+  Baza obejmuje wybrane popularne warianty, a każda masa wskazuje konkretny
+  plik/stronę lub kartę online.
 
 ## Ekstrakcja i kontrola
 

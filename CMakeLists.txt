@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 project(KalkulatorTrasKablowych
-    VERSION 0.4.0
+    VERSION 0.5.0
     DESCRIPTION "Kalkulator wypelnienia, masy i obciazenia ogniowego tras kablowych"
     LANGUAGES CXX
 )
@@ -34,6 +34,8 @@ configure_file(
 )
 
 add_library(ktk_core STATIC
+    src/domain/bakscatalog.cpp
+    src/domain/bakscatalog.h
     src/domain/calculator.cpp
     src/domain/calculator.h
     src/domain/catalogfilter.cpp
@@ -55,6 +57,8 @@ add_executable(KalkulatorTrasKablowych WIN32
     src/licensing/accesscontroller.h
     src/ui/cabletablemodel.cpp
     src/ui/cabletablemodel.h
+    src/ui/baksassemblydialog.cpp
+    src/ui/baksassemblydialog.h
     src/ui/catalogdialog.cpp
     src/ui/catalogdialog.h
     src/ui/mainwindow.cpp
@@ -69,6 +73,7 @@ qt_add_resources(KalkulatorTrasKablowych "ktk_resources"
     PREFIX "/"
     BASE "${CMAKE_CURRENT_SOURCE_DIR}/resources"
     FILES
+        resources/baks-catalog.json
         resources/catalog-seed.json
 )
 
@@ -100,6 +105,7 @@ install(FILES
     DESTINATION .
 )
 install(FILES
+    docs/baks-route-mass.md
     docs/fire-load-estimation.md
     DESTINATION docs
 )
@@ -122,6 +128,7 @@ if(BUILD_TESTING AND KTK_BUILD_TESTS)
         PREFIX "/"
         BASE "${CMAKE_CURRENT_SOURCE_DIR}/resources"
         FILES
+            resources/baks-catalog.json
             resources/catalog-seed.json
     )
     target_include_directories(ktk_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")

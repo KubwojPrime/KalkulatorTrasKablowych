@@ -6,7 +6,8 @@ Natywna aplikacja Windows do obliczania:
 
 - wypełnienia trasy według konserwatywnego wzoru `Σ(ilość × D²)`;
 - masy kabli na metr bieżący;
-- opcjonalnej masy koryta, pokrywy i zawieszeń;
+- masy koryta lub drabinki, pokrywy i elementów zawieszenia dobranych
+  z katalogu BAKS albo wprowadzonych ręcznie;
 - obciążenia ogniowego kabli w `MJ/m`;
 - schematycznego ułożenia kabli od największej średnicy;
 - importu i eksportu projektu oraz raportu w formacie XLSX.
@@ -16,16 +17,23 @@ oraz filtry producenta, typu/rodziny kabla, izolacji lub powłoki, klasy CPR
 i odporności ogniowej (np. `PH90`). Separatory `x`, `×` i `G` oraz zapis
 dziesiętny z przecinkiem lub kropką są traktowane równoważnie.
 
-Wersjonowana baza aplikacji jest generowana z oficjalnych katalogów TELE-FONIKA,
+Wersjonowana baza kabli jest generowana z oficjalnych katalogów TELE-FONIKA,
 ELPAR, BITNER i CobiCabling. Każdy rekord zachowuje producenta, wariant, kod
 katalogowy, dokładny plik i stronę PDF, adres źródłowy oraz metodę ekstrakcji.
 Zestaw `2026-07-24.1` zawiera 25 065 wariantów: 13 525 BITNER, 8 616 ELPAR,
 2 896 TELE-FONIKA Kable i 28 CobiCabling. Rekordy pozyskane automatycznie mają
 status „do weryfikacji”.
 
+Wbudowany konfigurator BAKS zawiera 55 popularnych wariantów koryt H42, drabinek
+H60/H100, pokryw, wysięgników, podstaw, zacisków i prętów gwintowanych. Użytkownik
+buduje rzeczywisty zestaw na punkt podparcia, podaje liczbę elementów, wysokość
+zwieszenia i rozstaw podpór. Każda pozycja zachowuje symbol, numer katalogowy,
+masę, jednostkę oraz źródło. Szczegóły modelu opisano w
+[`docs/baks-route-mass.md`](docs/baks-route-mass.md).
+
 ## Materiały źródłowe
 
-Oficjalne katalogi TELE-FONIKI, ELPAR, BITNER i CobiCabling są przechowywane
+Oficjalne katalogi TELE-FONIKI, ELPAR, BITNER, CobiCabling i BAKS są przechowywane
 w katalogu [`source-materials`](source-materials/README.md). Manifest zawiera
 oryginalne adresy URL, datę pobrania, liczbę stron, rozmiar i SHA-256 każdego
 pliku. Integralność całego archiwum można sprawdzić poleceniem:
@@ -67,6 +75,14 @@ masa kabli [kg/m] = Σ(ilość × masa katalogowa [kg/km] / 1000)
 masa podpór [kg/m] =
   (masa bazowa podpory + wysokość zwieszenia × masa elementów pionowych) / rozstaw podpór
 masa kompletna = kable + koryto + pokrywa + podpory
+```
+
+W trybie katalogowym BAKS:
+
+```text
+masa bazowa podpory = Σ(ilość × masa elementu BAKS [kg/szt.])
+masa elementów pionowych =
+  Σ(ilość × masa odcinka BAKS [kg/szt.] / długość odcinka [m])
 ```
 
 Brak masy katalogowej nie jest traktowany jako zero. Pokazana suma jest wtedy

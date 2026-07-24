@@ -1,7 +1,9 @@
 #include "ui/mainwindow.h"
 
+#include "domain/bakscatalog.h"
 #include "domain/calculator.h"
 #include "io/xlsxprojectio.h"
+#include "ui/baksassemblydialog.h"
 #include "ui/cabletablemodel.h"
 #include "ui/catalogdialog.h"
 #include "ui/routevisualizationwidget.h"
@@ -23,6 +25,7 @@
 #include <QPushButton>
 #include <QSplitter>
 #include <QStatusBar>
+#include <QStringList>
 #include <QTableView>
 #include <QTabWidget>
 #include <QVBoxLayout>
@@ -39,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_cableModel = new CableTableModel(this);
     buildUi();
     loadCatalog();
+    loadBaksCatalog();
     connectInputSignals();
     recalculate();
 }
@@ -195,6 +199,55 @@ void MainWindow::removeSelectedCables()
     }
 }
 
+void MainWindow::chooseBaksAssembly()
+{
+    if (m_baksCatalog.isEmpty()) {
+        QMessageBox::warning(
+            this,
+            tr("Katalog BAKS"),
+            tr("Wbudowany katalog produktów BAKS jest niedostępny."));
+        return;
+    }
+
+    BaksAssemblyDialog dialog(
+        m_baksCatalog,
+        m_baksAssembly,
+        m_suspensionHeight->value(),
+        m_supportSpacing->value(),
+        this);
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    m_baksAssembly = dialog.assemblyItems();
+    const BaksMassSummary summary =
+        BaksCatalog::summarize(m_baksAssembly);
+
+    m_updatingBaksFields = true;
+    m_trayMass->setValue(summary.trayMassKgPerM);
+    m_coverMass->setValue(summary.coverMassKgPerM);
+    m_hangerBaseMass->setValue(summary.fixedMassKgPerSupport);
+    m_verticalMass->setValue(summary.verticalMassKgPerSuspensionM);
+    for (const auto &item : m_baksAssembly) {
+        if (item.product.role == QStringLiteral("route")) {
+            if (item.product.widthMm > 0.0) {
+                m_width->setValue(item.product.widthMm);
+            }
+            if (item.product.heightMm > 0.0) {
+                m_height->setValue(item.product.heightMm);
+            }
+            break;
+        }
+    }
+    m_updatingBaksFields = false;
+
+    updateBaksSummary();
+    recalculate();
+    statusBar()->showMessage(
+        tr("Zastosowano zestaw BAKS z %n pozycją.", nullptr, m_baksAssembly.size()),
+        7000);
+}
+
 void MainWindow::importXlsx()
 {
     const QString path = QFileDialog::getOpenFileName(
@@ -319,12 +372,26 @@ QWidget *MainWindow::buildProjectTab()
     m_suspensionHeight = makeSpin(0.0, 100.0, 3, 0.0, tr(" m"));
     m_verticalMass = makeSpin(0.0, 1000.0, 3, 0.0, tr(" kg/m zwieszenia"));
     m_supportSpacing = makeSpin(0.01, 100.0, 3, 1.5, tr(" m"));
+    auto *baksButton = new QPushButton(tr("Dobierz zestaw z katalogu BAKS…"), supportGroup);
+    baksButton->setToolTip(
+        tr("Wybór koryta lub drabinki, pokrywy, wsporników, podstaw, "
+           "zacisków i prętów gwintowanych według mas katalogowych BAKS."));
+    m_baksSummary = new QLabel(supportGroup);
+    m_baksSummary->setWordWrap(true);
+    m_baksSummary->setProperty("role", "muted");
     supportForm->addRow(tr("Masa koryta:"), m_trayMass);
     supportForm->addRow(tr("Masa pokrywy:"), m_coverMass);
     supportForm->addRow(tr("Stała masa podpory:"), m_hangerBaseMass);
     supportForm->addRow(tr("Wysokość zwieszenia:"), m_suspensionHeight);
     supportForm->addRow(tr("Masa elementów pionowych:"), m_verticalMass);
     supportForm->addRow(tr("Rozstaw podpór:"), m_supportSpacing);
+    supportForm->addRow(baksButton);
+    supportForm->addRow(tr("Pochodzenie masy:"), m_baksSummary);
+    connect(
+        baksButton,
+        &QPushButton::clicked,
+        this,
+        &MainWindow::chooseBaksAssembly);
     columns->addWidget(supportGroup, 1);
     layout->addLayout(columns);
 
@@ -499,11 +566,14 @@ ProjectData MainWindow::currentProject() const
     project.route.suspensionVerticalMassKgPerM = m_verticalMass->value();
     project.route.supportSpacingM = m_supportSpacing->value();
     project.cables = m_cableModel->cables();
+    project.routeAssembly = m_baksAssembly;
     return project;
 }
 
 void MainWindow::setProject(const ProjectData &project)
 {
+    m_updatingBaksFields = true;
+    m_baksAssembly = project.routeAssembly;
     m_projectName->setText(project.route.projectName);
     m_width->setValue(project.route.internalWidthMm);
     m_height->setValue(project.route.internalHeightMm);
@@ -515,6 +585,8 @@ void MainWindow::setProject(const ProjectData &project)
     m_suspensionHeight->setValue(project.route.suspensionHeightM);
     m_verticalMass->setValue(project.route.suspensionVerticalMassKgPerM);
     m_supportSpacing->setValue(project.route.supportSpacingM);
+    m_updatingBaksFields = false;
+    updateBaksSummary();
     m_cableModel->setCables(project.cables);
     recalculate();
 }
@@ -535,6 +607,19 @@ void MainWindow::connectInputSignals()
     };
     for (auto *spin : spins) {
         connect(spin, &QDoubleSpinBox::valueChanged, this, &MainWindow::recalculate);
+    }
+    const QVector<QDoubleSpinBox *> baksDerivedSpins = {
+        m_trayMass,
+        m_coverMass,
+        m_hangerBaseMass,
+        m_verticalMass
+    };
+    for (auto *spin : baksDerivedSpins) {
+        connect(
+            spin,
+            &QDoubleSpinBox::valueChanged,
+            this,
+            &MainWindow::clearBaksAssembly);
     }
     connect(m_projectName, &QLineEdit::textChanged, this, &MainWindow::recalculate);
     connect(m_cableModel, &CableTableModel::cablesChanged, this, &MainWindow::recalculate);
@@ -558,6 +643,60 @@ void MainWindow::loadCatalog()
             tr("Załadowano %n pozycję katalogową.", nullptr, m_catalog.size()),
             5000);
     }
+}
+
+void MainWindow::loadBaksCatalog()
+{
+    QString error;
+    m_baksCatalog = BaksCatalog::load(&error);
+    if (!error.isEmpty()) {
+        QMessageBox::warning(this, tr("Katalog BAKS"), error);
+    }
+    updateBaksSummary();
+}
+
+void MainWindow::updateBaksSummary()
+{
+    if (!m_baksSummary) {
+        return;
+    }
+    if (m_baksAssembly.isEmpty()) {
+        m_baksSummary->setText(tr("tryb ręczny"));
+        m_baksSummary->setToolTip({});
+        return;
+    }
+
+    QStringList symbols;
+    QStringList sources;
+    for (const auto &item : m_baksAssembly) {
+        symbols << (item.quantity == 1.0
+                        ? item.product.symbol
+                        : QStringLiteral("%1 × %2")
+                              .arg(item.quantity, 0, 'g', 4)
+                              .arg(item.product.symbol));
+        sources << QStringLiteral("%1 — %2%3\n%4")
+                       .arg(
+                           item.product.symbol,
+                           item.product.sourceFile,
+                           item.product.sourcePage > 0
+                               ? tr(", strona PDF %1").arg(item.product.sourcePage)
+                               : QString(),
+                           item.product.sourceUrl);
+    }
+    m_baksSummary->setText(symbols.join(QStringLiteral(", ")));
+    m_baksSummary->setToolTip(sources.join(QStringLiteral("\n\n")));
+}
+
+void MainWindow::clearBaksAssembly()
+{
+    if (m_updatingBaksFields || m_baksAssembly.isEmpty()) {
+        return;
+    }
+    m_baksAssembly.clear();
+    updateBaksSummary();
+    statusBar()->showMessage(
+        tr("Zmieniono masę ręcznie — powiązanie z zestawem BAKS usunięto."),
+        5000);
 }
 
 void MainWindow::setResultLabel(

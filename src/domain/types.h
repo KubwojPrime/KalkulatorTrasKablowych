@@ -36,11 +36,6 @@ struct RouteParameters {
     double supportSpacingM = 1.5;
 };
 
-struct ProjectData {
-    RouteParameters route;
-    QVector<CableRow> cables;
-};
-
 struct CalculationResult {
     double reservedCableAreaMm2 = 0.0;
     double routeAreaMm2 = 0.0;
@@ -72,6 +67,41 @@ struct CatalogItem {
     QString sourceUrl;
     QString extractionMethod;
     bool verified = false;
+};
+
+struct BaksProduct {
+    QString id;
+    QString role;
+    QString name;
+    QString symbol;
+    QString catalogCode;
+    double widthMm = 0.0;
+    double heightMm = 0.0;
+    double lengthM = 0.0;
+    double massKgPerUnit = 0.0;
+    QString massUnit;
+    QString sourceFile;
+    int sourcePage = 0;
+    QString sourceUrl;
+    QString sourceDate;
+};
+
+struct RouteAssemblyItem {
+    BaksProduct product;
+    double quantity = 1.0;
+};
+
+struct BaksMassSummary {
+    double trayMassKgPerM = 0.0;
+    double coverMassKgPerM = 0.0;
+    double fixedMassKgPerSupport = 0.0;
+    double verticalMassKgPerSuspensionM = 0.0;
+};
+
+struct ProjectData {
+    RouteParameters route;
+    QVector<CableRow> cables;
+    QVector<RouteAssemblyItem> routeAssembly;
 };
 
 } // namespace ktk

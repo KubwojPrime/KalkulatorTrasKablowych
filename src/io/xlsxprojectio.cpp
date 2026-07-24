@@ -11,7 +11,7 @@ namespace ktk {
 
 namespace {
 
-constexpr int SchemaVersion = 3;
+constexpr int SchemaVersion = 4;
 
 void setError(QString *target, const QString &message)
 {
@@ -56,6 +56,19 @@ double readDouble(QXlsx::Document &document, int row, int column, double fallbac
     return ok ? value : fallback;
 }
 
+QString assemblyDescription(const QVector<RouteAssemblyItem> &items)
+{
+    QStringList symbols;
+    for (const auto &item : items) {
+        symbols << (item.quantity == 1.0
+                        ? item.product.symbol
+                        : QStringLiteral("%1 × %2")
+                              .arg(item.quantity, 0, 'g', 4)
+                              .arg(item.product.symbol));
+    }
+    return symbols.join(QStringLiteral(", "));
+}
+
 } // namespace
 
 bool XlsxProjectIo::exportProject(
@@ -72,7 +85,7 @@ bool XlsxProjectIo::exportProject(
     QXlsx::Document document;
     document.addSheet(QStringLiteral("Projekt"));
     document.selectSheet(QStringLiteral("Projekt"));
-    document.setColumnWidth(1, 34);
+    document.setColumnWidth(1, 48);
     document.setColumnWidth(2, 26);
 
     writeKeyValue(document, 1, QStringLiteral("Nazwa projektu"), project.route.projectName);
@@ -87,6 +100,18 @@ bool XlsxProjectIo::exportProject(
     writeKeyValue(document, 11, QStringLiteral("Masa elementów pionowych [kg/m zwieszenia]"),
                   project.route.suspensionVerticalMassKgPerM);
     writeKeyValue(document, 12, QStringLiteral("Rozstaw podpór [m]"), project.route.supportSpacingM);
+    writeKeyValue(
+        document,
+        14,
+        QStringLiteral("Pochodzenie masy trasy"),
+        project.routeAssembly.isEmpty()
+            ? QStringLiteral("wartości ręczne")
+            : QStringLiteral("zestaw produktów BAKS"));
+    writeKeyValue(
+        document,
+        15,
+        QStringLiteral("Zestaw BAKS"),
+        assemblyDescription(project.routeAssembly));
 
     document.addSheet(QStringLiteral("Kable"));
     document.selectSheet(QStringLiteral("Kable"));
@@ -153,6 +178,66 @@ bool XlsxProjectIo::exportProject(
         document.write(row, 11, cable.source);
     }
 
+    document.addSheet(QStringLiteral("Zestaw BAKS"));
+    document.selectSheet(QStringLiteral("Zestaw BAKS"));
+    const QStringList baksHeaders = {
+        QStringLiteral("ID rekordu"),
+        QStringLiteral("Rola"),
+        QStringLiteral("Nazwa"),
+        QStringLiteral("Symbol"),
+        QStringLiteral("Numer katalogowy"),
+        QStringLiteral("Ilość"),
+        QStringLiteral("Masa katalogowa"),
+        QStringLiteral("Jednostka masy"),
+        QStringLiteral("Długość odcinka [m]"),
+        QStringLiteral("Szerokość [mm]"),
+        QStringLiteral("Wysokość [mm]"),
+        QStringLiteral("Plik źródłowy"),
+        QStringLiteral("Strona PDF"),
+        QStringLiteral("URL źródła"),
+        QStringLiteral("Data źródła")
+    };
+    for (int column = 0; column < baksHeaders.size(); ++column) {
+        document.write(1, column + 1, baksHeaders.at(column), headerFormat());
+    }
+    document.setColumnWidth(1, 24);
+    document.setColumnWidth(2, 16);
+    document.setColumnWidth(3, 28);
+    document.setColumnWidth(4, 22);
+    document.setColumnWidth(5, 18);
+    document.setColumnWidth(6, 10);
+    document.setColumnWidth(7, 18);
+    document.setColumnWidth(8, 16);
+    document.setColumnWidth(9, 20);
+    document.setColumnWidth(10, 16);
+    document.setColumnWidth(11, 16);
+    document.setColumnWidth(12, 58);
+    document.setColumnWidth(13, 14);
+    document.setColumnWidth(14, 68);
+    document.setColumnWidth(15, 16);
+    for (int index = 0; index < project.routeAssembly.size(); ++index) {
+        const int row = index + 2;
+        const auto &item = project.routeAssembly.at(index);
+        const auto &product = item.product;
+        document.write(row, 1, product.id);
+        document.write(row, 2, product.role);
+        document.write(row, 3, product.name);
+        document.write(row, 4, product.symbol);
+        document.write(row, 5, product.catalogCode);
+        document.write(row, 6, item.quantity);
+        document.write(row, 7, product.massKgPerUnit);
+        document.write(row, 8, product.massUnit);
+        document.write(row, 9, product.lengthM);
+        document.write(row, 10, product.widthMm);
+        document.write(row, 11, product.heightMm);
+        document.write(row, 12, product.sourceFile);
+        if (product.sourcePage > 0) {
+            document.write(row, 13, product.sourcePage);
+        }
+        document.write(row, 14, product.sourceUrl);
+        document.write(row, 15, product.sourceDate);
+    }
+
     document.addSheet(QStringLiteral("Raport"));
     document.selectSheet(QStringLiteral("Raport"));
     document.setColumnWidth(1, 42);
@@ -204,6 +289,14 @@ bool XlsxProjectIo::exportProject(
         completeness.isEmpty()
             ? QStringLiteral("Wszystkie wiersze mają dane masowe i ogniowe.")
             : completeness.join(QLatin1Char(' ')));
+    writeKeyValue(
+        document,
+        17,
+        QStringLiteral("Pochodzenie masy trasy"),
+        project.routeAssembly.isEmpty()
+            ? QStringLiteral("wartości ręczne")
+            : QStringLiteral("BAKS: %1")
+                  .arg(assemblyDescription(project.routeAssembly)));
 
     document.addSheet(QStringLiteral("Meta"));
     document.selectSheet(QStringLiteral("Meta"));
@@ -220,6 +313,13 @@ bool XlsxProjectIo::exportProject(
         QStringLiteral(
             "* = konserwatywne oszacowanie materiałowo-geometryczne; "
             "docs/fire-load-estimation.md"));
+    document.write(5, 1, QStringLiteral("routeMassFormula"));
+    document.write(
+        5,
+        2,
+        QStringLiteral(
+            "trasa + pokrywa + (elementy stale + wysokosc zwieszenia "
+            "* elementy pionowe) / rozstaw podpor"));
 
     if (!document.saveAs(path)) {
         setError(errorMessage,
@@ -277,6 +377,37 @@ bool XlsxProjectIo::importProject(
     loaded.route.suspensionHeightM = readDouble(document, 10, 2, 0.0);
     loaded.route.suspensionVerticalMassKgPerM = readDouble(document, 11, 2, 0.0);
     loaded.route.supportSpacingM = readDouble(document, 12, 2, 1.5);
+
+    if (schemaVersion >= 4
+        && document.sheetNames().contains(QStringLiteral("Zestaw BAKS"))
+        && document.selectSheet(QStringLiteral("Zestaw BAKS"))) {
+        constexpr int MaximumAssemblyRows = 10000;
+        for (int row = 2; row <= MaximumAssemblyRows; ++row) {
+            const QString id = document.read(row, 1).toString().trimmed();
+            const QString symbol = document.read(row, 4).toString().trimmed();
+            if (id.isEmpty() && symbol.isEmpty()) {
+                break;
+            }
+
+            RouteAssemblyItem item;
+            item.product.id = id;
+            item.product.role = document.read(row, 2).toString().trimmed();
+            item.product.name = document.read(row, 3).toString();
+            item.product.symbol = symbol;
+            item.product.catalogCode = document.read(row, 5).toString();
+            item.quantity = readDouble(document, row, 6, 1.0);
+            item.product.massKgPerUnit = readDouble(document, row, 7, 0.0);
+            item.product.massUnit = document.read(row, 8).toString();
+            item.product.lengthM = readDouble(document, row, 9, 0.0);
+            item.product.widthMm = readDouble(document, row, 10, 0.0);
+            item.product.heightMm = readDouble(document, row, 11, 0.0);
+            item.product.sourceFile = document.read(row, 12).toString();
+            item.product.sourcePage = document.read(row, 13).toInt();
+            item.product.sourceUrl = document.read(row, 14).toString();
+            item.product.sourceDate = document.read(row, 15).toString();
+            loaded.routeAssembly.append(item);
+        }
+    }
 
     if (!document.selectSheet(QStringLiteral("Kable"))) {
         setError(errorMessage, QStringLiteral("Brak arkusza „Kable”."));

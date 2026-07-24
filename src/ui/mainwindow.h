@@ -29,6 +29,7 @@ private slots:
     void addFromCatalog();
     void addCustomCable();
     void removeSelectedCables();
+    void chooseBaksAssembly();
     void importXlsx();
     void exportXlsx();
     void newProject();
@@ -50,11 +51,17 @@ private:
     void setProject(const ProjectData &project);
     void connectInputSignals();
     void loadCatalog();
+    void loadBaksCatalog();
+    void updateBaksSummary();
+    void clearBaksAssembly();
     void setResultLabel(QLabel *label, double value, int decimals, const QString &unit);
 
     CatalogRepository m_catalogRepository;
     QVector<CatalogItem> m_catalog;
+    QVector<BaksProduct> m_baksCatalog;
+    QVector<RouteAssemblyItem> m_baksAssembly;
     CableTableModel *m_cableModel = nullptr;
+    bool m_updatingBaksFields = false;
 
     QTabWidget *m_tabs = nullptr;
     QLineEdit *m_projectName = nullptr;
@@ -68,6 +75,7 @@ private:
     QDoubleSpinBox *m_suspensionHeight = nullptr;
     QDoubleSpinBox *m_verticalMass = nullptr;
     QDoubleSpinBox *m_supportSpacing = nullptr;
+    QLabel *m_baksSummary = nullptr;
 
     QTableView *m_cableTable = nullptr;
     RouteVisualizationWidget *m_visualization = nullptr;

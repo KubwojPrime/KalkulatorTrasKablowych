@@ -1,4 +1,5 @@
 #include "domain/calculator.h"
+#include "domain/bakscatalog.h"
 #include "domain/catalogfilter.h"
 #include "domain/fireloadestimator.h"
 #include "data/catalogrepository.h"
@@ -85,6 +86,45 @@ void testCalculator()
     require(result.estimatedFireLoadRows == 1, "estimated fire load rows");
     require(result.exceedsFillLimit, "fill limit");
     require(result.exceedsFireLoadLimit, "fire load limit");
+}
+
+void testBaksCatalog()
+{
+    QString error;
+    const auto catalog = ktk::BaksCatalog::load(&error);
+    require(error.isEmpty(), qPrintable(error));
+    require(catalog.size() == 55, "BAKS catalog item count");
+
+    const auto route =
+        ktk::BaksCatalog::findById(catalog, QStringLiteral("baks-kgr100h42-3"));
+    const auto cover =
+        ktk::BaksCatalog::findById(catalog, QStringLiteral("baks-pkl100-3"));
+    const auto bracket =
+        ktk::BaksCatalog::findById(catalog, QStringLiteral("baks-wws200"));
+    const auto rod =
+        ktk::BaksCatalog::findById(catalog, QStringLiteral("baks-pgm10-3"));
+    require(route.has_value(), "BAKS route");
+    require(cover.has_value(), "BAKS cover");
+    require(bracket.has_value(), "BAKS bracket");
+    require(rod.has_value(), "BAKS rod");
+    requireNear(route->massKgPerUnit, 0.74, "BAKS KGR100 mass");
+    require(route->sourcePage == 14, "BAKS KGR100 source page");
+    requireNear(rod->massKgPerUnit / rod->lengthM, 0.5, "BAKS PGM10 kg/m");
+
+    const QVector<ktk::RouteAssemblyItem> assembly = {
+        {*route, 1.0},
+        {*cover, 1.0},
+        {*bracket, 2.0},
+        {*rod, 2.0}
+    };
+    const auto summary = ktk::BaksCatalog::summarize(assembly);
+    requireNear(summary.trayMassKgPerM, 0.74, "BAKS tray summary");
+    requireNear(summary.coverMassKgPerM, 0.72, "BAKS cover summary");
+    requireNear(summary.fixedMassKgPerSupport, 0.76, "BAKS fixed summary");
+    requireNear(
+        summary.verticalMassKgPerSuspensionM,
+        1.0,
+        "BAKS vertical summary");
 }
 
 void testFireLoadEstimator()
@@ -319,6 +359,8 @@ int main(int argc, char *argv[])
     QCoreApplication application(argc, argv);
     testCalculator();
     std::cerr << "calculator: passed\n";
+    testBaksCatalog();
+    std::cerr << "BAKS catalog: passed\n";
     testCatalogFilter();
     std::cerr << "catalog filter: passed\n";
     testFireLoadEstimator();
@@ -341,6 +383,25 @@ int main(int argc, char *argv[])
     original.route.suspensionHeightM = 0.8;
     original.route.suspensionVerticalMassKgPerM = 0.6;
     original.route.supportSpacingM = 1.25;
+
+    ktk::BaksProduct trayProduct;
+    trayProduct.id = QStringLiteral("baks-test-tray");
+    trayProduct.role = QStringLiteral("route");
+    trayProduct.name = QStringLiteral("Korytko testowe");
+    trayProduct.symbol = QStringLiteral("KGR200H42/3");
+    trayProduct.catalogCode = QStringLiteral("141716");
+    trayProduct.widthMm = 200.0;
+    trayProduct.heightMm = 42.0;
+    trayProduct.lengthM = 3.0;
+    trayProduct.massKgPerUnit = 1.10;
+    trayProduct.massUnit = QStringLiteral("kg/m");
+    trayProduct.sourceFile =
+        QStringLiteral("source-materials/baks/BAKS_Korytka_kablowe_2024.pdf");
+    trayProduct.sourcePage = 14;
+    trayProduct.sourceUrl =
+        QStringLiteral("https://katalog.baks.com.pl/test");
+    trayProduct.sourceDate = QStringLiteral("2026-07-24");
+    original.routeAssembly.append({trayProduct, 1.0});
 
     ktk::CableRow cable;
     cable.manufacturer = QStringLiteral("Producent");
@@ -371,7 +432,12 @@ int main(int argc, char *argv[])
     original.cables.append(estimated);
 
     const auto result = ktk::Calculator::calculate(original);
-    const QString path = directory.filePath(QStringLiteral("projekt.xlsx"));
+    const QString requestedOutput =
+        QString::fromLocal8Bit(qgetenv("KTK_TEST_XLSX_OUTPUT")).trimmed();
+    const QString path =
+        requestedOutput.isEmpty()
+            ? directory.filePath(QStringLiteral("projekt.xlsx"))
+            : requestedOutput;
     QString error;
     const bool exported = ktk::XlsxProjectIo::exportProject(path, original, result, &error);
     if (!exported) {
@@ -392,6 +458,17 @@ int main(int argc, char *argv[])
         exportedWorkbook.read(4, 8).toString().contains(
             QStringLiteral("oszacowanie")),
         "estimated XLSX origin");
+    require(
+        exportedWorkbook.selectSheet(QStringLiteral("Zestaw BAKS")),
+        "select exported BAKS sheet");
+    require(
+        exportedWorkbook.read(2, 4).toString()
+            == QStringLiteral("KGR200H42/3"),
+        "BAKS symbol exported");
+    requireNear(
+        exportedWorkbook.read(2, 7).toDouble(),
+        1.10,
+        "BAKS mass exported");
 
     ktk::ProjectData loaded;
     const bool imported = ktk::XlsxProjectIo::importProject(path, &loaded, &error);
@@ -404,6 +481,14 @@ int main(int argc, char *argv[])
     require(loaded.route.projectName == original.route.projectName, "project name");
     requireNear(loaded.route.internalWidthMm, 200.0, "width");
     requireNear(loaded.route.suspensionHeightM, 0.8, "suspension height");
+    require(loaded.routeAssembly.size() == 1, "BAKS assembly count");
+    require(
+        loaded.routeAssembly.at(0).product.catalogCode
+            == trayProduct.catalogCode,
+        "BAKS catalog code roundtrip");
+    require(
+        loaded.routeAssembly.at(0).product.sourcePage == 14,
+        "BAKS source page roundtrip");
     require(loaded.cables.size() == 3, "cable count");
     require(loaded.cables.at(0).manufacturer == cable.manufacturer, "manufacturer");
     require(loaded.cables.at(0).designation == cable.designation, "designation");

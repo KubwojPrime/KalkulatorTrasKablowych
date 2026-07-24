@@ -1,6 +1,6 @@
 param(
     [string]$Preset = "windows-release",
-    [string]$Version = "0.4.0"
+    [string]$Version = "0.5.0"
 )
 
 $ErrorActionPreference = "Stop"
@@ -46,6 +46,8 @@ Copy-Item -LiteralPath (Join-Path $projectRoot "THIRD_PARTY_NOTICES.md") -Destin
 $docsDirectory = Join-Path $stageRoot "docs"
 New-Item -ItemType Directory -Path $docsDirectory -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $projectRoot "docs\fire-load-estimation.md") `
+    -Destination $docsDirectory
+Copy-Item -LiteralPath (Join-Path $projectRoot "docs\baks-route-mass.md") `
     -Destination $docsDirectory
 
 $licenseDirectory = Join-Path $stageRoot "licenses"
