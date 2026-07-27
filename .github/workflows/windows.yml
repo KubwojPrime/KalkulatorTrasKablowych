@@ -29,3 +29,22 @@ jobs:
 
       - name: Test
         run: ctest --test-dir build/ci --output-on-failure
+
+      - name: Package Windows application
+        shell: pwsh
+        run: |
+          $stage = Join-Path $PWD "release/KalkulatorTrasKablowych-0.5.0-win64"
+          New-Item -ItemType Directory -Path $stage -Force | Out-Null
+          Copy-Item "build/ci/KalkulatorTrasKablowych.exe" $stage
+          Copy-Item "LICENSE.md" $stage
+          Copy-Item "README.md" $stage
+          Copy-Item "THIRD_PARTY_NOTICES.md" $stage
+          windeployqt --release --compiler-runtime --no-translations "$stage/KalkulatorTrasKablowych.exe"
+          Compress-Archive -Path "$stage/*" -DestinationPath "release/KalkulatorTrasKablowych-0.5.0-win64.zip" -CompressionLevel Optimal
+
+      - name: Upload Windows package
+        uses: actions/upload-artifact@v4
+        with:
+          name: KalkulatorTrasKablowych-0.5.0-win64
+          path: release/KalkulatorTrasKablowych-0.5.0-win64.zip
+          if-no-files-found: error
