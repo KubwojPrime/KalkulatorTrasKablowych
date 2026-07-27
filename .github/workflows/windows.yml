@@ -14,20 +14,24 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Qt
+      - name: Install Qt and MinGW
         uses: jurplel/install-qt-action@v4
         with:
           version: "6.8.3"
-          arch: "win64_msvc2022_64"
+          arch: "win64_mingw"
+          tools: "tools_mingw1310"
           cache: true
 
       - name: Configure
-        run: cmake -S . -B build/ci -G Ninja -DCMAKE_BUILD_TYPE=Release -DKTK_BUILD_TESTS=ON
+        shell: pwsh
+        run: cmake -S . -B build/ci -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DKTK_BUILD_TESTS=ON
 
       - name: Build
+        shell: pwsh
         run: cmake --build build/ci --parallel 4
 
       - name: Test
+        shell: pwsh
         run: ctest --test-dir build/ci --output-on-failure
 
       - name: Package Windows application
