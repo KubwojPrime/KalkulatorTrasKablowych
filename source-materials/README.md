@@ -4,12 +4,12 @@ Ten katalog przechowuje niezmienione dokumenty pobrane z oficjalnych stron
 producentów. Służą one jako ślad audytowy dla danych wprowadzanych do katalogu
 aplikacji.
 
-Stan archiwum na 2026-07-24:
+Stan archiwum na 2026-08-04:
 
-- 24 pliki źródłowe: 14 PDF i 10 migawek HTML;
+- 30 plików źródłowych: 14 PDF i 16 migawek HTML;
 - 5 producentów;
 - 2208 stron PDF;
-- 235 961 741 bajtów (225,03 MiB).
+- 238 119 891 bajtów (227,09 MiB).
 
 Wygenerowany zestaw `2026-07-24.1` zawiera 25 065 wariantów. Raport zachowuje
 cztery odrzucone wiersze BITNER: dwa bez parametrów liczbowych i dwa z podaną
@@ -91,8 +91,9 @@ zamocowań, rozstawu podpór ani wymagań E30/E60/E90.
   angielski zawiera średnice zewnętrzne kabli sieciowych i klasy CPR, ale nie
   zapewnia kompletnej masy `kg/km` dla wszystkich pozycji.
 - **BAKS**: dział PDF katalogu 2024/25 dla koryt i pokryw oraz niezmienione
-  migawki aktualnych kart online 2026 dla drabinek i elementów montażowych.
-  Baza obejmuje wybrane popularne warianty, a każda masa wskazuje konkretny
+  migawki aktualnych kart online 2026 dla korytek KCJ, drabinek i elementów
+  montażowych. Baza obejmuje wybrane popularne warianty, w tym pełny zestaw
+  41 pozycji KCJ/KCOJ w sześciu wysokościach, a każda masa wskazuje konkretny
   plik/stronę lub kartę online.
 
 ## Ekstrakcja i kontrola

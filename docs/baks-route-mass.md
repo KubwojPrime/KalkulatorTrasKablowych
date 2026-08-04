@@ -3,10 +3,11 @@
 ## Zakres
 
 Konfigurator BAKS służy do obliczenia masy własnej systemu trasy przypadającej
-na metr jej długości. Baza `resources/baks-catalog.json` zawiera 55 wybranych
+na metr jej długości. Baza `resources/baks-catalog.json` zawiera 96 wybranych
 popularnych produktów:
 
 - korytka KGR i KGL/KCL H42;
+- 41 wariantów korytek KCJ/KCOJ H42, H50, H60, H80, H100 i H110;
 - drabinki DKP H60 i DUP H100;
 - pokrywy PKL i PKJ;
 - wysięgniki WS, WPL i WWS/WWSO;

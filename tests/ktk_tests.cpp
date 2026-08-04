@@ -93,7 +93,19 @@ void testBaksCatalog()
     QString error;
     const auto catalog = ktk::BaksCatalog::load(&error);
     require(error.isEmpty(), qPrintable(error));
-    require(catalog.size() == 55, "BAKS catalog item count");
+    require(catalog.size() == 96, "BAKS catalog item count");
+    int kcjCount = 0;
+    QSet<int> kcjHeights;
+    for (const auto &product : catalog) {
+        if (product.symbol.contains(QStringLiteral("KCJ"))) {
+            ++kcjCount;
+            kcjHeights.insert(qRound(product.heightMm));
+        }
+    }
+    require(kcjCount == 41, "BAKS KCJ item count");
+    require(
+        kcjHeights == QSet<int>({42, 50, 60, 80, 100, 110}),
+        "BAKS KCJ height families");
 
     const auto route =
         ktk::BaksCatalog::findById(catalog, QStringLiteral("baks-kgr100h42-3"));
@@ -103,13 +115,31 @@ void testBaksCatalog()
         ktk::BaksCatalog::findById(catalog, QStringLiteral("baks-wws200"));
     const auto rod =
         ktk::BaksCatalog::findById(catalog, QStringLiteral("baks-pgm10-3"));
+    const auto kcjH60 = ktk::BaksCatalog::findById(
+        catalog,
+        QStringLiteral("baks-kcj-kcoj200h60-3"));
+    const auto kcjH110 = ktk::BaksCatalog::findById(
+        catalog,
+        QStringLiteral("baks-kcj600h110-3"));
+    const auto kcjH80 = ktk::BaksCatalog::findById(
+        catalog,
+        QStringLiteral("baks-kcj500h80-3"));
     require(route.has_value(), "BAKS route");
     require(cover.has_value(), "BAKS cover");
     require(bracket.has_value(), "BAKS bracket");
     require(rod.has_value(), "BAKS rod");
+    require(kcjH60.has_value(), "BAKS KCJ H60 route");
+    require(kcjH80.has_value(), "BAKS KCJ H80 route");
+    require(kcjH110.has_value(), "BAKS KCJ H110 route");
     requireNear(route->massKgPerUnit, 0.74, "BAKS KGR100 mass");
     require(route->sourcePage == 14, "BAKS KGR100 source page");
     requireNear(rod->massKgPerUnit / rod->lengthM, 0.5, "BAKS PGM10 kg/m");
+    requireNear(kcjH60->massKgPerUnit, 2.13, "BAKS KCJ200H60 mass");
+    require(kcjH60->catalogCode == QStringLiteral("161020"), "BAKS KCJ200H60 code");
+    require(kcjH60->sourcePage == 59, "BAKS KCJ200H60 source page");
+    requireNear(kcjH80->massKgPerUnit, 4.31, "BAKS KCJ500H80 mass");
+    require(kcjH80->sourcePage == 105, "BAKS KCJ500H80 source page");
+    requireNear(kcjH110->massKgPerUnit, 5.16, "BAKS KCJ600H110 mass");
 
     const QVector<ktk::RouteAssemblyItem> assembly = {
         {*route, 1.0},

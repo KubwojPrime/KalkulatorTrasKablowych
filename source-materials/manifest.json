@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "generatedAtUtc": "2026-07-24T21:16:00Z",
-  "sourceCount": 24,
-  "totalBytes": 235961741,
+  "generatedAtUtc": "2026-08-04T09:25:00Z",
+  "sourceCount": 30,
+  "totalBytes": 238119891,
   "totalPages": 2208,
   "verification": {
     "pdfSignatureChecked": true,
@@ -33,6 +33,30 @@
       {
         "file": "source-materials/cobicabling/CobiCabling_Katalog_produktow_PL.pdf",
         "pdfPage": 10
+      },
+      {
+        "file": "source-materials/baks/BAKS_Korytka_kablowe_2024.pdf",
+        "pdfPage": 16
+      },
+      {
+        "file": "source-materials/baks/BAKS_Korytka_kablowe_2024.pdf",
+        "pdfPage": 36
+      },
+      {
+        "file": "source-materials/baks/BAKS_Korytka_kablowe_2024.pdf",
+        "pdfPage": 59
+      },
+      {
+        "file": "source-materials/baks/BAKS_Korytka_kablowe_2024.pdf",
+        "pdfPage": 105
+      },
+      {
+        "file": "source-materials/baks/BAKS_Korytka_kablowe_2024.pdf",
+        "pdfPage": 126
+      },
+      {
+        "file": "source-materials/baks/BAKS_Korytka_kablowe_2024.pdf",
+        "pdfPage": 149
       }
     ],
     "fireLoadFinding": "Dla części wariantów w katalogu elektroenergetycznym TELE-FONIKA znaleziono bezpośrednie ciepło spalania w kWh/m; aplikacja przelicza je jednostkowo przez 3,6 na MJ/m. Dla pozostałych wariantów brak pozostaje brakiem danych. CPR nie może zastępować tej wartości."
@@ -530,6 +554,132 @@
         "catalog-number"
       ],
       "limitations": "Do zestawu należy dodać rzeczywistą liczbę zacisków przypadającą na jeden punkt podparcia."
+    },
+    {
+      "id": "baks-online-kcj-h42-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online KCJ...H42 Korytko",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_KCJ_H42_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/kcjh42-korytko_94.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/kcjh42-korytko_94.html",
+      "retrievedAtUtc": "2026-08-04T09:25:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 373551,
+      "pages": 0,
+      "sha256": "fc323f8c6742e05065694856a962010dfa736eb7bb9e749568c03d3b90df24ed",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    },
+    {
+      "id": "baks-online-kcj-h50-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online KCJ...H50 Korytko",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_KCJ_H50_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/kcjh50-korytko_192.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/kcjh50-korytko_192.html",
+      "retrievedAtUtc": "2026-08-04T09:25:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 396281,
+      "pages": 0,
+      "sha256": "44b779f77f41fae4999025c2a73909ab97ee5938b03a3607ec1f20b58db81273",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    },
+    {
+      "id": "baks-online-kcj-h60-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online KCJ/KCOJ...H60 Korytko",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_KCJ_H60_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/kcj-kcoj-korytko_307.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/kcj-kcoj-korytko_307.html",
+      "retrievedAtUtc": "2026-08-04T09:25:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 423061,
+      "pages": 0,
+      "sha256": "a4be9a846dc00d5935a24a73f1eb9d40332fbdd3540f7891e8e2335a4c8e5e67",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    },
+    {
+      "id": "baks-online-kcj-h80-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online KCJ...H80 Korytko",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_KCJ_H80_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/kcjh80-korytko_431.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/kcjh80-korytko_431.html",
+      "retrievedAtUtc": "2026-08-04T09:25:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 352593,
+      "pages": 0,
+      "sha256": "173e241aabf75393dade759c3dc0b5fa1634e09c4b6f6255b2f078ef6d565d00",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    },
+    {
+      "id": "baks-online-kcj-h100-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online KCJ...H100 Korytko",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_KCJ_H100_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/kcjh100-korytko_522.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/kcjh100-korytko_522.html",
+      "retrievedAtUtc": "2026-08-04T09:25:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 355876,
+      "pages": 0,
+      "sha256": "3fc2dcbc8e86c64720da5bab7443446f08729f1e71791eacf6167570df6c114d",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    },
+    {
+      "id": "baks-online-kcj-h110-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online KCJ...H110 Korytko",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_KCJ_H110_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/kcjh110-korytko-_2009.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/kcjh110-korytko-_2009.html",
+      "retrievedAtUtc": "2026-08-04T09:25:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 256788,
+      "pages": 0,
+      "sha256": "a2cf012765a1ca67f92e5d9c8b791950f33d93926b61ca8935fcb3e364197f8e",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
     }
   ]
 }

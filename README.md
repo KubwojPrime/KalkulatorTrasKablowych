@@ -24,8 +24,9 @@ Zestaw `2026-07-24.1` zawiera 25 065 wariantów: 13 525 BITNER, 8 616 ELPAR,
 2 896 TELE-FONIKA Kable i 28 CobiCabling. Rekordy pozyskane automatycznie mają
 status „do weryfikacji”.
 
-Wbudowany konfigurator BAKS zawiera 55 popularnych wariantów koryt H42, drabinek
-H60/H100, pokryw, wysięgników, podstaw, zacisków i prętów gwintowanych. Użytkownik
+Wbudowany konfigurator BAKS zawiera 96 popularnych wariantów, w tym 41 korytek
+KCJ/KCOJ H42, H50, H60, H80, H100 i H110, a także pozostałe koryta, drabinki,
+pokrywy, wysięgniki, podstawy, zaciski i pręty gwintowane. Użytkownik
 buduje rzeczywisty zestaw na punkt podparcia, podaje liczbę elementów, wysokość
 zwieszenia i rozstaw podpór. Każda pozycja zachowuje symbol, numer katalogowy,
 masę, jednostkę oraz źródło. Szczegóły modelu opisano w
