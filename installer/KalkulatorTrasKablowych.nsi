@@ -41,6 +41,8 @@ VIAddVersionKey /LANG=1045 "LegalCopyright" "Copyright (c) 2026 Jakub"
 !define MUI_FINISHPAGE_RUN "$INSTDIR\KalkulatorTrasKablowych.exe"
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "${LICENSE_FILE}"
+!define MUI_DIRECTORYPAGE_TEXT_TOP "Wybierz docelowy pusty katalog albo katalog wcześniejszej instalacji. Jeśli wybierasz istniejącą lokalizację, utwórz w niej osobny podfolder dla programu."
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE DirectoryPageLeave
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
@@ -82,10 +84,10 @@ Function ValidateInstallDirectory
   validate_done:
 FunctionEnd
 
-Function .onVerifyInstDir
+Function DirectoryPageLeave
   Call ValidateInstallDirectory
   ${If} $R9 != "1"
-    MessageBox MB_ICONEXCLAMATION|MB_OK "Wybierz pusty katalog albo katalog wcześniejszej instalacji Kalkulatora Tras Kablowych. Chroni to inne pliki przed usunięciem podczas deinstalacji."
+    MessageBox MB_ICONEXCLAMATION|MB_OK "Wybrany katalog nie jest pusty i nie jest katalogiem wcześniejszej instalacji. Utwórz osobny pusty podfolder, np. 'Kalkulator Tras Kablowych'. Chroni to inne pliki przed usunięciem podczas deinstalacji."
     Abort
   ${EndIf}
 FunctionEnd

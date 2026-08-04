@@ -18,6 +18,8 @@ wersjonowania semantycznego.
 - wybór katalogu instalacji z ochroną niepustych obcych katalogów;
 - wybór skrótu w menu Start i opcjonalnego skrótu na pulpicie;
 - poprawne kodowanie Unicode treści EULA w instalatorze.
+- poprawiono walidację katalogu instalacji: komunikat pojawia się dopiero po
+  kliknięciu „Dalej”, a nie podczas każdego kliknięcia lub wpisywania ścieżki.
 
 ### Zmieniono
 
