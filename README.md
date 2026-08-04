@@ -154,6 +154,11 @@ prywatny nie jest kopiowany do paczki ani repozytorium.
 Bez zainstalowanego NSIS można zbudować tylko paczkę przenośną poleceniem
 `.\scripts\package-windows.ps1 -SkipInstaller`.
 
+Pełny lokalny test instalacji systemowej należy uruchomić w PowerShellu
+otwartym jako administrator. W procesie bez podwyższonych uprawnień wykonywany
+jest test paczki przenośnej, a test instalatora jest odkładany do GitHub CI,
+gdzie pozostaje obowiązkową bramką wydania.
+
 ## Instalator Windows
 
 Instalator prowadzi użytkownika przez standardowe ekrany:
@@ -164,15 +169,17 @@ Instalator prowadzi użytkownika przez standardowe ekrany:
 4. wybór skrótów;
 5. postęp instalacji i ekran końcowy z możliwością uruchomienia programu.
 
-Domyślna instalacja jest wykonywana bez uprawnień administratora do
-`%LOCALAPPDATA%\Programs\Kalkulator Tras Kablowych`. Użytkownik może wskazać
-inny zapisywalny katalog. Ze względów bezpieczeństwa instalator przyjmuje tylko
-katalog pusty albo rozpoznany katalog wcześniejszej instalacji — zapobiega to
-usunięciu obcych plików przez deinstalator.
+Instalator prosi system Windows o uprawnienia administratora. Domyślna
+instalacja dla wszystkich użytkowników jest wykonywana do
+`%ProgramFiles%\Kalkulator Tras Kablowych`, ale użytkownik może wskazać inny
+katalog. Ze względów bezpieczeństwa instalator przyjmuje tylko katalog pusty
+albo rozpoznany katalog wcześniejszej instalacji — zapobiega to usunięciu
+obcych plików przez deinstalator.
 
-Skrót w menu Start jest domyślnie włączony. Skrót na pulpicie jest opcjonalny.
-Instalator rejestruje program na liście zainstalowanych aplikacji Windows i
-tworzy deinstalator w wybranym katalogu.
+Skrót w menu Start dla wszystkich użytkowników jest domyślnie włączony. Skrót
+na wspólnym pulpicie jest opcjonalny. Instalator zapisuje wpis aplikacji w
+64-bitowej gałęzi `HKLM`, rejestruje program na liście zainstalowanych aplikacji
+Windows i tworzy wymagający administratora deinstalator w wybranym katalogu.
 
 Wydania Early Access używają samopodpisanego certyfikatu Authenticode. Publiczny
 certyfikat, jego odciski oraz instrukcja weryfikacji są dołączone do wydania.

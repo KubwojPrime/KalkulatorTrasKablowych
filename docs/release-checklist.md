@@ -3,7 +3,7 @@
 ## Blokujące przed 1.0.0
 
 - [x] Jedno źródło numeru wersji dla programu, EXE, CI i nazw paczek.
-- [x] Przenośna paczka ZIP oraz instalator per-user niewymagający administratora.
+- [x] Przenośna paczka ZIP oraz instalator all-users wymagający administratora.
 - [x] Automatyczny test startu pliku EXE i instalatora.
 - [x] Testy zgodności starszego schematu i odrzucania uszkodzonych XLSX.
 - [x] Test wydajności na pełnym katalogu około 25 tys. rekordów.

@@ -1,7 +1,8 @@
 param(
     [Parameter(Mandatory = $true)]
     [string]$PackageDirectory,
-    [string]$InstallerPath = ""
+    [string]$InstallerPath = "",
+    [switch]$RequireAdminInstallerTest
 )
 
 $ErrorActionPreference = "Stop"
@@ -38,6 +39,18 @@ function Invoke-SmokeTest([string]$Executable) {
 Invoke-SmokeTest $packageExecutable
 
 if (-not [string]::IsNullOrWhiteSpace($InstallerPath)) {
+    $isElevated = [Security.Principal.WindowsPrincipal]::new(
+        [Security.Principal.WindowsIdentity]::GetCurrent()
+    ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    if (-not $isElevated) {
+        if ($RequireAdminInstallerTest) {
+            throw "Administrator installer smoke test is required, but the current process is not elevated."
+        }
+        Write-Warning "Administrator installer smoke test skipped in a non-elevated process. Run packaging from an elevated PowerShell; GitHub CI enforces the complete test."
+        Write-Output "Windows package smoke test passed (portable package; admin installer deferred)."
+        return
+    }
+
     $installer = [System.IO.Path]::GetFullPath($InstallerPath)
     if (-not (Test-Path -LiteralPath $installer)) {
         throw "Installer is missing: $installer"
@@ -72,11 +85,18 @@ if (-not [string]::IsNullOrWhiteSpace($InstallerPath)) {
             throw "Silent installer failed with exit code $($installProcess.ExitCode)"
         }
         $registeredInstallRoot = Get-ItemPropertyValue `
-            -LiteralPath "HKCU:\Software\KubwojPrime\KalkulatorTrasKablowych" `
+            -LiteralPath "HKLM:\Software\KubwojPrime\KalkulatorTrasKablowych" `
             -Name "InstallDir"
         if ([System.IO.Path]::GetFullPath($registeredInstallRoot) -ne $installRoot) {
             throw "Installer did not preserve the selected installation directory."
         }
+        $uninstallRegistration = Get-ItemProperty `
+            -LiteralPath "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych"
+        if ($uninstallRegistration.InstallLocation -ne $installRoot -or
+            [string]::IsNullOrWhiteSpace($uninstallRegistration.UninstallString)) {
+            throw "Installer did not create the expected all-users uninstall registration."
+        }
+        Write-Output "All-users HKLM registration test passed."
         Write-Output "Existing empty directory installation test passed."
         Invoke-SmokeTest (Join-Path $installRoot "KalkulatorTrasKablowych.exe")
 

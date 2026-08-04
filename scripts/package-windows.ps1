@@ -5,7 +5,8 @@ param(
     [string]$SigningCertificateThumbprint = "",
     [string]$TimestampServer = "http://timestamp.digicert.com",
     [switch]$SkipBuild,
-    [switch]$SkipInstaller
+    [switch]$SkipInstaller,
+    [switch]$RequireAdminInstallerTest
 )
 
 $ErrorActionPreference = "Stop"
@@ -276,8 +277,14 @@ if (-not $SkipInstaller) {
     }
     Set-KtkAuthenticodeSignature $installerPath
     Test-KtkAuthenticodeSignature $installerPath
-    & (Join-Path $PSScriptRoot "test-windows-package.ps1") `
-        -PackageDirectory $stageRoot -InstallerPath $installerPath
+    $installerTestArguments = @{
+        PackageDirectory = $stageRoot
+        InstallerPath = $installerPath
+    }
+    if ($RequireAdminInstallerTest) {
+        $installerTestArguments.RequireAdminInstallerTest = $true
+    }
+    & (Join-Path $PSScriptRoot "test-windows-package.ps1") @installerTestArguments
     if ($LASTEXITCODE -ne 0) { throw "Installer smoke test failed." }
     $artifacts += $installerPath
 }

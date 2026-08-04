@@ -22,9 +22,8 @@ Var NoShortcuts
 
 Name "Kalkulator Tras Kablowych"
 OutFile "${OUTPUT_DIR}\KalkulatorTrasKablowych-${APP_VERSION}-win64-setup.exe"
-InstallDir "$LOCALAPPDATA\Programs\Kalkulator Tras Kablowych"
-InstallDirRegKey HKCU "Software\KubwojPrime\KalkulatorTrasKablowych" "InstallDir"
-RequestExecutionLevel user
+InstallDir "$PROGRAMFILES64\Kalkulator Tras Kablowych"
+RequestExecutionLevel admin
 ShowInstDetails show
 ShowUninstDetails show
 BrandingText "Kalkulator Tras Kablowych ${APP_VERSION}"
@@ -55,6 +54,13 @@ VIAddVersionKey /LANG=1045 "LegalCopyright" "Copyright (c) 2026 Jakub"
 !insertmacro MUI_LANGUAGE "English"
 
 Function .onInit
+  SetShellVarContext all
+  SetRegView 64
+  ReadRegStr $R2 HKLM "Software\KubwojPrime\KalkulatorTrasKablowych" "InstallDir"
+  StrCmp $R2 "" no_previous_installation
+  StrCpy $INSTDIR $R2
+
+  no_previous_installation:
   ${GetParameters} $R0
   ClearErrors
   ${GetOptions} $R0 "/NO_SHORTCUTS=" $R1
@@ -62,6 +68,11 @@ Function .onInit
   StrCpy $NoShortcuts $R1
 
   no_shortcut_override:
+FunctionEnd
+
+Function un.onInit
+  SetShellVarContext all
+  SetRegView 64
 FunctionEnd
 
 Function ValidateInstallDirectory
@@ -131,15 +142,16 @@ Section "Program (wymagane)" MainSection
   Delete "$SMPROGRAMS\Kalkulator Tras Kablowych\Odinstaluj.lnk"
   RMDir "$SMPROGRAMS\Kalkulator Tras Kablowych"
 
-  WriteRegStr HKCU "Software\KubwojPrime\KalkulatorTrasKablowych" "InstallDir" "$INSTDIR"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "DisplayName" "Kalkulator Tras Kablowych"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "DisplayVersion" "${APP_VERSION}"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "Publisher" "Jakub"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "InstallLocation" "$INSTDIR"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "DisplayIcon" "$INSTDIR\KalkulatorTrasKablowych.exe"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "UninstallString" '"$INSTDIR\Uninstall.exe"'
-  WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "NoModify" 1
-  WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "NoRepair" 1
+  WriteRegStr HKLM "Software\KubwojPrime\KalkulatorTrasKablowych" "InstallDir" "$INSTDIR"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "DisplayName" "Kalkulator Tras Kablowych"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "DisplayVersion" "${APP_VERSION}"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "Publisher" "KubwojPrime"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "InstallLocation" "$INSTDIR"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "DisplayIcon" "$INSTDIR\KalkulatorTrasKablowych.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "UninstallString" '"$INSTDIR\Uninstall.exe"'
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "QuietUninstallString" '"$INSTDIR\Uninstall.exe" /S'
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "NoModify" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "NoRepair" 1
 SectionEnd
 
 Section "Skrót w menu Start" StartMenuShortcutSection
@@ -175,8 +187,8 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\Kalkulator Tras Kablowych\Odinstaluj.lnk"
   RMDir "$SMPROGRAMS\Kalkulator Tras Kablowych"
   Delete "$DESKTOP\Kalkulator Tras Kablowych.lnk"
-  DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych"
-  DeleteRegKey HKCU "Software\KubwojPrime\KalkulatorTrasKablowych"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych"
+  DeleteRegKey HKLM "Software\KubwojPrime\KalkulatorTrasKablowych"
   Delete "$INSTDIR\.ktk-install-root"
   RMDir /r "$INSTDIR"
 SectionEnd

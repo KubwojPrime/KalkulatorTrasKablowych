@@ -22,6 +22,9 @@ wersjonowania semantycznego.
   kliknięciu „Dalej”, a nie podczas każdego kliknięcia lub wpisywania ścieżki.
 - poprawiono rozpoznawanie istniejącego pustego katalogu przez pomijanie
   technicznych wpisów `.` i `..`; dodano odpowiadający test regresji.
+- instalator i deinstalator wymagają uprawnień administratora, domyślnie używają
+  64-bitowego `Program Files` oraz rejestrują aplikację i skróty dla wszystkich
+  użytkowników w `HKLM`.
 
 ### Zmieniono
 
