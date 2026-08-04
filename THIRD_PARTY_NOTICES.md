@@ -12,6 +12,8 @@ Strona licencji: <https://www.qt.io/licensing/>
 W planowanej bezpłatnej dystrybucji własnościowej należy używać dynamicznego
 linkowania z modułami dostępnymi na LGPLv3, przekazać użytkownikowi wymagane
 informacje i tekst licencji oraz nie ograniczać praw do wymiany bibliotek Qt.
+Kopia tekstu LGPLv3 używana przez proces pakowania znajduje się w
+`third_party/licenses/Qt-LGPL-3.0.txt`.
 
 ## QXlsx 1.5.1.1
 

@@ -91,24 +91,9 @@ New-Item -ItemType Directory -Path $licenseDirectory -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $projectRoot "third_party\QXlsx\LICENSE") `
     -Destination (Join-Path $licenseDirectory "QXlsx-MIT.txt")
 
-$licenseCopies = @{
-    "C:\Qt\Tools\QtCreator\share\qtcreator\generic-highlighter\syntax\licenses\LICENSE.LGPLv3" = "Qt-LGPL-3.0.txt"
-    "C:\Qt\Tools\mingw1310_64\licenses\gcc\COPYING3" = "GNU-GPL-3.0.txt"
-    "C:\Qt\Tools\mingw1310_64\licenses\gcc\COPYING.RUNTIME" = "GCC-Runtime-Library-Exception.txt"
-    "C:\Qt\Tools\mingw1310_64\licenses\mingw-w64\COPYING.MinGW-w64-runtime.txt" = "MinGW-w64-runtime.txt"
-    "C:\Qt\Tools\mingw1310_64\licenses\winpthreads\COPYING" = "winpthreads-COPYING.txt"
-}
-foreach ($source in $licenseCopies.Keys) {
-    if (Test-Path -LiteralPath $source) {
-        Copy-Item -LiteralPath $source `
-            -Destination (Join-Path $licenseDirectory $licenseCopies[$source])
-    }
-}
-
 function Ensure-LicenseFile(
     [string]$DestinationName,
-    [string[]]$Candidates,
-    [string]$FallbackUrl
+    [string[]]$Candidates
 ) {
     $destination = Join-Path $licenseDirectory $DestinationName
     if (Test-Path -LiteralPath $destination) { return }
@@ -118,18 +103,37 @@ function Ensure-LicenseFile(
             return
         }
     }
-    Invoke-WebRequest -Uri $FallbackUrl -OutFile $destination
+    throw "Missing required third-party license: $DestinationName"
 }
 
 Ensure-LicenseFile "Qt-LGPL-3.0.txt" @(
-    "C:\Qt\Tools\QtCreator\share\qtcreator\generic-highlighter\syntax\licenses\LICENSE.LGPLv3"
-) "https://www.gnu.org/licenses/lgpl-3.0.txt"
+    (Join-Path $projectRoot "third_party\licenses\Qt-LGPL-3.0.txt")
+)
+
+$toolchainRoots = @("C:\Qt\Tools\mingw1310_64")
+$compilerCommand = Get-Command "g++.exe" -ErrorAction SilentlyContinue
+if ($compilerCommand) {
+    $compilerBin = Split-Path -Parent $compilerCommand.Source
+    $toolchainRoots += Split-Path -Parent $compilerBin
+}
+$toolchainRoots = @($toolchainRoots | Select-Object -Unique)
+
+function Get-ToolchainLicenseCandidates([string]$RelativePath) {
+    @($toolchainRoots | ForEach-Object { Join-Path $_ $RelativePath })
+}
+
 Ensure-LicenseFile "GNU-GPL-3.0.txt" @(
-    "C:\Qt\Tools\mingw1310_64\licenses\gcc\COPYING3"
-) "https://www.gnu.org/licenses/gpl-3.0.txt"
+    Get-ToolchainLicenseCandidates "licenses\gcc\COPYING3"
+)
 Ensure-LicenseFile "GCC-Runtime-Library-Exception.txt" @(
-    "C:\Qt\Tools\mingw1310_64\licenses\gcc\COPYING.RUNTIME"
-) "https://www.gnu.org/licenses/gcc-exception-3.1.txt"
+    Get-ToolchainLicenseCandidates "licenses\gcc\COPYING.RUNTIME"
+)
+Ensure-LicenseFile "MinGW-w64-runtime.txt" @(
+    Get-ToolchainLicenseCandidates "licenses\mingw-w64\COPYING.MinGW-w64-runtime.txt"
+)
+Ensure-LicenseFile "winpthreads-COPYING.txt" @(
+    Get-ToolchainLicenseCandidates "licenses\winpthreads\COPYING"
+)
 
 $windeployqtCommand = Get-Command "windeployqt.exe" -ErrorAction SilentlyContinue
 $windeployqt = if ($windeployqtCommand) {

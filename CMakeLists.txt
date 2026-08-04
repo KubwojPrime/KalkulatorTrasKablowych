@@ -153,6 +153,10 @@ install(FILES
     DESTINATION licenses
     RENAME QXlsx-MIT.txt
 )
+install(FILES
+    third_party/licenses/Qt-LGPL-3.0.txt
+    DESTINATION licenses
+)
 
 include(CTest)
 if(BUILD_TESTING AND KTK_BUILD_TESTS)
