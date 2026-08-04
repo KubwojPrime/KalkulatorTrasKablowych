@@ -12,8 +12,10 @@
 - [x] Automatyczny test integralności źródeł i wygenerowanego katalogu w CI.
 - [ ] Test wszystkich głównych operacji GUI na Windows 10 i Windows 11.
 - [ ] Przegląd treści EULA przez prawnika przed dystrybucją komercyjną.
-- [ ] Decyzja o podpisie cyfrowym EXE i instalatora; brak podpisu musi być jawnie
-  opisany w informacji o wydaniu.
+- [x] Early Access: podpis cyfrowy EXE i instalatora samopodpisanym certyfikatem
+  z jawnym odciskiem i instrukcją zaufania.
+- [ ] 1.0.0: zastąpić certyfikat samopodpisany certyfikatem publicznie zaufanym
+  albo jawnie zaakceptować ostrzeżenia Windows.
 
 ## Procedura wydania
 

@@ -12,6 +12,9 @@ wersjonowania semantycznego.
 - testy importu starszego schematu XLSX oraz ręcznie uszkodzonych plików;
 - kontrolę czasu ładowania i filtrowania pełnego katalogu kabli;
 - sumy SHA-256 artefaktów wydania i automatyczną publikację po tagu.
+- opcjonalne podpisywanie Authenticode pliku EXE i instalatora certyfikatem z
+  lokalnego magazynu Windows;
+- eksport publicznego certyfikatu i odcisku dla wydań Early Access.
 
 ### Zmieniono
 

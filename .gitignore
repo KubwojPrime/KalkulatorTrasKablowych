@@ -18,6 +18,10 @@
 *.sqlite-wal
 *.xlsx
 *.log
+*.pfx
+*.p12
+*.pvk
+*.key
 __pycache__/
 *.py[cod]
 

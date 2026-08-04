@@ -2,6 +2,8 @@ param(
     [string]$Preset = "windows-release",
     [string]$BuildDirectory = "",
     [string]$Version = "",
+    [string]$SigningCertificateThumbprint = "",
+    [string]$TimestampServer = "http://timestamp.digicert.com",
     [switch]$SkipBuild,
     [switch]$SkipInstaller
 )
@@ -17,6 +19,59 @@ if ([string]::IsNullOrWhiteSpace($BuildDirectory)) {
     $buildRoot = [System.IO.Path]::GetFullPath((Join-Path $projectRoot $BuildDirectory))
 }
 $releaseRoot = [System.IO.Path]::GetFullPath((Join-Path $projectRoot "release"))
+
+$signingCertificate = $null
+if (-not [string]::IsNullOrWhiteSpace($SigningCertificateThumbprint)) {
+    $normalizedThumbprint = $SigningCertificateThumbprint.Replace(" ", "").ToUpperInvariant()
+    $certificatePath = "Cert:\CurrentUser\My\$normalizedThumbprint"
+    $signingCertificate = Get-Item -LiteralPath $certificatePath -ErrorAction SilentlyContinue
+    if (-not $signingCertificate) {
+        throw "Code-signing certificate was not found: $normalizedThumbprint"
+    }
+    if (-not $signingCertificate.HasPrivateKey) {
+        throw "Code-signing certificate has no private key: $normalizedThumbprint"
+    }
+    if ($signingCertificate.NotAfter -le (Get-Date)) {
+        throw "Code-signing certificate has expired: $($signingCertificate.NotAfter)"
+    }
+    $codeSigningOid = "1.3.6.1.5.5.7.3.3"
+    $hasCodeSigningUsage = @($signingCertificate.Extensions | Where-Object {
+        $_ -is [System.Security.Cryptography.X509Certificates.X509EnhancedKeyUsageExtension]
+    } | ForEach-Object { $_.EnhancedKeyUsages } | Where-Object {
+        $_.Value -eq $codeSigningOid
+    }).Count -gt 0
+    if (-not $hasCodeSigningUsage) {
+        throw "Certificate is not valid for code signing: $normalizedThumbprint"
+    }
+}
+
+function Set-KtkAuthenticodeSignature([string]$TargetPath) {
+    if (-not $signingCertificate) { return }
+    $signature = Set-AuthenticodeSignature `
+        -LiteralPath $TargetPath `
+        -Certificate $signingCertificate `
+        -HashAlgorithm SHA256 `
+        -TimestampServer $TimestampServer
+    if (-not $signature.SignerCertificate -or
+        $signature.SignerCertificate.Thumbprint -ne $signingCertificate.Thumbprint) {
+        throw "Authenticode signing failed for: $TargetPath ($($signature.StatusMessage))"
+    }
+    if (-not $signature.TimeStamperCertificate) {
+        throw "Authenticode timestamp is missing for: $TargetPath"
+    }
+}
+
+function Test-KtkAuthenticodeSignature([string]$TargetPath) {
+    if (-not $signingCertificate) { return }
+    $signature = Get-AuthenticodeSignature -LiteralPath $TargetPath
+    if (-not $signature.SignerCertificate -or
+        $signature.SignerCertificate.Thumbprint -ne $signingCertificate.Thumbprint) {
+        throw "Unexpected Authenticode signer for: $TargetPath"
+    }
+    if (-not $signature.TimeStamperCertificate) {
+        throw "Authenticode timestamp verification failed for: $TargetPath"
+    }
+}
 
 foreach ($path in @($buildRoot, $releaseRoot)) {
     if (-not $path.StartsWith(
@@ -85,6 +140,10 @@ New-Item -ItemType Directory -Path $docsDirectory -Force | Out-Null
 foreach ($file in @("fire-load-estimation.md", "baks-route-mass.md", "data-governance.md", "license-and-access.md")) {
     Copy-Item -LiteralPath (Join-Path $projectRoot "docs\$file") -Destination $docsDirectory
 }
+if ($signingCertificate) {
+    Copy-Item -LiteralPath (Join-Path $projectRoot "docs\early-access-signature.md") `
+        -Destination $docsDirectory
+}
 
 $licenseDirectory = Join-Path $stageRoot "licenses"
 New-Item -ItemType Directory -Path $licenseDirectory -Force | Out-Null
@@ -150,6 +209,37 @@ if (-not (Test-Path -LiteralPath $windeployqt)) {
     (Join-Path $stageRoot "KalkulatorTrasKablowych.exe")
 if ($LASTEXITCODE -ne 0) { throw "windeployqt failed." }
 
+$publicCertificatePath = $null
+$certificateInfoPath = $null
+if ($signingCertificate) {
+    $publicCertificatePath = Join-Path $releaseRoot `
+        "KalkulatorTrasKablowych-$Version-early-access-code-signing.cer"
+    $certificateInfoPath = Join-Path $releaseRoot `
+        "KalkulatorTrasKablowych-$Version-early-access-code-signing.txt"
+    Export-Certificate -Cert $signingCertificate -FilePath $publicCertificatePath -Force | Out-Null
+
+    $certificateLines = @(
+        "Kalkulator Tras Kablowych - Early Access self-signed code-signing certificate"
+        "Subject: $($signingCertificate.Subject)"
+        "Issuer: $($signingCertificate.Issuer)"
+        "SHA-1 thumbprint: $($signingCertificate.Thumbprint)"
+        "SHA-256 certificate fingerprint: $((Get-FileHash -Algorithm SHA256 -LiteralPath $publicCertificatePath).Hash)"
+        "Valid from: $($signingCertificate.NotBefore.ToUniversalTime().ToString('u'))"
+        "Valid until: $($signingCertificate.NotAfter.ToUniversalTime().ToString('u'))"
+        "Trust scope: Early Access only; not issued by a public certification authority."
+    )
+    Set-Content -LiteralPath $certificateInfoPath -Value $certificateLines -Encoding utf8
+    Copy-Item -LiteralPath $publicCertificatePath `
+        -Destination (Join-Path $stageRoot "EarlyAccess-CodeSigning.cer")
+    Copy-Item -LiteralPath $certificateInfoPath `
+        -Destination (Join-Path $stageRoot "EarlyAccess-CodeSigning.txt")
+
+    Set-KtkAuthenticodeSignature `
+        (Join-Path $stageRoot "KalkulatorTrasKablowych.exe")
+    Test-KtkAuthenticodeSignature `
+        (Join-Path $stageRoot "KalkulatorTrasKablowych.exe")
+}
+
 & (Join-Path $PSScriptRoot "test-windows-package.ps1") -PackageDirectory $stageRoot
 if ($LASTEXITCODE -ne 0) { throw "Portable package smoke test failed." }
 
@@ -178,10 +268,17 @@ if (-not $SkipInstaller) {
     if (-not (Test-Path -LiteralPath $installerPath)) {
         throw "NSIS did not create expected installer: $installerPath"
     }
+    Set-KtkAuthenticodeSignature $installerPath
+    Test-KtkAuthenticodeSignature $installerPath
     & (Join-Path $PSScriptRoot "test-windows-package.ps1") `
         -PackageDirectory $stageRoot -InstallerPath $installerPath
     if ($LASTEXITCODE -ne 0) { throw "Installer smoke test failed." }
     $artifacts += $installerPath
+}
+
+if ($publicCertificatePath) {
+    $artifacts += $publicCertificatePath
+    $artifacts += $certificateInfoPath
 }
 
 $hashPath = Join-Path $releaseRoot "SHA256SUMS-$Version.txt"
