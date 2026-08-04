@@ -119,9 +119,10 @@ niejednoznaczne wiersze w `source-materials/extraction-rejects.json`.
 Wymagania:
 
 - CMake 3.24 lub nowszy;
-- Qt 6.5 lub nowszy z modułami Core, Gui, Widgets, Sql i Network;
+- Qt 6.5 lub nowszy z modułami Core, Gui, Widgets i Sql;
 - MinGW 64-bit albo MSVC;
-- podmoduł QXlsx.
+- podmoduł QXlsx;
+- NSIS 3.x do utworzenia instalatora (nie jest wymagany dla samej kompilacji).
 
 ```powershell
 git submodule update --init --recursive
@@ -139,23 +140,26 @@ Paczka Windows:
 .\scripts\package-windows.ps1
 ```
 
-Archiwum powstaje w `release\KalkulatorTrasKablowych-<wersja>-win64.zip`.
+Skrypt pobiera numer wersji bezpośrednio z konfiguracji CMake, uruchamia testy
+oraz test startu gotowej paczki. Powstają:
 
-## Kontrola dostępu
+- `release\KalkulatorTrasKablowych-<wersja>-win64.zip`;
+- `release\KalkulatorTrasKablowych-<wersja>-win64-setup.exe`;
+- `release\SHA256SUMS-<wersja>.txt`.
 
-Domyślna kompilacja deweloperska nie wymaga serwera licencyjnego. Wersję
-dystrybucyjną z możliwością cofnięcia dostępu buduje się przykładowo tak:
+Bez zainstalowanego NSIS można zbudować tylko paczkę przenośną poleceniem
+`.\scripts\package-windows.ps1 -SkipInstaller`.
 
-```powershell
-cmake -S . -B build/licensed -G "MinGW Makefiles" `
-  -DCMAKE_PREFIX_PATH=C:/Qt/6.11.0/mingw_64 `
-  -DKTK_LICENSE_REQUIRED=ON `
-  -DKTK_LICENSE_ENDPOINT=https://licencje.example.com/v1/verify `
-  -DKTK_OFFLINE_GRACE_HOURS=24
-```
+## Licencja i dostęp
 
-Kontrakt serwera i ograniczenia mechanizmu opisano w
+Aplikacja działa całkowicie offline. Nie ma serwera aktywacyjnego, telemetrii ani
+technicznej blokady zainstalowanej kopii. Dostęp jest udzielany i może być
+cofnięty pisemnie na zasadach `EULA.txt`. Model i jego ograniczenia opisano w
 [`docs/license-and-access.md`](docs/license-and-access.md).
+
+Numer wersji w aplikacji, właściwościach EXE, nazwach paczek i instalatorze
+pochodzi z deklaracji `project(... VERSION ...)` w `CMakeLists.txt`. Wysłanie tagu
+`v<wersja>` uruchamia publikację obu paczek oraz sum SHA-256 w GitHub Releases.
 
 ## Status odpowiedzialności
 

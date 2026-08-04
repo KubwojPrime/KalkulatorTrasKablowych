@@ -8,6 +8,7 @@
 #include <xlsxdocument.h>
 
 #include <QCoreApplication>
+#include <QElapsedTimer>
 #include <QFile>
 #include <QSet>
 #include <QSqlDatabase>
@@ -86,6 +87,45 @@ void testCalculator()
     require(result.estimatedFireLoadRows == 1, "estimated fire load rows");
     require(result.exceedsFillLimit, "fill limit");
     require(result.exceedsFireLoadLimit, "fire load limit");
+}
+
+void testCalculatorBoundaries()
+{
+    ktk::ProjectData project;
+    project.route.internalWidthMm = -100.0;
+    project.route.internalHeightMm = 50.0;
+    project.route.trayMassKgPerM = -1.0;
+    project.route.coverMassKgPerM = -1.0;
+    project.route.hangerBaseMassKg = -1.0;
+    project.route.suspensionHeightM = -1.0;
+    project.route.suspensionVerticalMassKgPerM = -1.0;
+    project.route.supportSpacingM = 0.0;
+
+    ktk::CableRow zeroQuantity;
+    zeroQuantity.quantity = 0;
+    zeroQuantity.outerDiameterMm = 10.0;
+
+    ktk::CableRow negativeMass;
+    negativeMass.quantity = 1;
+    negativeMass.outerDiameterMm = 10.0;
+    negativeMass.massKgPerKm = -1.0;
+
+    ktk::CableRow validZeroValues;
+    validZeroValues.quantity = 1;
+    validZeroValues.outerDiameterMm = 5.0;
+    validZeroValues.massKgPerKm = 0.0;
+    validZeroValues.fireLoadMjPerM = 0.0;
+
+    project.cables = {zeroQuantity, negativeMass, validZeroValues};
+    const auto result = ktk::Calculator::calculate(project);
+
+    requireNear(result.routeAreaMm2, 0.0, "negative route dimension");
+    requireNear(result.fillPercent, 0.0, "zero route fill");
+    requireNear(result.reservedCableAreaMm2, 25.0, "only valid cable area");
+    requireNear(result.supportSystemMassKgPerM, 0.0, "negative support values clamped");
+    require(result.invalidRows == 2, "invalid calculator row count");
+    require(result.unknownMassRows == 0, "zero mass remains known");
+    require(result.unknownFireLoadRows == 0, "zero fire load remains known");
 }
 
 void testBaksCatalog()
@@ -318,12 +358,15 @@ void createLegacyCatalog(const QString &databasePath)
 void testCatalog(const QString &databasePath)
 {
     createLegacyCatalog(databasePath);
+    QElapsedTimer loadTimer;
+    loadTimer.start();
     ktk::CatalogRepository repository(databasePath);
     QString error;
     require(repository.open(&error), qPrintable(error));
     const auto items = repository.allItems(&error);
     require(error.isEmpty(), qPrintable(error));
     require(items.size() >= 15000, "catalog item count");
+    require(loadTimer.elapsed() < 60000, "catalog load performance under 60 seconds");
 
     QSet<QString> manufacturers;
     bool cobiMissingMass = false;
@@ -379,6 +422,156 @@ void testCatalog(const QString &databasePath)
         "TFK direct-value estimate benchmarks");
     require(legacyItemPreserved, "legacy custom catalog item preserved");
     require(realYkyMatches > 0, "real catalog Outlook-style YKY query");
+
+    QElapsedTimer filterTimer;
+    filterTimer.start();
+    int repeatedQueryMatches = 0;
+    for (const auto &item : items) {
+        if (realMatcher.matches(item)) {
+            ++repeatedQueryMatches;
+        }
+    }
+    require(repeatedQueryMatches == realYkyMatches, "repeatable catalog query");
+    require(filterTimer.elapsed() < 10000, "catalog filter performance under 10 seconds");
+}
+
+struct TestWorkbookOptions {
+    int schemaVersion = 4;
+    QVariant width = 200.0;
+    QVariant quantity = 2;
+    QVariant diameter = 10.0;
+    QVariant mass = 120.0;
+    QVariant fireLoad = 0.75;
+    bool includeProjectSheet = true;
+    bool includeCableSheet = true;
+};
+
+void createTestProjectWorkbook(
+    const QString &path,
+    const TestWorkbookOptions &options = {})
+{
+    QXlsx::Document document;
+    document.addSheet(QStringLiteral("Meta"));
+    document.selectSheet(QStringLiteral("Meta"));
+    document.write(1, 1, QStringLiteral("schema"));
+    document.write(1, 2, QStringLiteral("KalkulatorTrasKablowych"));
+    document.write(2, 1, QStringLiteral("schemaVersion"));
+    document.write(2, 2, options.schemaVersion);
+
+    if (options.includeProjectSheet) {
+        document.addSheet(QStringLiteral("Projekt"));
+        document.selectSheet(QStringLiteral("Projekt"));
+        document.write(1, 2, QStringLiteral("Projekt zgodnosci"));
+        document.write(2, 2, options.width);
+        document.write(3, 2, 60.0);
+        document.write(4, 2, 40.0);
+        document.write(5, 2, 12.0);
+        document.write(7, 2, 1.0);
+        document.write(8, 2, 0.5);
+        document.write(9, 2, 0.25);
+        document.write(10, 2, 0.8);
+        document.write(11, 2, 0.4);
+        document.write(12, 2, 1.5);
+    }
+
+    if (options.includeCableSheet) {
+        document.addSheet(QStringLiteral("Kable"));
+        document.selectSheet(QStringLiteral("Kable"));
+        document.write(2, 1, QStringLiteral("Producent testowy"));
+        document.write(2, 2, QStringLiteral("YKY 3 x 2,5"));
+        document.write(2, 3, QStringLiteral("TEST-1"));
+        document.write(2, 4, options.quantity);
+        document.write(2, 5, options.diameter);
+        document.write(2, 6, options.mass);
+        document.write(2, 7, options.fireLoad);
+        if (options.schemaVersion >= 3) {
+            document.write(2, 8, QStringLiteral("wartosc podana / producent"));
+            document.write(2, 10, QStringLiteral("Dca-s2,d2"));
+            document.write(2, 11, QStringLiteral("https://example.invalid/new"));
+        } else {
+            document.write(2, 8, QStringLiteral("Dca-s2,d2"));
+            document.write(2, 9, QStringLiteral("https://example.invalid/legacy"));
+        }
+    }
+
+    require(document.saveAs(path), "save generated XLSX fixture");
+}
+
+void testXlsxCompatibilityAndValidation(const QString &directoryPath)
+{
+    QString error;
+
+    TestWorkbookOptions legacyOptions;
+    legacyOptions.schemaVersion = 2;
+    const QString legacyPath = directoryPath + QStringLiteral("/legacy-v2.xlsx");
+    createTestProjectWorkbook(legacyPath, legacyOptions);
+    ktk::ProjectData legacy;
+    require(
+        ktk::XlsxProjectIo::importProject(legacyPath, &legacy, &error),
+        qPrintable(error));
+    require(legacy.cables.size() == 1, "legacy XLSX cable count");
+    requireNear(legacy.route.internalWidthMm, 200.0, "legacy XLSX width");
+    require(
+        legacy.cables.at(0).cprClass == QStringLiteral("Dca-s2,d2"),
+        "legacy XLSX CPR column");
+    require(
+        legacy.cables.at(0).source == QStringLiteral("https://example.invalid/legacy"),
+        "legacy XLSX source column");
+
+    const auto expectRejected = [&](const QString &path, const char *label) {
+        ktk::ProjectData unchanged;
+        unchanged.route.projectName = QStringLiteral("nie zmieniaj");
+        error.clear();
+        require(!ktk::XlsxProjectIo::importProject(path, &unchanged, &error), label);
+        require(!error.isEmpty(), "rejected XLSX explains error");
+        require(
+            unchanged.route.projectName == QStringLiteral("nie zmieniaj"),
+            "rejected XLSX is atomic");
+    };
+
+    const QString unrelatedPath = directoryPath + QStringLiteral("/unrelated.xlsx");
+    {
+        QXlsx::Document unrelated;
+        unrelated.write(1, 1, QStringLiteral("zwykly arkusz"));
+        require(unrelated.saveAs(unrelatedPath), "save unrelated workbook");
+    }
+    expectRejected(unrelatedPath, "reject non-project XLSX");
+
+    TestWorkbookOptions future;
+    future.schemaVersion = 999;
+    const QString futurePath = directoryPath + QStringLiteral("/future.xlsx");
+    createTestProjectWorkbook(futurePath, future);
+    expectRejected(futurePath, "reject future XLSX schema");
+
+    TestWorkbookOptions missingCableSheet;
+    missingCableSheet.includeCableSheet = false;
+    const QString missingCablePath = directoryPath + QStringLiteral("/missing-cables.xlsx");
+    createTestProjectWorkbook(missingCablePath, missingCableSheet);
+    expectRejected(missingCablePath, "reject XLSX without cable sheet");
+
+    TestWorkbookOptions invalidWidth;
+    invalidWidth.width = QStringLiteral("dwieście");
+    const QString invalidWidthPath = directoryPath + QStringLiteral("/invalid-width.xlsx");
+    createTestProjectWorkbook(invalidWidthPath, invalidWidth);
+    expectRejected(invalidWidthPath, "reject textual route width");
+
+    TestWorkbookOptions missingWidth;
+    missingWidth.width = QVariant();
+    const QString missingWidthPath = directoryPath + QStringLiteral("/missing-width.xlsx");
+    createTestProjectWorkbook(missingWidthPath, missingWidth);
+    expectRejected(missingWidthPath, "reject missing route width");
+
+    TestWorkbookOptions invalidQuantity;
+    invalidQuantity.quantity = 0;
+    const QString invalidQuantityPath = directoryPath + QStringLiteral("/invalid-quantity.xlsx");
+    createTestProjectWorkbook(invalidQuantityPath, invalidQuantity);
+    expectRejected(invalidQuantityPath, "reject zero cable quantity");
+
+    TestWorkbookOptions invalidFireLoad;
+    invalidFireLoad.fireLoad = -0.1;
+    const QString invalidFireLoadPath = directoryPath + QStringLiteral("/invalid-fire-load.xlsx");
+    createTestProjectWorkbook(invalidFireLoadPath, invalidFireLoad);
+    expectRejected(invalidFireLoadPath, "reject negative fire load");
 }
 
 } // namespace
@@ -389,6 +582,8 @@ int main(int argc, char *argv[])
     QCoreApplication application(argc, argv);
     testCalculator();
     std::cerr << "calculator: passed\n";
+    testCalculatorBoundaries();
+    std::cerr << "calculator boundaries: passed\n";
     testBaksCatalog();
     std::cerr << "BAKS catalog: passed\n";
     testCatalogFilter();
@@ -398,6 +593,8 @@ int main(int argc, char *argv[])
     QTemporaryDir directory;
     require(directory.isValid(), "temporary directory");
     std::cerr << "xlsx: temporary directory ready\n";
+    testXlsxCompatibilityAndValidation(directory.path());
+    std::cerr << "xlsx compatibility and validation: passed\n";
     testCatalog(directory.filePath(QStringLiteral("catalog.sqlite")));
     std::cerr << "catalog: passed\n";
 

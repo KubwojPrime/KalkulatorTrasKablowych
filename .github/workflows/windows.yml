@@ -2,8 +2,12 @@ name: Windows
 
 on:
   push:
-    branches: [main, "agent/**"]
+    branches: [main, "agent/**", "codex/**"]
+    tags: ["v*"]
   pull_request:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -22,9 +26,36 @@ jobs:
           tools: "tools_mingw1310"
           cache: true
 
+      - name: Install NSIS
+        shell: pwsh
+        run: choco install nsis --no-progress -y
+
+      - name: Verify source manifest pointers
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        shell: pwsh
+        run: .\scripts\verify-source-materials.ps1 -AllowLfsPointers
+
+      - name: Fetch and verify complete source archive for release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        run: |
+          git lfs pull
+          .\scripts\verify-source-materials.ps1
+
+      - name: Verify generated cable catalog
+        shell: pwsh
+        run: python .\tools\verify_catalog_dataset.py
+
       - name: Configure
         shell: pwsh
         run: cmake -S . -B build/ci -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DKTK_BUILD_TESTS=ON
+
+      - name: Read application version
+        shell: pwsh
+        run: |
+          $version = (Get-Content -Raw build/ci/ktk-version.txt).Trim()
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Invalid version: $version" }
+          "KTK_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Build
         shell: pwsh
@@ -34,21 +65,37 @@ jobs:
         shell: pwsh
         run: ctest --test-dir build/ci --output-on-failure
 
-      - name: Package Windows application
+      - name: Package portable application and installer
+        shell: pwsh
+        run: .\scripts\package-windows.ps1 -BuildDirectory build/ci -SkipBuild
+
+      - name: Validate release tag
+        if: startsWith(github.ref, 'refs/tags/')
         shell: pwsh
         run: |
-          $stage = Join-Path $PWD "release/KalkulatorTrasKablowych-0.5.0-win64"
-          New-Item -ItemType Directory -Path $stage -Force | Out-Null
-          Copy-Item "build/ci/KalkulatorTrasKablowych.exe" $stage
-          Copy-Item "LICENSE.md" $stage
-          Copy-Item "README.md" $stage
-          Copy-Item "THIRD_PARTY_NOTICES.md" $stage
-          windeployqt --release --compiler-runtime --no-translations "$stage/KalkulatorTrasKablowych.exe"
-          Compress-Archive -Path "$stage/*" -DestinationPath "release/KalkulatorTrasKablowych-0.5.0-win64.zip" -CompressionLevel Optimal
+          if ("v$env:KTK_VERSION" -ne "${{ github.ref_name }}") {
+            throw "Tag ${{ github.ref_name }} does not match application version v$env:KTK_VERSION"
+          }
 
-      - name: Upload Windows package
+      - name: Upload Windows packages
         uses: actions/upload-artifact@v4
         with:
-          name: KalkulatorTrasKablowych-0.5.0-win64
-          path: release/KalkulatorTrasKablowych-0.5.0-win64.zip
+          name: KalkulatorTrasKablowych-${{ env.KTK_VERSION }}-win64
+          path: |
+            release/KalkulatorTrasKablowych-${{ env.KTK_VERSION }}-win64.zip
+            release/KalkulatorTrasKablowych-${{ env.KTK_VERSION }}-win64-setup.exe
+            release/SHA256SUMS-${{ env.KTK_VERSION }}.txt
           if-no-files-found: error
+
+      - name: Publish tagged GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v$env:KTK_VERSION" `
+            "release/KalkulatorTrasKablowych-$env:KTK_VERSION-win64.zip" `
+            "release/KalkulatorTrasKablowych-$env:KTK_VERSION-win64-setup.exe" `
+            "release/SHA256SUMS-$env:KTK_VERSION.txt" `
+            --title "Kalkulator Tras Kablowych $env:KTK_VERSION" `
+            --generate-notes

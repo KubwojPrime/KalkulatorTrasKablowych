@@ -11,6 +11,10 @@ Samo otrzymanie kopii nie przenosi praw autorskich ani nie udziela prawa do
 rozpowszechniania, odsprzedaży, sublicencjonowania, publikowania kodu źródłowego lub
 tworzenia wersji pochodnych bez odrębnej pisemnej zgody autora.
 
+Warunki używania skompilowanej aplikacji określa również `EULA.txt`. Udzielona
+zgoda może zostać cofnięta pisemnie; aplikacja nie korzysta z serwera aktywacji
+ani technicznej zdalnej blokady.
+
 Dystrybucja komponentów zewnętrznych podlega ich własnym licencjom. W szczególności
 postanowienia niniejszego dokumentu nie ograniczają praw użytkownika wynikających
 z GNU LGPL w odniesieniu do bibliotek Qt.
@@ -20,6 +24,5 @@ przez osobę posiadającą odpowiednie kwalifikacje i nie stanowią samodzielneg
 potwierdzenia zgodności projektu z przepisami, normami ani wymaganiami ochrony
 przeciwpożarowej.
 
-Ostateczna umowa użytkownika końcowego oraz polityka prywatności dla produkcyjnego
-systemu licencjonowania wymagają przeglądu prawnego przed publiczną dystrybucją.
-
+Treść umowy użytkownika końcowego wymaga przeglądu prawnego przed szeroką
+dystrybucją komercyjną.

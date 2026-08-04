@@ -1,5 +1,4 @@
 #include "data/catalogrepository.h"
-#include "licensing/accesscontroller.h"
 #include "ui/mainwindow.h"
 #include "ui/theme.h"
 
@@ -7,7 +6,6 @@
 
 #include <QApplication>
 #include <QDebug>
-#include <QMessageBox>
 #include <QStyleFactory>
 #include <QTemporaryDir>
 
@@ -23,17 +21,8 @@ int main(int argc, char *argv[])
     QApplication::setStyle(QStyleFactory::create(QStringLiteral("Fusion")));
     ktk::Theme::applyDark(application);
 
-    ktk::AccessController accessController;
-    const auto access = accessController.verify();
-    if (!access.allowed) {
-        QMessageBox::critical(
-            nullptr,
-            QStringLiteral("Brak dostępu"),
-            access.message);
-        return 23;
-    }
-
-    if (application.arguments().contains(QStringLiteral("--smoke-test"))) {
+    if (application.arguments().contains(QStringLiteral("--smoke-test"))
+        || qEnvironmentVariableIntValue("KTK_SMOKE_TEST") == 1) {
         QTemporaryDir smokeDirectory;
         if (!smokeDirectory.isValid()) {
             qCritical() << "cannot create smoke-test directory";
@@ -59,8 +48,5 @@ int main(int argc, char *argv[])
 
     ktk::MainWindow window;
     window.show();
-    if (access.usedOfflineGrace) {
-        window.showAccessNotice(access.message);
-    }
     return application.exec();
 }

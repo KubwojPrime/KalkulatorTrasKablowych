@@ -1,0 +1,43 @@
+UMOWA LICENCYJNA UZYTKOWNIKA KONCOWEGO
+Kalkulator Tras Kablowych
+
+Copyright (c) 2026 Jakub. Wszelkie prawa zastrzezone.
+
+1. Zakres licencji
+Autor moze udzielic wskazanej osobie lub organizacji niewylacznej,
+nieprzenoszalnej i odwolalnej zgody na uzywanie skompilowanej aplikacji na
+warunkach przekazanych na pismie. Nie jest wymagany serwer aktywacyjny, konto
+internetowe ani stale polaczenie z siecia.
+
+2. Ograniczenia
+Bez odrebnej pisemnej zgody autora zabronione jest rozpowszechnianie,
+odsprzedaz, sublicencjonowanie, publikowanie kodu zrodlowego oraz tworzenie i
+udostepnianie wersji pochodnych aplikacji. Uprawnienia wynikajace z licencji
+komponentow zewnetrznych, w szczegolnosci GNU LGPL dla bibliotek Qt, pozostaja
+nienaruszone.
+
+3. Cofniecie zgody
+Autor moze cofnac udzielona zgode w formie pisemnej. Po otrzymaniu takiej
+informacji uzytkownik ma obowiazek zaprzestac korzystania z aplikacji i usunac
+jej kopie w terminie wskazanym przez autora. Aplikacja nie zawiera technicznego
+mechanizmu zdalnego blokowania juz zainstalowanej kopii.
+
+4. Dane katalogowe i wyniki
+Dane producentow moga pochodzic z automatycznej ekstrakcji i wymagaja
+sprawdzenia z aktualna karta katalogowa. Wartosci obciazenia ogniowego oznaczone
+gwiazdka sa oszacowaniami materialowymi. Program wspiera prace projektanta, ale
+nie zastepuje oceny osoby posiadajacej odpowiednie kwalifikacje, rzeczoznawcy do
+spraw zabezpieczen przeciwpozarowych ani weryfikacji przepisow i norm.
+
+5. Brak gwarancji
+W zakresie dozwolonym przez prawo oprogramowanie jest dostarczane bez gwarancji.
+Uzytkownik odpowiada za sprawdzenie danych wejsciowych, wynikow i przydatnosci
+programu do konkretnego zastosowania.
+
+6. Komponenty zewnetrzne
+Komponenty zewnetrzne podlegaja licencjom wskazanym w pliku
+THIRD_PARTY_NOTICES.md oraz w katalogu licenses dolaczonym do aplikacji.
+
+Instalujac lub uruchamiajac aplikacje, uzytkownik potwierdza zapoznanie sie z
+niniejszymi warunkami. Przed wdrozeniem komercyjnym zalecany jest przeglad
+prawny tresci umowy w jurysdykcji uzytkownika i autora.

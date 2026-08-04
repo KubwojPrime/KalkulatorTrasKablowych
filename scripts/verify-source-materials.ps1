@@ -1,5 +1,6 @@
 param(
-    [string]$ManifestPath = "source-materials\manifest.json"
+    [string]$ManifestPath = "source-materials\manifest.json",
+    [switch]$AllowLfsPointers
 )
 
 $ErrorActionPreference = "Stop"
@@ -45,6 +46,43 @@ foreach ($source in $manifest.sources) {
 
     $file = Get-Item -LiteralPath $targetPath
     $bytes = [System.IO.File]::ReadAllBytes($targetPath)
+    $pointerText = if ($bytes.Length -lt 512) {
+        [System.Text.Encoding]::ASCII.GetString($bytes)
+    } else {
+        ""
+    }
+    $oidMatch = [regex]::Match($pointerText, '(?m)^oid sha256:([0-9a-f]{64})$')
+    $sizeMatch = [regex]::Match($pointerText, '(?m)^size ([0-9]+)$')
+    $isLfsPointer = $pointerText.StartsWith(
+        "version https://git-lfs.github.com/spec/v1") `
+        -and $oidMatch.Success -and $sizeMatch.Success
+
+    if ($isLfsPointer) {
+        if (-not $AllowLfsPointers) {
+            $failures.Add(
+                "${relativePath}: znaleziono wskaznik Git LFS zamiast materialu zrodlowego.")
+            continue
+        }
+        $pointerHash = $oidMatch.Groups[1].Value.ToLowerInvariant()
+        $pointerSize = [int64]$sizeMatch.Groups[1].Value
+        if ($pointerSize -ne [int64]$source.bytes) {
+            $failures.Add(
+                "${relativePath}: wskaznik LFS ma rozmiar $pointerSize, oczekiwano $($source.bytes).")
+        }
+        if ($pointerHash -ne ([string]$source.sha256).ToLowerInvariant()) {
+            $failures.Add(
+                "${relativePath}: identyfikator SHA-256 wskaznika LFS nie zgadza sie z manifestem.")
+        }
+        $totalBytes += $pointerSize
+        $verified.Add([pscustomobject]@{
+            Manufacturer = [string]$source.manufacturer
+            File = $relativePath
+            Bytes = $pointerSize
+            SHA256 = $pointerHash
+        })
+        continue
+    }
+
     $signature = if ($bytes.Length -ge 5) {
         [System.Text.Encoding]::ASCII.GetString($bytes, 0, 5)
     } else {

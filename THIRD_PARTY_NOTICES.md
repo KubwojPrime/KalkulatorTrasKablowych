@@ -2,7 +2,7 @@
 
 ## Qt 6
 
-Projekt korzysta dynamicznie z modułów Qt Core, Gui, Widgets, Sql i Network.
+Projekt korzysta dynamicznie z modułów Qt Core, Gui, Widgets i Sql.
 Qt jest dostępne na zasadach licencji komercyjnej albo odpowiednich licencji open
 source, w tym GNU Lesser General Public License v3. Sposób dystrybucji programu musi
 spełniać warunki wariantu wybranego przez właściciela projektu.
@@ -32,3 +32,11 @@ Biblioteka i jej zależności nie są dołączane do pliku wykonywalnego aplikac
 Wersja Windows budowana MinGW może zawierać biblioteki uruchomieniowe GCC i MinGW-w64.
 Ich pliki licencyjne należy dołączyć do paczki produkcyjnej zgodnie z wersją
 toolchaina użytego do kompilacji.
+
+## NSIS (narzędzie do tworzenia instalatora)
+
+Instalator Windows jest generowany przez Nullsoft Scriptable Install System
+(NSIS), Copyright (C) 1999-2026 Contributors, na warunkach licencji zlib/libpng.
+Skrypt projektu używa kompresji zlib. NSIS nie jest linkowany z właściwą aplikacją.
+
+Tekst licencji i dokumentacja: <https://nsis.sourceforge.io/Docs/AppendixI.html>.

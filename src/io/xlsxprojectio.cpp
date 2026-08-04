@@ -7,11 +7,21 @@
 #include <QLocale>
 #include <QStringList>
 
+#include <cmath>
+#include <limits>
+
 namespace ktk {
 
 namespace {
 
 constexpr int SchemaVersion = 4;
+constexpr int MinimumSchemaVersion = 1;
+
+struct ParsedNumber {
+    bool present = false;
+    bool valid = false;
+    double value = 0.0;
+};
 
 void setError(QString *target, const QString &message)
 {
@@ -49,11 +59,43 @@ void writeKeyValue(QXlsx::Document &document, int row, const QString &key,
     document.write(row, 2, value);
 }
 
-double readDouble(QXlsx::Document &document, int row, int column, double fallback)
+ParsedNumber parseNumber(const QVariant &cellValue)
 {
+    const QString text = cellValue.toString().trimmed();
+    if (!cellValue.isValid() || text.isEmpty()) {
+        return {};
+    }
+
     bool ok = false;
-    const double value = document.read(row, column).toDouble(&ok);
-    return ok ? value : fallback;
+    double value = cellValue.toDouble(&ok);
+    if (!ok) {
+        value = QLocale::c().toDouble(QString(text).replace(',', '.'), &ok);
+    }
+    return {true, ok && std::isfinite(value), value};
+}
+
+bool readDoubleField(
+    QXlsx::Document &document,
+    int row,
+    int column,
+    double fallback,
+    const QString &label,
+    double *target,
+    QString *errorMessage)
+{
+    const ParsedNumber parsed = parseNumber(document.read(row, column));
+    if (!parsed.present) {
+        *target = fallback;
+        return true;
+    }
+    if (!parsed.valid) {
+        setError(
+            errorMessage,
+            QStringLiteral("Pole %1 zawiera nieprawidlowa liczbe.").arg(label));
+        return false;
+    }
+    *target = parsed.value;
+    return true;
 }
 
 QString assemblyDescription(const QVector<RouteAssemblyItem> &items)
@@ -354,7 +396,13 @@ bool XlsxProjectIo::importProject(
         return false;
     }
 
-    const int schemaVersion = document.read(2, 2).toInt();
+    bool schemaOk = false;
+    const int schemaVersion = document.read(2, 2).toInt(&schemaOk);
+    if (!schemaOk || schemaVersion < MinimumSchemaVersion) {
+        setError(errorMessage,
+                 QStringLiteral("Plik ma nieprawidlowa wersje schematu."));
+        return false;
+    }
     if (schemaVersion > SchemaVersion) {
         setError(errorMessage,
                  QStringLiteral("Plik pochodzi z nowszej wersji programu."));
@@ -366,17 +414,63 @@ bool XlsxProjectIo::importProject(
         setError(errorMessage, QStringLiteral("Brak arkusza „Projekt”."));
         return false;
     }
+    if (!parseNumber(document.read(2, 2)).present
+        || !parseNumber(document.read(3, 2)).present
+        || !parseNumber(document.read(4, 2)).present) {
+        setError(
+            errorMessage,
+            QStringLiteral(
+                "Arkusz Projekt nie zawiera wymaganych wymiarow lub limitu wypelnienia."));
+        return false;
+    }
     loaded.route.projectName = document.read(1, 2).toString();
-    loaded.route.internalWidthMm = readDouble(document, 2, 2, 300.0);
-    loaded.route.internalHeightMm = readDouble(document, 3, 2, 60.0);
-    loaded.route.maximumFillPercent = readDouble(document, 4, 2, 40.0);
-    loaded.route.fireLoadLimitMjPerM = readDouble(document, 5, 2, 0.0);
-    loaded.route.trayMassKgPerM = readDouble(document, 7, 2, 0.0);
-    loaded.route.coverMassKgPerM = readDouble(document, 8, 2, 0.0);
-    loaded.route.hangerBaseMassKg = readDouble(document, 9, 2, 0.0);
-    loaded.route.suspensionHeightM = readDouble(document, 10, 2, 0.0);
-    loaded.route.suspensionVerticalMassKgPerM = readDouble(document, 11, 2, 0.0);
-    loaded.route.supportSpacingM = readDouble(document, 12, 2, 1.5);
+    if (!readDoubleField(document, 2, 2, 300.0, QStringLiteral("szerokosc trasy"),
+                         &loaded.route.internalWidthMm, errorMessage)
+        || !readDoubleField(document, 3, 2, 60.0, QStringLiteral("wysokosc trasy"),
+                            &loaded.route.internalHeightMm, errorMessage)
+        || !readDoubleField(document, 4, 2, 40.0, QStringLiteral("limit wypelnienia"),
+                            &loaded.route.maximumFillPercent, errorMessage)
+        || !readDoubleField(document, 5, 2, 0.0, QStringLiteral("limit ogniowy"),
+                            &loaded.route.fireLoadLimitMjPerM, errorMessage)
+        || !readDoubleField(document, 7, 2, 0.0, QStringLiteral("masa koryta"),
+                            &loaded.route.trayMassKgPerM, errorMessage)
+        || !readDoubleField(document, 8, 2, 0.0, QStringLiteral("masa pokrywy"),
+                            &loaded.route.coverMassKgPerM, errorMessage)
+        || !readDoubleField(document, 9, 2, 0.0, QStringLiteral("masa zawieszenia"),
+                            &loaded.route.hangerBaseMassKg, errorMessage)
+        || !readDoubleField(document, 10, 2, 0.0, QStringLiteral("wysokosc zwieszenia"),
+                            &loaded.route.suspensionHeightM, errorMessage)
+        || !readDoubleField(document, 11, 2, 0.0, QStringLiteral("masa elementow pionowych"),
+                            &loaded.route.suspensionVerticalMassKgPerM, errorMessage)
+        || !readDoubleField(document, 12, 2, 1.5, QStringLiteral("rozstaw podpor"),
+                            &loaded.route.supportSpacingM, errorMessage)) {
+        return false;
+    }
+
+    if (loaded.route.internalWidthMm <= 0.0
+        || loaded.route.internalHeightMm <= 0.0) {
+        setError(errorMessage,
+                 QStringLiteral("Wymiary wewnetrzne trasy musza byc dodatnie."));
+        return false;
+    }
+    if (loaded.route.maximumFillPercent <= 0.0
+        || loaded.route.maximumFillPercent > 100.0) {
+        setError(errorMessage,
+                 QStringLiteral("Limit wypelnienia musi nalezec do zakresu (0, 100]."));
+        return false;
+    }
+    if (loaded.route.fireLoadLimitMjPerM < 0.0
+        || loaded.route.trayMassKgPerM < 0.0
+        || loaded.route.coverMassKgPerM < 0.0
+        || loaded.route.hangerBaseMassKg < 0.0
+        || loaded.route.suspensionHeightM < 0.0
+        || loaded.route.suspensionVerticalMassKgPerM < 0.0
+        || loaded.route.supportSpacingM <= 0.0) {
+        setError(errorMessage,
+                 QStringLiteral(
+                     "Parametry masowe nie moga byc ujemne, a rozstaw podpor musi byc dodatni."));
+        return false;
+    }
 
     if (schemaVersion >= 4
         && document.sheetNames().contains(QStringLiteral("Zestaw BAKS"))
@@ -395,12 +489,58 @@ bool XlsxProjectIo::importProject(
             item.product.name = document.read(row, 3).toString();
             item.product.symbol = symbol;
             item.product.catalogCode = document.read(row, 5).toString();
-            item.quantity = readDouble(document, row, 6, 1.0);
-            item.product.massKgPerUnit = readDouble(document, row, 7, 0.0);
+            if (!readDoubleField(
+                    document,
+                    row,
+                    6,
+                    1.0,
+                    QStringLiteral("ilosc BAKS w wierszu %1").arg(row),
+                    &item.quantity,
+                    errorMessage)
+                || !readDoubleField(
+                    document,
+                    row,
+                    7,
+                    0.0,
+                    QStringLiteral("masa BAKS w wierszu %1").arg(row),
+                    &item.product.massKgPerUnit,
+                    errorMessage)
+                || !readDoubleField(
+                    document,
+                    row,
+                    9,
+                    0.0,
+                    QStringLiteral("dlugosc BAKS w wierszu %1").arg(row),
+                    &item.product.lengthM,
+                    errorMessage)
+                || !readDoubleField(
+                    document,
+                    row,
+                    10,
+                    0.0,
+                    QStringLiteral("szerokosc BAKS w wierszu %1").arg(row),
+                    &item.product.widthMm,
+                    errorMessage)
+                || !readDoubleField(
+                    document,
+                    row,
+                    11,
+                    0.0,
+                    QStringLiteral("wysokosc BAKS w wierszu %1").arg(row),
+                    &item.product.heightMm,
+                    errorMessage)) {
+                return false;
+            }
             item.product.massUnit = document.read(row, 8).toString();
-            item.product.lengthM = readDouble(document, row, 9, 0.0);
-            item.product.widthMm = readDouble(document, row, 10, 0.0);
-            item.product.heightMm = readDouble(document, row, 11, 0.0);
+            if (item.quantity <= 0.0 || item.product.massKgPerUnit < 0.0
+                || item.product.lengthM < 0.0 || item.product.widthMm < 0.0
+                || item.product.heightMm < 0.0) {
+                setError(
+                    errorMessage,
+                    QStringLiteral("Wiersz %1 arkusza Zestaw BAKS ma ujemne lub zerowe dane.")
+                        .arg(row));
+                return false;
+            }
             item.product.sourceFile = document.read(row, 12).toString();
             item.product.sourcePage = document.read(row, 13).toInt();
             item.product.sourceUrl = document.read(row, 14).toString();
@@ -426,31 +566,52 @@ bool XlsxProjectIo::importProject(
         cable.manufacturer = manufacturer;
         cable.designation = designation;
         cable.catalogCode = document.read(row, 3).toString();
-        cable.quantity = document.read(row, 4).toInt();
-        cable.outerDiameterMm = readDouble(document, row, 5, 0.0);
+        const ParsedNumber quantity = parseNumber(document.read(row, 4));
+        const ParsedNumber diameter = parseNumber(document.read(row, 5));
+        if (!quantity.present || !quantity.valid || quantity.value < 1.0
+            || quantity.value > std::numeric_limits<int>::max()
+            || std::floor(quantity.value) != quantity.value) {
+            setError(
+                errorMessage,
+                QStringLiteral("Wiersz %1 arkusza Kable ma nieprawidlowa ilosc.")
+                    .arg(row));
+            return false;
+        }
+        if (!diameter.present || !diameter.valid || diameter.value <= 0.0) {
+            setError(
+                errorMessage,
+                QStringLiteral("Wiersz %1 arkusza Kable ma nieprawidlowa srednice.")
+                    .arg(row));
+            return false;
+        }
+        cable.quantity = static_cast<int>(quantity.value);
+        cable.outerDiameterMm = diameter.value;
         const QVariant mass = document.read(row, 6);
         if (mass.isValid() && !mass.toString().trimmed().isEmpty()) {
-            bool ok = false;
-            const double value = mass.toDouble(&ok);
-            if (ok) {
-                cable.massKgPerKm = value;
+            const ParsedNumber parsedMass = parseNumber(mass);
+            if (!parsedMass.valid || parsedMass.value < 0.0) {
+                setError(
+                    errorMessage,
+                    QStringLiteral("Wiersz %1 arkusza Kable ma nieprawidlowa mase.")
+                        .arg(row));
+                return false;
             }
+            cable.massKgPerKm = parsedMass.value;
         }
         const QVariant fireLoad = document.read(row, 7);
         QString fireLoadText = fireLoad.toString().trimmed();
         const bool starMarker = fireLoadText.endsWith(QLatin1Char('*'));
         fireLoadText.remove(QLatin1Char('*'));
         if (fireLoad.isValid() && !fireLoadText.isEmpty()) {
-            bool ok = false;
-            double value = fireLoad.toDouble(&ok);
-            if (!ok) {
-                value = QLocale::c().toDouble(
-                    QString(fireLoadText).replace(',', '.'),
-                    &ok);
+            const ParsedNumber parsedFireLoad = parseNumber(fireLoadText);
+            if (!parsedFireLoad.valid || parsedFireLoad.value < 0.0) {
+                setError(
+                    errorMessage,
+                    QStringLiteral("Wiersz %1 arkusza Kable ma nieprawidlowe obciazenie ogniowe.")
+                        .arg(row));
+                return false;
             }
-            if (ok) {
-                cable.fireLoadMjPerM = value;
-            }
+            cable.fireLoadMjPerM = parsedFireLoad.value;
         }
         if (schemaVersion >= 3) {
             const QString origin = document.read(row, 8).toString();

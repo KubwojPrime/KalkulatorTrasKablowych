@@ -47,11 +47,6 @@ MainWindow::MainWindow(QWidget *parent)
     recalculate();
 }
 
-void MainWindow::showAccessNotice(const QString &message)
-{
-    statusBar()->showMessage(message, 15000);
-}
-
 void MainWindow::recalculate()
 {
     const ProjectData project = currentProject();

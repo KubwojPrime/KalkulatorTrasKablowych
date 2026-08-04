@@ -1,49 +1,42 @@
-# Bezpłatna dystrybucja i kontrola dostępu
+# Licencja pisemna i praca offline
 
-## Model
+## Model dla wersji 1.0
 
-Aplikacja pozostaje własnościowa, ale właściciel może udostępniać jej skompilowane
-kopie bez pobierania opłat. Qt jest linkowane dynamicznie na warunkach LGPLv3,
-a QXlsx na warunkach MIT.
+Aplikacja jest własnościowa i może być bezpłatnie udostępniana wskazanym osobom
+lub firmom. Prawo używania wynika z pisemnej zgody autora oraz z warunków
+`EULA.txt`. Program nie wymaga konta, serwera aktywacyjnego ani połączenia z
+Internetem.
 
-Możliwość cofnięcia dostępu jest cechą aplikacji, nie licencji bibliotek. Produkcyjna
-kompilacja może wymagać zdalnej autoryzacji przy starcie:
+Wersja 1.0 nie:
 
-```text
-POST /v1/verify
-Content-Type: application/json
+- wysyła klucza licencyjnego ani identyfikatora instalacji;
+- wykonuje zdalnej kontroli dostępu;
+- posiada telemetrii ani automatycznego sprawdzania aktualizacji;
+- pozwala autorowi technicznie wyłączyć już zainstalowanej kopii.
 
-{
-  "licenseKey": "...",
-  "installationId": "...",
-  "application": "KalkulatorTrasKablowych",
-  "version": "0.1.0"
-}
-```
+## Cofnięcie zgody
 
-Odpowiedź:
+Autor może cofnąć udzieloną licencję w formie pisemnej. Jest to mechanizm umowny:
+adresat ma obowiązek zaprzestać korzystania z aplikacji i usunąć kopie zgodnie z
+otrzymanym zawiadomieniem. Autor może też odmówić przekazywania kolejnych wersji.
 
-```json
-{
-  "allowed": true,
-  "message": "Dostęp aktywny"
-}
-```
+Brak technicznej blokady jest świadomą decyzją. Upraszcza wdrożenie w firmach,
+eliminuje zależność od dostępności serwera i nie wymaga gromadzenia danych
+użytkowników.
 
-Ustawienie `allowed: false` cofa dostęp dla klucza przy następnym sprawdzeniu.
-W razie braku sieci ostatnie pozytywne potwierdzenie działa przez skonfigurowany
-okres offline. Jawna odpowiedź odmowna usuwa ten okres.
+## Dane lokalne
 
-## Ograniczenia
+Katalog aplikacji jest kopiowany do lokalnej bazy SQLite użytkownika. Projekty
+XLSX są zapisywane wyłącznie w lokalizacji wskazanej przez użytkownika. Program
+nie przesyła tych danych. Kopie zapasowe i kontrola dostępu do plików należą do
+organizacji używającej programu.
 
-- Serwer licencyjny nie jest jeszcze częścią repozytorium.
-- Obecny mechanizm sprawdza dostęp przy uruchomieniu.
-- Zabezpieczenie klienta nigdy nie jest absolutne; zdeterminowany użytkownik może
-  próbować modyfikować plik wykonywalny.
-- Natychmiastowe cofnięcie dostępu wymaga cyklicznej kontroli podczas działania i
-  stałego połączenia, co pogarsza odporność aplikacji na awarie sieci.
-- Produkcyjne wdrożenie powinno używać podpisanych tokenów, pinowania domeny,
-  podpisu pliku wykonywalnego, dziennika decyzji i zgodnej z RODO polityki danych.
+## Komponenty zewnętrzne
 
-Przed udostępnianiem programu klientom należy przygotować regulamin/EULA i politykę
-prywatności oraz poddać je przeglądowi prawnemu.
+Qt jest linkowane dynamicznie na warunkach LGPLv3, QXlsx jest używane na
+warunkach MIT, a instalator powstaje przy użyciu NSIS na warunkach zlib/libpng.
+Paczka zawiera wymagane informacje oraz teksty licencji. Własnościowa EULA nie
+ogranicza praw użytkownika wynikających z licencji komponentów zewnętrznych.
+
+Przed szeroką dystrybucją komercyjną treść EULA powinna zostać sprawdzona przez
+prawnika właściwego dla jurysdykcji autora i odbiorców.
