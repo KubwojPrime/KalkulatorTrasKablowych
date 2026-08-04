@@ -58,6 +58,13 @@ if (-not [string]::IsNullOrWhiteSpace($InstallerPath)) {
     }
 
     try {
+        # Regression: NSIS wildcard checks can report an existing empty
+        # directory as non-empty because of the implicit . and .. entries.
+        # Create the directory before installation so this exact case is tested.
+        New-Item -ItemType Directory -Path $installRoot -Force | Out-Null
+        if (@(Get-ChildItem -LiteralPath $installRoot -Force).Count -ne 0) {
+            throw "Installer smoke-test directory is not empty before installation."
+        }
         $installProcess = Start-Process -FilePath $installer `
             -ArgumentList @("/S", "/NO_SHORTCUTS=1", "/D=$installRoot") `
             -WindowStyle Hidden -Wait -PassThru
@@ -70,6 +77,7 @@ if (-not [string]::IsNullOrWhiteSpace($InstallerPath)) {
         if ([System.IO.Path]::GetFullPath($registeredInstallRoot) -ne $installRoot) {
             throw "Installer did not preserve the selected installation directory."
         }
+        Write-Output "Existing empty directory installation test passed."
         Invoke-SmokeTest (Join-Path $installRoot "KalkulatorTrasKablowych.exe")
 
         $uninstaller = Join-Path $installRoot "Uninstall.exe"
@@ -96,6 +104,7 @@ if (-not [string]::IsNullOrWhiteSpace($InstallerPath)) {
             (Test-Path -LiteralPath (Join-Path $unsafeRoot "KalkulatorTrasKablowych.exe"))) {
             throw "Installer changed a protected foreign directory."
         }
+        Write-Output "Non-empty foreign directory protection test passed."
     } finally {
         foreach ($testRoot in @($installRoot, $unsafeRoot)) {
             if (Test-Path -LiteralPath $testRoot) {

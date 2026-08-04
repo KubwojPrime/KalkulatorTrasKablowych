@@ -67,16 +67,35 @@ FunctionEnd
 Function ValidateInstallDirectory
   StrCpy $R9 "0"
   StrCmp $INSTDIR "" validate_done
-  IfFileExists "$INSTDIR\*.*" directory_not_empty directory_valid
+  IfFileExists "$INSTDIR\.ktk-install-root" validate_existing_install scan_directory
 
-  directory_not_empty:
-    IfFileExists "$INSTDIR\.ktk-install-root" 0 validate_done
+  validate_existing_install:
     ClearErrors
     FileOpen $0 "$INSTDIR\.ktk-install-root" r
-    IfErrors validate_done
+    IfErrors scan_directory
     FileRead $0 $1
     FileClose $0
-    StrCmp $1 "KTK-INSTALL-ROOT-v1" directory_valid validate_done
+    StrCmp $1 "KTK-INSTALL-ROOT-v1" directory_valid scan_directory
+
+  scan_directory:
+    ClearErrors
+    FindFirst $R0 $R1 "$INSTDIR\*"
+    IfErrors directory_valid
+
+  scan_next_entry:
+    StrCmp $R1 "." continue_scan
+    StrCmp $R1 ".." continue_scan
+    FindClose $R0
+    Goto validate_done
+
+  continue_scan:
+    ClearErrors
+    FindNext $R0 $R1
+    IfErrors directory_empty
+    Goto scan_next_entry
+
+  directory_empty:
+    FindClose $R0
 
   directory_valid:
     StrCpy $R9 "1"

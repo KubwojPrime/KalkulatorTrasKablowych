@@ -20,6 +20,8 @@ wersjonowania semantycznego.
 - poprawne kodowanie Unicode treści EULA w instalatorze.
 - poprawiono walidację katalogu instalacji: komunikat pojawia się dopiero po
   kliknięciu „Dalej”, a nie podczas każdego kliknięcia lub wpisywania ścieżki.
+- poprawiono rozpoznawanie istniejącego pustego katalogu przez pomijanie
+  technicznych wpisów `.` i `..`; dodano odpowiadający test regresji.
 
 ### Zmieniono
 
