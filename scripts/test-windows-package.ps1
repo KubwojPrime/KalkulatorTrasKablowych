@@ -45,19 +45,30 @@ if (-not [string]::IsNullOrWhiteSpace($InstallerPath)) {
 
     $tempRoot = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath())
     $installRoot = [System.IO.Path]::GetFullPath(
-        (Join-Path $tempRoot "KTK-installer-smoke-$PID"))
+        (Join-Path $tempRoot "KTK installer smoke $PID"))
+    $unsafeRoot = [System.IO.Path]::GetFullPath(
+        (Join-Path $tempRoot "KTK installer unsafe $PID"))
     if (-not $installRoot.StartsWith(
             $tempRoot,
+            [System.StringComparison]::OrdinalIgnoreCase) -or
+        -not $unsafeRoot.StartsWith(
+            $tempRoot,
             [System.StringComparison]::OrdinalIgnoreCase)) {
-        throw "Unsafe installer smoke-test directory: $installRoot"
+        throw "Unsafe installer smoke-test directory."
     }
 
     try {
         $installProcess = Start-Process -FilePath $installer `
-            -ArgumentList @("/S", "/D=$installRoot") `
+            -ArgumentList @("/S", "/NO_SHORTCUTS=1", "/D=$installRoot") `
             -WindowStyle Hidden -Wait -PassThru
         if ($installProcess.ExitCode -ne 0) {
             throw "Silent installer failed with exit code $($installProcess.ExitCode)"
+        }
+        $registeredInstallRoot = Get-ItemPropertyValue `
+            -LiteralPath "HKCU:\Software\KubwojPrime\KalkulatorTrasKablowych" `
+            -Name "InstallDir"
+        if ([System.IO.Path]::GetFullPath($registeredInstallRoot) -ne $installRoot) {
+            throw "Installer did not preserve the selected installation directory."
         }
         Invoke-SmokeTest (Join-Path $installRoot "KalkulatorTrasKablowych.exe")
 
@@ -71,9 +82,25 @@ if (-not [string]::IsNullOrWhiteSpace($InstallerPath)) {
         if ($uninstallProcess.ExitCode -ne 0) {
             throw "Silent uninstaller failed with exit code $($uninstallProcess.ExitCode)"
         }
+
+        New-Item -ItemType Directory -Path $unsafeRoot -Force | Out-Null
+        $sentinel = Join-Path $unsafeRoot "do-not-delete.txt"
+        Set-Content -LiteralPath $sentinel -Value "installer safety test"
+        $unsafeInstallProcess = Start-Process -FilePath $installer `
+            -ArgumentList @("/S", "/NO_SHORTCUTS=1", "/D=$unsafeRoot") `
+            -WindowStyle Hidden -Wait -PassThru
+        if ($unsafeInstallProcess.ExitCode -eq 0) {
+            throw "Installer accepted a non-empty foreign directory."
+        }
+        if (-not (Test-Path -LiteralPath $sentinel) -or
+            (Test-Path -LiteralPath (Join-Path $unsafeRoot "KalkulatorTrasKablowych.exe"))) {
+            throw "Installer changed a protected foreign directory."
+        }
     } finally {
-        if (Test-Path -LiteralPath $installRoot) {
-            Remove-Item -LiteralPath $installRoot -Recurse -Force
+        foreach ($testRoot in @($installRoot, $unsafeRoot)) {
+            if (Test-Path -LiteralPath $testRoot) {
+                Remove-Item -LiteralPath $testRoot -Recurse -Force
+            }
         }
     }
 }

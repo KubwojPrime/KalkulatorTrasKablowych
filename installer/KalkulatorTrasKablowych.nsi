@@ -1,4 +1,4 @@
-Unicode True
+﻿Unicode True
 SetCompressor /SOLID zlib
 
 !ifndef APP_VERSION
@@ -10,8 +10,15 @@ SetCompressor /SOLID zlib
 !ifndef OUTPUT_DIR
   !error "OUTPUT_DIR is required"
 !endif
+!ifndef LICENSE_FILE
+  !error "LICENSE_FILE is required"
+!endif
 
 !include "MUI2.nsh"
+!include "FileFunc.nsh"
+!include "LogicLib.nsh"
+
+Var NoShortcuts
 
 Name "Kalkulator Tras Kablowych"
 OutFile "${OUTPUT_DIR}\KalkulatorTrasKablowych-${APP_VERSION}-win64-setup.exe"
@@ -30,9 +37,12 @@ VIAddVersionKey /LANG=1045 "FileDescription" "Instalator Kalkulatora Tras Kablow
 VIAddVersionKey /LANG=1045 "LegalCopyright" "Copyright (c) 2026 Jakub"
 
 !define MUI_ABORTWARNING
+!define MUI_COMPONENTSPAGE_SMALLDESC
 !define MUI_FINISHPAGE_RUN "$INSTDIR\KalkulatorTrasKablowych.exe"
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "${SOURCE_DIR}\EULA.txt"
+!insertmacro MUI_PAGE_LICENSE "${LICENSE_FILE}"
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 
@@ -42,7 +52,52 @@ VIAddVersionKey /LANG=1045 "LegalCopyright" "Copyright (c) 2026 Jakub"
 !insertmacro MUI_LANGUAGE "Polish"
 !insertmacro MUI_LANGUAGE "English"
 
-Section "Program" MainSection
+Function .onInit
+  ${GetParameters} $R0
+  ClearErrors
+  ${GetOptions} $R0 "/NO_SHORTCUTS=" $R1
+  IfErrors no_shortcut_override
+  StrCpy $NoShortcuts $R1
+
+  no_shortcut_override:
+FunctionEnd
+
+Function ValidateInstallDirectory
+  StrCpy $R9 "0"
+  StrCmp $INSTDIR "" validate_done
+  IfFileExists "$INSTDIR\*.*" directory_not_empty directory_valid
+
+  directory_not_empty:
+    IfFileExists "$INSTDIR\.ktk-install-root" 0 validate_done
+    ClearErrors
+    FileOpen $0 "$INSTDIR\.ktk-install-root" r
+    IfErrors validate_done
+    FileRead $0 $1
+    FileClose $0
+    StrCmp $1 "KTK-INSTALL-ROOT-v1" directory_valid validate_done
+
+  directory_valid:
+    StrCpy $R9 "1"
+
+  validate_done:
+FunctionEnd
+
+Function .onVerifyInstDir
+  Call ValidateInstallDirectory
+  ${If} $R9 != "1"
+    MessageBox MB_ICONEXCLAMATION|MB_OK "Wybierz pusty katalog albo katalog wcześniejszej instalacji Kalkulatora Tras Kablowych. Chroni to inne pliki przed usunięciem podczas deinstalacji."
+    Abort
+  ${EndIf}
+FunctionEnd
+
+Section "Program (wymagane)" MainSection
+  SectionIn RO
+  Call ValidateInstallDirectory
+  ${If} $R9 != "1"
+    SetErrorLevel 2
+    Quit
+  ${EndIf}
+
   SetOutPath "$INSTDIR"
   File /r "${SOURCE_DIR}\*"
   FileOpen $0 "$INSTDIR\.ktk-install-root" w
@@ -50,9 +105,10 @@ Section "Program" MainSection
   FileClose $0
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
-  CreateDirectory "$SMPROGRAMS\Kalkulator Tras Kablowych"
-  CreateShortcut "$SMPROGRAMS\Kalkulator Tras Kablowych\Kalkulator Tras Kablowych.lnk" "$INSTDIR\KalkulatorTrasKablowych.exe"
-  CreateShortcut "$SMPROGRAMS\Kalkulator Tras Kablowych\Odinstaluj.lnk" "$INSTDIR\Uninstall.exe"
+  Delete "$DESKTOP\Kalkulator Tras Kablowych.lnk"
+  Delete "$SMPROGRAMS\Kalkulator Tras Kablowych\Kalkulator Tras Kablowych.lnk"
+  Delete "$SMPROGRAMS\Kalkulator Tras Kablowych\Odinstaluj.lnk"
+  RMDir "$SMPROGRAMS\Kalkulator Tras Kablowych"
 
   WriteRegStr HKCU "Software\KubwojPrime\KalkulatorTrasKablowych" "InstallDir" "$INSTDIR"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "DisplayName" "Kalkulator Tras Kablowych"
@@ -63,6 +119,22 @@ Section "Program" MainSection
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "UninstallString" '"$INSTDIR\Uninstall.exe"'
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "NoModify" 1
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych" "NoRepair" 1
+SectionEnd
+
+Section "Skrót w menu Start" StartMenuShortcutSection
+  StrCmp $NoShortcuts "1" start_menu_done
+  CreateDirectory "$SMPROGRAMS\Kalkulator Tras Kablowych"
+  CreateShortcut "$SMPROGRAMS\Kalkulator Tras Kablowych\Kalkulator Tras Kablowych.lnk" "$INSTDIR\KalkulatorTrasKablowych.exe"
+  CreateShortcut "$SMPROGRAMS\Kalkulator Tras Kablowych\Odinstaluj.lnk" "$INSTDIR\Uninstall.exe"
+
+  start_menu_done:
+SectionEnd
+
+Section /o "Skrót na pulpicie" DesktopShortcutSection
+  StrCmp $NoShortcuts "1" desktop_done
+  CreateShortcut "$DESKTOP\Kalkulator Tras Kablowych.lnk" "$INSTDIR\KalkulatorTrasKablowych.exe"
+
+  desktop_done:
 SectionEnd
 
 Section "Uninstall"
@@ -81,6 +153,7 @@ Section "Uninstall"
   Delete "$SMPROGRAMS\Kalkulator Tras Kablowych\Kalkulator Tras Kablowych.lnk"
   Delete "$SMPROGRAMS\Kalkulator Tras Kablowych\Odinstaluj.lnk"
   RMDir "$SMPROGRAMS\Kalkulator Tras Kablowych"
+  Delete "$DESKTOP\Kalkulator Tras Kablowych.lnk"
   DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych"
   DeleteRegKey HKCU "Software\KubwojPrime\KalkulatorTrasKablowych"
   Delete "$INSTDIR\.ktk-install-root"

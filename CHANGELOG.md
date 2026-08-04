@@ -15,6 +15,9 @@ wersjonowania semantycznego.
 - opcjonalne podpisywanie Authenticode pliku EXE i instalatora certyfikatem z
   lokalnego magazynu Windows;
 - eksport publicznego certyfikatu i odcisku dla wydań Early Access.
+- wybór katalogu instalacji z ochroną niepustych obcych katalogów;
+- wybór skrótu w menu Start i opcjonalnego skrótu na pulpicie;
+- poprawne kodowanie Unicode treści EULA w instalatorze.
 
 ### Zmieniono
 

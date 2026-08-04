@@ -147,8 +147,37 @@ oraz test startu gotowej paczki. Powstają:
 - `release\KalkulatorTrasKablowych-<wersja>-win64-setup.exe`;
 - `release\SHA256SUMS-<wersja>.txt`.
 
+Przy pakowaniu z certyfikatem Early Access skrypt dodaje także publiczny plik
+`.cer` i tekstowy opis podmiotu, ważności oraz odcisków certyfikatu. Klucz
+prywatny nie jest kopiowany do paczki ani repozytorium.
+
 Bez zainstalowanego NSIS można zbudować tylko paczkę przenośną poleceniem
 `.\scripts\package-windows.ps1 -SkipInstaller`.
+
+## Instalator Windows
+
+Instalator prowadzi użytkownika przez standardowe ekrany:
+
+1. powitanie;
+2. treść EULA i obowiązkową akceptację licencji;
+3. wybór katalogu instalacji;
+4. wybór skrótów;
+5. postęp instalacji i ekran końcowy z możliwością uruchomienia programu.
+
+Domyślna instalacja jest wykonywana bez uprawnień administratora do
+`%LOCALAPPDATA%\Programs\Kalkulator Tras Kablowych`. Użytkownik może wskazać
+inny zapisywalny katalog. Ze względów bezpieczeństwa instalator przyjmuje tylko
+katalog pusty albo rozpoznany katalog wcześniejszej instalacji — zapobiega to
+usunięciu obcych plików przez deinstalator.
+
+Skrót w menu Start jest domyślnie włączony. Skrót na pulpicie jest opcjonalny.
+Instalator rejestruje program na liście zainstalowanych aplikacji Windows i
+tworzy deinstalator w wybranym katalogu.
+
+Wydania Early Access używają samopodpisanego certyfikatu Authenticode. Publiczny
+certyfikat, jego odciski oraz instrukcja weryfikacji są dołączone do wydania.
+Szczegóły opisano w
+[`docs/early-access-signature.md`](docs/early-access-signature.md).
 
 ## Licencja i dostęp
 
@@ -159,7 +188,9 @@ cofnięty pisemnie na zasadach `EULA.txt`. Model i jego ograniczenia opisano w
 
 Numer wersji w aplikacji, właściwościach EXE, nazwach paczek i instalatorze
 pochodzi z deklaracji `project(... VERSION ...)` w `CMakeLists.txt`. Wysłanie tagu
-`v<wersja>` uruchamia publikację obu paczek oraz sum SHA-256 w GitHub Releases.
+`v<wersja>` uruchamia publikację stabilnych paczek oraz sum SHA-256 w GitHub
+Releases. Tagi `v<wersja>-early-access.<numer>` przechodzą ten sam pełny build i
+testy, ale podpisane artefakty są publikowane ręcznie jako pre-release.
 
 ## Status odpowiedzialności
 

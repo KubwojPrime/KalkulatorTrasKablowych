@@ -259,8 +259,14 @@ if (-not $SkipInstaller) {
     }
 
     $installerScript = Join-Path $projectRoot "installer\KalkulatorTrasKablowych.nsi"
+    $installerLicensePath = Join-Path $buildRoot "EULA-installer-utf16.txt"
+    $installerLicenseText = Get-Content -Raw -Encoding utf8 `
+        -LiteralPath (Join-Path $projectRoot "EULA.txt")
+    Set-Content -LiteralPath $installerLicensePath `
+        -Value $installerLicenseText -Encoding unicode
     & $makeNsis "/DAPP_VERSION=$Version" "/DSOURCE_DIR=$stageRoot" `
-        "/DOUTPUT_DIR=$releaseRoot" $installerScript
+        "/DOUTPUT_DIR=$releaseRoot" "/DLICENSE_FILE=$installerLicensePath" `
+        $installerScript
     if ($LASTEXITCODE -ne 0) { throw "NSIS installer build failed." }
 
     $installerPath = Join-Path $releaseRoot `
