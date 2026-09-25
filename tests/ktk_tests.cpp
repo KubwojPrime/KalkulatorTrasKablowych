@@ -4,6 +4,8 @@
 #include "domain/fireloadestimator.h"
 #include "data/catalogrepository.h"
 #include "io/xlsxprojectio.h"
+#include "io/dxfexport.h"
+#include "domain/cablelayout.h"
 
 #include <xlsxdocument.h>
 
@@ -35,6 +37,52 @@ void requireNear(double actual, double expected, const char *label)
         std::cerr << label << ": expected " << expected << ", got " << actual << '\n';
         std::exit(EXIT_FAILURE);
     }
+}
+
+void testDxf()
+{
+    ktk::ProjectData p;
+    p.route.projectName = QStringLiteral("Próba żółć");
+    p.route.internalWidthMm = 30;
+    p.route.internalHeightMm = 20;
+    ktk::CableRow small;
+    small.designation = QStringLiteral("YKYżo 3 x 2,5");
+    small.manufacturer = QStringLiteral("Test");
+    small.quantity = 2;
+    small.outerDiameterMm = 10;
+    small.fireLoadMjPerM = 1.25;
+    small.fireLoadEstimated = true;
+    auto large = small;
+    large.outerDiameterMm = 20;
+    large.quantity = 1;
+    p.cables = {small, large};
+    const auto layout = ktk::cableLayout(p);
+    require(layout.size() == 3, "CAD cable count");
+    require(layout[0].row == 1 && layout[1].row == 0, "CAD descending diameter and row mapping");
+    requireNear(layout[1].x, 20, "CAD second cable x");
+    requireNear(layout[2].y, 20, "CAD next layer y");
+    require(layout[2].overflow && !layout[1].overflow, "CAD overflow");
+    QTemporaryDir dir;
+    QString path = QString::fromLocal8Bit(qgetenv("KTK_TEST_DXF_OUTPUT"));
+    if (path.isEmpty()) path = dir.filePath(QStringLiteral("test.dxf"));
+    QString error;
+    require(ktk::DxfExport::write(path, p, &error), "DXF export");
+    QFile file(path);
+    require(file.open(QIODevice::ReadOnly), "DXF read");
+    const auto data = file.readAll();
+    file.close();
+    require(data.count("0\nCIRCLE\n") == 3, "DXF circles");
+    require(data.contains(QStringLiteral("YKYżo").toUtf8()) && data.contains("1.250*"), "DXF unicode and estimate");
+    require(data.contains("brak danych") && data.contains("$INSUNITS\n70\n4"), "DXF missing data and mm");
+    p.cables[0].outerDiameterMm = 0;
+    require(!ktk::DxfExport::write(path, p, &error), "DXF invalid data rejected");
+    require(file.open(QIODevice::ReadOnly) && file.readAll() == data, "DXF failure preserves existing file");
+    file.close();
+    p.cables.clear();
+    require(ktk::DxfExport::write(dir.filePath(QStringLiteral("empty.dxf")), p, &error), "DXF empty tray");
+    small.quantity = 1001;
+    p.cables = {small};
+    require(ktk::cableLayout(p).size() == 1001, "CAD does not truncate quantities at 1000");
 }
 
 void testCalculator()
@@ -581,6 +629,7 @@ int main(int argc, char *argv[])
     std::cerr << "tests: start\n";
     QCoreApplication application(argc, argv);
     testCalculator();
+    testDxf();
     std::cerr << "calculator: passed\n";
     testCalculatorBoundaries();
     std::cerr << "calculator boundaries: passed\n";

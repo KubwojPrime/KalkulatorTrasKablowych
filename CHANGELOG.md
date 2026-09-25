@@ -3,6 +3,13 @@
 Wszystkie istotne zmiany projektu są opisywane w tym pliku. Projekt używa
 wersjonowania semantycznego.
 
+## [0.7.0] - 2026-09-25
+
+- Eksport edytowalnego przekroju i tabeli kabli do DXF, skala 1:1 w mm.
+- Numery pozycji kabli na rysunku, warstwy CAD i czerwone oznaczenie przepełnienia.
+- Wspólna geometria podglądu i eksportu, bez obcinania ilości do 1000 sztuk.
+- Testy eksportu, geometrii, polskich znaków i ochrony pliku przy błędnych danych.
+
 ## [0.6.0] - w przygotowaniu
 
 ### Dodano

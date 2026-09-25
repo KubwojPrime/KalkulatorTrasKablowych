@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 project(KalkulatorTrasKablowych
-    VERSION 0.6.0
+    VERSION 0.7.0
     DESCRIPTION "Kalkulator wypelnienia, masy i obciazenia ogniowego tras kablowych"
     LANGUAGES CXX
 )
@@ -66,6 +66,8 @@ if(WIN32)
 endif()
 
 add_library(ktk_core STATIC
+    src/domain/cablelayout.cpp
+    src/io/dxfexport.cpp
     src/domain/bakscatalog.cpp
     src/domain/bakscatalog.h
     src/domain/calculator.cpp

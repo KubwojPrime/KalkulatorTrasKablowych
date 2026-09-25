@@ -159,6 +159,22 @@ otwartym jako administrator. W procesie bez podwyższonych uprawnień wykonywany
 jest test paczki przenośnej, a test instalatora jest odkładany do GitHub CI,
 gdzie pozostaje obowiązkową bramką wydania.
 
+## Eksport rysunku CAD
+
+W zakładce „3. Wyniki i przekrój” wybierz „Eksportuj przekrój i tabelę do DXF…”.
+Ta sama funkcja jest dostępna w menu Plik. Eksport zapisuje edytowalny DXF
+(AutoCAD 2007, UTF-8), w milimetrach, w skali 1:1, bez dodatkowych bibliotek CAD.
+Obrys trasy i okręgi kabli mają wspólny układ z podglądem: największe średnice
+są układane jako pierwsze. Numery w okręgach odpowiadają pozycjom tabeli.
+Kable wystające poza obrys są czerwone, na warstwie PRZEPELNIENIE.
+
+Tabela pod przekrojem zawiera producenta, oznaczenie, kod, ilość, średnicę,
+masę jednostkową, obciążenie ogniowe kabla i CPR. Jest zbudowana z edytowalnych
+linii i tekstów, a nie z obiektu tabeli AutoCAD. Zachowuje brakujące dane
+i oznaczenia oszacowań (*). Eksport odrzuca błędne ilości/średnice i więcej
+niż 100 000 sztuk, zamiast zapisywać niepełny rysunek. DXF można otworzyć
+w programie CAD i zapisać jako DWG.
+
 ## Instalator Windows
 
 Instalator prowadzi użytkownika przez standardowe ekrany:

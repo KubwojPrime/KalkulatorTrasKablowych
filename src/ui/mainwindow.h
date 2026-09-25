@@ -31,6 +31,7 @@ private slots:
     void chooseBaksAssembly();
     void importXlsx();
     void exportXlsx();
+    void exportDxf();
     void newProject();
     void showAbout();
 

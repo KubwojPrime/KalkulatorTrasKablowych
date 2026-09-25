@@ -1,4 +1,5 @@
 #include "ui/routevisualizationwidget.h"
+#include "domain/cablelayout.h"
 
 #include <QLocale>
 #include <QPainter>
@@ -91,49 +92,14 @@ void RouteVisualizationWidget::paintEvent(QPaintEvent *event)
 QVector<RouteVisualizationWidget::PlacedCable>
 RouteVisualizationWidget::layoutCables(const QRectF &tray) const
 {
-    struct Instance {
-        CableRow cable;
-    };
-
-    QVector<Instance> instances;
-    for (const auto &cable : m_project.cables) {
-        if (cable.quantity <= 0 || cable.outerDiameterMm <= 0.0) {
-            continue;
-        }
-        const int drawCount = std::min(cable.quantity, 1000);
-        for (int i = 0; i < drawCount; ++i) {
-            instances.append({cable});
-        }
-    }
-    std::stable_sort(instances.begin(), instances.end(), [](const Instance &a, const Instance &b) {
-        return a.cable.outerDiameterMm > b.cable.outerDiameterMm;
-    });
-
     const double scale = tray.width() / m_project.route.internalWidthMm;
     QVector<PlacedCable> result;
-    double x = tray.left();
-    double baseline = tray.bottom();
-    double rowHeight = 0.0;
-
-    for (const auto &instance : instances) {
-        const double diameter = instance.cable.outerDiameterMm * scale;
-        if (x > tray.left() && x + diameter > tray.right() + 0.01) {
-            baseline -= rowHeight;
-            x = tray.left();
-            rowHeight = 0.0;
-        }
-
-        const QRectF cableRect(x, baseline - diameter, diameter, diameter);
-        const bool overflow =
-            cableRect.top() < tray.top() - 0.01 || cableRect.right() > tray.right() + 0.01;
-        result.append({
-            cableRect,
-            instance.cable.designation,
-            cableColor(instance.cable),
-            overflow
-        });
-        x += diameter;
-        rowHeight = std::max(rowHeight, diameter);
+    for (const auto &c : cableLayout(m_project)) {
+        const auto &row = m_project.cables[c.row];
+        result.append({QRectF(tray.left() + c.x * scale,
+                             tray.bottom() - (c.y + c.diameter) * scale,
+                             c.diameter * scale, c.diameter * scale),
+                       row.designation, cableColor(row), c.overflow});
     }
     return result;
 }

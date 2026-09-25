@@ -3,6 +3,7 @@
 #include "domain/bakscatalog.h"
 #include "domain/calculator.h"
 #include "io/xlsxprojectio.h"
+#include "io/dxfexport.h"
 #include "ui/baksassemblydialog.h"
 #include "ui/cabletablemodel.h"
 #include "ui/catalogdialog.h"
@@ -297,6 +298,19 @@ void MainWindow::exportXlsx()
     statusBar()->showMessage(tr("Zapisano %1").arg(path), 7000);
 }
 
+void MainWindow::exportDxf()
+{
+    QString path = QFileDialog::getSaveFileName(this, tr("Eksportuj przekrój i listę kabli"),
+        QStringLiteral("trasa-kablowa.dxf"), tr("Rysunek CAD (*.dxf)"));
+    if (path.isEmpty()) return;
+    QString error;
+    if (!DxfExport::write(path, currentProject(), &error)) {
+        QMessageBox::critical(this, tr("Eksport DXF"), error);
+        return;
+    }
+    statusBar()->showMessage(tr("Zapisano rysunek i tabelę kabli: %1").arg(path), 7000);
+}
+
 void MainWindow::newProject()
 {
     ProjectData project;
@@ -497,6 +511,9 @@ QWidget *MainWindow::buildResultsTab()
     splitter->setStretchFactor(1, 1);
     splitter->setSizes({360, 800});
     layout->addWidget(splitter, 1);
+    auto *exportDxfButton = new QPushButton(tr("Eksportuj przekrój i tabelę do DXF…"), page);
+    connect(exportDxfButton, &QPushButton::clicked, this, &MainWindow::exportDxf);
+    layout->addWidget(exportDxfButton);
     return page;
 }
 
@@ -509,6 +526,8 @@ void MainWindow::buildMenus()
     importAction->setShortcut(QKeySequence::Open);
     auto *exportAction = fileMenu->addAction(tr("&Eksportuj XLSX…"));
     exportAction->setShortcut(QKeySequence::Save);
+    auto *dxfAction = fileMenu->addAction(tr("Eksportuj rysunek DXF…"));
+    connect(dxfAction, &QAction::triggered, this, &MainWindow::exportDxf);
     fileMenu->addSeparator();
     auto *exitAction = fileMenu->addAction(tr("Za&kończ"));
     exitAction->setShortcut(QKeySequence::Quit);
