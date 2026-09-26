@@ -3,6 +3,7 @@
 /build-*/
 /release/
 /out/
+/tmp/
 
 # IDE and local state
 /.vs/
@@ -17,8 +18,13 @@
 *.sqlite-wal
 *.xlsx
 *.log
+*.pfx
+*.p12
+*.pvk
+*.key
+__pycache__/
+*.py[cod]
 
 # Windows
 Thumbs.db
 Desktop.ini
-
