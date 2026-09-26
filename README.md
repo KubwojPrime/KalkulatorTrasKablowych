@@ -159,6 +159,21 @@ otwartym jako administrator. W procesie bez podwyższonych uprawnień wykonywany
 jest test paczki przenośnej, a test instalatora jest odkładany do GitHub CI,
 gdzie pozostaje obowiązkową bramką wydania.
 
+## Zapis pracy i odzyskiwanie
+
+Program zapisuje osobną kopię odzyskiwania 5 sekund po ostatniej zmianie oraz
+co 30 sekund podczas ciągłej pracy. Kopia `autosave.json` znajduje się w lokalnym
+profilu użytkownika (`%LOCALAPPDATA%/KubwojPrime/KalkulatorTrasKablowych`, ścieżka
+ustalana przez Qt). Po awarii następne uruchomienie proponuje odzyskanie projektu.
+Autosave nie nadpisuje XLSX i nie zastępuje własnych kopii zapasowych.
+
+Zamknięcie, nowy projekt i import pytają o zapis niezapisanych zmian. Anulowanie
+zapisu pozostawia bieżący projekt. Eksport DXF nie oznacza zapisania projektu.
+Ostatni folder eksportu jest pamiętany między uruchomieniami. Jednocześnie działa
+jedna sesja programu na profil użytkownika, aby kopie odzyskiwania nie kolidowały.
+Podgląd pokazuje do 5000 największych kabli z jawnym komunikatem o ograniczeniu;
+obliczenia obejmują wszystkie pozycje. DXF zachowuje limit 100 000 sztuk.
+
 ## Eksport rysunku CAD
 
 W zakładce „3. Wyniki i przekrój” wybierz „Eksportuj przekrój i tabelę do DXF…”.
@@ -211,9 +226,12 @@ cofnięty pisemnie na zasadach `EULA.txt`. Model i jego ograniczenia opisano w
 
 Numer wersji w aplikacji, właściwościach EXE, nazwach paczek i instalatorze
 pochodzi z deklaracji `project(... VERSION ...)` w `CMakeLists.txt`. Wysłanie tagu
-`v<wersja>` uruchamia publikację stabilnych paczek oraz sum SHA-256 w GitHub
-Releases. Tagi `v<wersja>-early-access.<numer>` przechodzą ten sam pełny build i
-testy, ale podpisane artefakty są publikowane ręcznie jako pre-release.
+`v<wersja>`, `v<wersja>-rc.<numer>` lub `v<wersja>-early-access.<numer>` uruchamia
+pełny build i testy. CI nie publikuje swoich niepodpisanych paczek jako wydań.
+Po podpisaniu paczki służy do tego `scripts/publish-release.ps1 -Tag <tag>
+-NotesFile <opis.md>`. Skrypt sprawdza sumy, podpisy EXE i setupu, wersję,
+zgodność commita paczki z tagiem i zielony wynik CI. Wariant `-ValidateOnly`
+wykonuje te kontrole bez publikacji.
 
 ## Status odpowiedzialności
 

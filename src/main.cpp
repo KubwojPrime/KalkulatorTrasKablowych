@@ -8,6 +8,10 @@
 #include <QDebug>
 #include <QStyleFactory>
 #include <QTemporaryDir>
+#include <QLockFile>
+#include <QStandardPaths>
+#include <QDir>
+#include <QMessageBox>
 
 int main(int argc, char *argv[])
 {
@@ -46,6 +50,15 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+    const auto dataDir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
+    QDir().mkpath(dataDir);
+    QLockFile sessionLock(QDir(dataDir).filePath(QStringLiteral("session.lock")));
+    sessionLock.setStaleLockTime(0);
+    if (!sessionLock.tryLock()) {
+        QMessageBox::information(nullptr, QObject::tr("Kalkulator Tras Kablowych"),
+            QObject::tr("Program jest już uruchomiony lub katalog sesji jest niedostępny. Sprawdź otwarte okno programu."));
+        return 1;
+    }
     ktk::MainWindow window;
     window.show();
     return application.exec();

@@ -3,7 +3,7 @@
 Copyright (c) 2026 Jakub. Wszelkie prawa zastrzeżone.
 
 Kod źródłowy, baza danych, dokumentacja i pozostałe elementy tego repozytorium,
-z wyjątkiem składników wymienionych w `THIRD_PARTY_NOTICES.md`, są oprogramowaniem
+z wyjątkiem materiałów producentów oraz składników wymienionych w `THIRD_PARTY_NOTICES.md`, są oprogramowaniem
 własnościowym.
 
 Autor może bezpłatnie udostępniać skompilowane kopie aplikacji wybranym użytkownikom.

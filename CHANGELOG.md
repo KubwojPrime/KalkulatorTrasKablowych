@@ -3,6 +3,17 @@
 Wszystkie istotne zmiany projektu są opisywane w tym pliku. Projekt używa
 wersjonowania semantycznego.
 
+## [1.0.0-rc.1] - 2026-09-26
+
+- Autosave z odzyskiwaniem projektu, zachowaniem BAKS i niedokończonych edycji.
+- Zapamiętywanie folderu eksportu i pytanie o niezapisane zmiany.
+- Atomowy zapis XLSX; ograniczenie podglądu do 5000 kabli bez obcinania obliczeń.
+- Rozpoznawanie istniejącej instalacji po metadanych EXE, również bez znacznika.
+- Deinstalacja wyłącznie plików paczki; zachowanie plików użytkownika.
+- Trzy projekty wzorcowe i automatyczne testy sesji GUI oraz aktualizacji.
+- Kontrolowana publikacja podpisanych paczek także dla stabilnych tagów.
+- Rozbudowana EULA offline i instrukcja praw do bibliotek zewnętrznych.
+
 ## [0.7.0] - 2026-09-25
 
 - Eksport edytowalnego przekroju i tabeli kabli do DXF, skala 1:1 w mm.

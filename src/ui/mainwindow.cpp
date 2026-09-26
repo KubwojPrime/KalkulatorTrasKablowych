@@ -4,6 +4,15 @@
 #include "domain/calculator.h"
 #include "io/xlsxprojectio.h"
 #include "io/dxfexport.h"
+#include "io/projectrecovery.h"
+#include <QTimer>
+#include <QSettings>
+#include <QStandardPaths>
+#include <QDir>
+#include <QFileInfo>
+#include <QCloseEvent>
+#include <QDateTime>
+#include <QFile>
 #include "ui/baksassemblydialog.h"
 #include "ui/cabletablemodel.h"
 #include "ui/catalogdialog.h"
@@ -33,12 +42,12 @@
 
 namespace ktk {
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent, const QString &sessionDirectory)
+    : QMainWindow(parent), m_sessionDirectory(sessionDirectory)
 {
     resize(1280, 780);
     setMinimumSize(980, 640);
-    setWindowTitle(tr("Kalkulator Tras Kablowych"));
+    setWindowTitle(tr("Kalkulator Tras Kablowych[*]"));
 
     m_cableModel = new CableTableModel(this);
     buildUi();
@@ -46,10 +55,25 @@ MainWindow::MainWindow(QWidget *parent)
     loadBaksCatalog();
     connectInputSignals();
     recalculate();
+    m_ready = true;
+    m_autosaveTimer = new QTimer(this);
+    m_autosaveTimer->setSingleShot(true);
+    connect(m_autosaveTimer, &QTimer::timeout, this, &MainWindow::autosave);
+    auto *periodic = new QTimer(this);
+    periodic->setInterval(30000);
+    connect(periodic, &QTimer::timeout, this, &MainWindow::autosave);
+    periodic->start();
+    QTimer::singleShot(0, this, &MainWindow::recoverProject);
 }
 
 void MainWindow::recalculate()
 {
+    if (m_ready && !m_loading) {
+        m_dirty = true;
+        m_autosavePending = true;
+        setWindowModified(true);
+        if (m_autosaveTimer) m_autosaveTimer->start(5000);
+    }
     const ProjectData project = currentProject();
     const CalculationResult result = Calculator::calculate(project);
 
@@ -249,7 +273,7 @@ void MainWindow::importXlsx()
     const QString path = QFileDialog::getOpenFileName(
         this,
         tr("Importuj projekt"),
-        {},
+        exportLocation(QString()),
         tr("Arkusze programu (*.xlsx)"));
     if (path.isEmpty()) {
         return;
@@ -262,8 +286,12 @@ void MainWindow::importXlsx()
         return;
     }
 
+    if (!confirmUnsaved()) return;
     setProject(project);
     m_currentFile = path;
+    m_dirty = m_autosavePending = false;
+    setWindowModified(false);
+    QFile::remove(recoveryPath());
     statusBar()->showMessage(tr("Zaimportowano %1").arg(path), 7000);
 }
 
@@ -274,7 +302,7 @@ void MainWindow::exportXlsx()
         const QString baseName = m_projectName->text().trimmed().isEmpty()
                                      ? QStringLiteral("trasa-kablowa")
                                      : m_projectName->text().trimmed();
-        suggested = baseName + QStringLiteral(".xlsx");
+        suggested = exportLocation(baseName + QStringLiteral(".xlsx"));
     }
 
     const QString path = QFileDialog::getSaveFileName(
@@ -295,28 +323,124 @@ void MainWindow::exportXlsx()
     }
 
     m_currentFile = path;
+    rememberExport(path);
+    m_dirty = m_autosavePending = false;
+    setWindowModified(false);
+    QFile::remove(recoveryPath());
     statusBar()->showMessage(tr("Zapisano %1").arg(path), 7000);
 }
 
 void MainWindow::exportDxf()
 {
     QString path = QFileDialog::getSaveFileName(this, tr("Eksportuj przekrój i listę kabli"),
-        QStringLiteral("trasa-kablowa.dxf"), tr("Rysunek CAD (*.dxf)"));
+        exportLocation(QStringLiteral("trasa-kablowa.dxf")), tr("Rysunek CAD (*.dxf)"));
     if (path.isEmpty()) return;
     QString error;
     if (!DxfExport::write(path, currentProject(), &error)) {
         QMessageBox::critical(this, tr("Eksport DXF"), error);
         return;
     }
+    rememberExport(path);
     statusBar()->showMessage(tr("Zapisano rysunek i tabelę kabli: %1").arg(path), 7000);
 }
 
 void MainWindow::newProject()
 {
+    if (!confirmUnsaved()) return;
     ProjectData project;
     setProject(project);
     m_currentFile.clear();
+    m_dirty = m_autosavePending = false;
+    setWindowModified(false);
+    QFile::remove(recoveryPath());
     statusBar()->showMessage(tr("Utworzono nowy projekt."), 5000);
+}
+
+QString MainWindow::recoveryPath() const
+{
+    const QString dir = m_sessionDirectory.isEmpty()
+        ? QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) : m_sessionDirectory;
+    QDir().mkpath(dir);
+    return QDir(dir).filePath(QStringLiteral("autosave.json"));
+}
+
+QString MainWindow::exportLocation(const QString &name) const
+{
+    QString dir = QSettings().value(QStringLiteral("files/lastExportDirectory")).toString();
+    if (!QDir(dir).exists() || dir.isEmpty())
+        dir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    return QDir(dir).filePath(name);
+}
+
+void MainWindow::rememberExport(const QString &path)
+{
+    QSettings().setValue(QStringLiteral("files/lastExportDirectory"), QFileInfo(path).absolutePath());
+}
+
+void MainWindow::autosave()
+{
+    if (!m_dirty || !m_autosavePending) return;
+    QString error;
+    if (!ProjectRecovery::save(recoveryPath(), currentProject(), m_currentFile, &error)) {
+        statusBar()->showMessage(tr("Nie udało się zapisać kopii odzyskiwania: %1").arg(error));
+        return;
+    }
+    m_autosavePending = false;
+    statusBar()->showMessage(tr("Zapisano kopię odzyskiwania (%1).")
+        .arg(QTime::currentTime().toString(QStringLiteral("HH:mm:ss"))), 3000);
+}
+
+void MainWindow::recoverProject()
+{
+    const QString path = recoveryPath();
+    if (!QFile::exists(path)) return;
+    ProjectData project;
+    QString original, error;
+    if (!ProjectRecovery::load(path, &project, &original, &error)) {
+        // Preserve corrupt copies for diagnostics instead of overwriting them.
+        const QString backup = path + QStringLiteral(".damaged-") +
+            QString::number(QDateTime::currentMSecsSinceEpoch());
+        if (!QFile::rename(path, backup)) {
+            QMessageBox::critical(this, tr("Odzyskiwanie"),
+                tr("Nie można zabezpieczyć uszkodzonej kopii: %1. Program zostanie zamknięty.").arg(path));
+            QApplication::quit();
+            return;
+        }
+        QMessageBox::warning(this, tr("Odzyskiwanie"), error + QStringLiteral("\n") + backup);
+        return;
+    }
+    if (QMessageBox::question(this, tr("Odzyskiwanie pracy"),
+        tr("Znaleziono niezapisaną pracę z %1. Czy ją odzyskać? Wybranie Nie usuwa tę kopię.")
+            .arg(QFileInfo(path).lastModified().toString(QStringLiteral("yyyy-MM-dd HH:mm:ss"))),
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes) {
+        setProject(project);
+        m_currentFile = original;
+        m_dirty = true;
+        setWindowModified(true);
+    } else {
+        QFile::remove(path);
+    }
+}
+
+bool MainWindow::confirmUnsaved()
+{
+    // Finish any active cell editor before deciding whether the project is dirty.
+    if (auto *focused = QApplication::focusWidget()) focused->clearFocus();
+    if (!m_dirty) return true;
+    autosave();
+    const auto answer = QMessageBox::warning(this, tr("Niezapisane zmiany"),
+        tr("Zapisać projekt do XLSX? Kopia automatyczna służy odzyskiwaniu, a DXF nie zastępuje projektu."),
+        QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
+    if (answer == QMessageBox::Cancel) return false;
+    if (answer == QMessageBox::Save) { exportXlsx(); return !m_dirty; }
+    return answer == QMessageBox::Discard;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (!confirmUnsaved()) { event->ignore(); return; }
+    QFile::remove(recoveryPath());
+    event->accept();
 }
 
 void MainWindow::showAbout()
@@ -586,6 +710,7 @@ ProjectData MainWindow::currentProject() const
 
 void MainWindow::setProject(const ProjectData &project)
 {
+    m_loading = true;
     m_updatingBaksFields = true;
     m_baksAssembly = project.routeAssembly;
     m_projectName->setText(project.route.projectName);
@@ -603,6 +728,7 @@ void MainWindow::setProject(const ProjectData &project)
     updateBaksSummary();
     m_cableModel->setCables(project.cables);
     recalculate();
+    m_loading = false;
 }
 
 void MainWindow::connectInputSignals()

@@ -5,6 +5,9 @@
 #include "data/catalogrepository.h"
 #include "io/xlsxprojectio.h"
 #include "io/dxfexport.h"
+#include "io/projectrecovery.h"
+#include <QJsonDocument>
+#include <QJsonObject>
 #include "domain/cablelayout.h"
 
 #include <xlsxdocument.h>
@@ -83,6 +86,53 @@ void testDxf()
     small.quantity = 1001;
     p.cables = {small};
     require(ktk::cableLayout(p).size() == 1001, "CAD does not truncate quantities at 1000");
+}
+
+void testRecoveryAndReferenceProjects()
+{
+    QTemporaryDir dir;
+    for (const auto *name : {"mixed", "missing", "empty"}) {
+        const QString fixture = QStringLiteral(KTK_TEST_DATA_DIR) + QLatin1Char('/') + QString::fromLatin1(name) + QStringLiteral(".json");
+        ktk::ProjectData p;
+        QString origin, error;
+        require(ktk::ProjectRecovery::load(fixture, &p, &origin, &error), "reference project load");
+        QFile input(fixture); require(input.open(QIODevice::ReadOnly), "reference expected values");
+        const auto expected = QJsonDocument::fromJson(input.readAll()).object()["expected"].toObject();
+        const auto r = ktk::Calculator::calculate(p);
+        requireNear(r.fillPercent, expected["fill"].toDouble(), "reference fill");
+        requireNear(r.cableMassKgPerM, expected["mass"].toDouble(), "reference cable mass");
+        requireNear(r.totalInstalledMassKgPerM, expected["total"].toDouble(), "reference installed mass");
+        requireNear(r.knownFireLoadMjPerM, expected["fire"].toDouble(), "reference fire load");
+        const auto xlsx = dir.filePath(QString::fromLatin1(name) + QStringLiteral(".xlsx"));
+        require(ktk::XlsxProjectIo::exportProject(xlsx, p, r, &error), "reference XLSX export");
+        ktk::ProjectData imported;
+        require(ktk::XlsxProjectIo::importProject(xlsx, &imported, &error), "reference XLSX import");
+        requireNear(ktk::Calculator::calculate(imported).totalInstalledMassKgPerM, r.totalInstalledMassKgPerM, "reference XLSX result");
+        require(ktk::DxfExport::write(dir.filePath(QString::fromLatin1(name) + QStringLiteral(".dxf")), p, &error), "reference DXF export");
+        const auto save = dir.filePath(QStringLiteral("autosave.json"));
+        // Recovery must preserve incomplete edits, unlike a validated report.
+        if (!p.cables.isEmpty()) p.cables[0].outerDiameterMm = 0;
+        require(ktk::ProjectRecovery::save(save, p, xlsx, &error), "recovery save");
+        require(ktk::ProjectRecovery::load(save, &imported, &origin, &error), "recovery restore");
+        require(origin == xlsx && imported.cables.size() == p.cables.size(), "recovery path and rows");
+        if (!p.cables.isEmpty()) {
+            requireNear(imported.cables[0].outerDiameterMm, 0, "recovery unfinished edit");
+            require(imported.cables[0].fireLoadBasis == p.cables[0].fireLoadBasis, "recovery estimate provenance");
+        }
+        require(imported.routeAssembly.size() == p.routeAssembly.size(), "recovery BAKS count");
+        if (!p.routeAssembly.isEmpty()) require(imported.routeAssembly[0].product.sourceFile == p.routeAssembly[0].product.sourceFile, "recovery BAKS source");
+    }
+    ktk::ProjectData huge;
+    ktk::CableRow c; c.quantity = std::numeric_limits<int>::max(); c.outerDiameterMm = 10;
+    huge.cables.append(c);
+    require(ktk::cableLayout(huge, ktk::MaximumPreviewCables).size() == ktk::MaximumPreviewCables, "bounded preview");
+    QString error;
+    require(!ktk::DxfExport::write(dir.filePath("huge.dxf"), huge, &error), "huge DXF rejected");
+    const auto corrupt = dir.filePath("corrupt.json");
+    QFile bad(corrupt); require(bad.open(QIODevice::WriteOnly), "corrupt recovery create"); bad.write("{bad"); bad.close();
+    QString origin;
+    require(!ktk::ProjectRecovery::load(corrupt, &huge, &origin, &error), "corrupt recovery rejected");
+    require(huge.cables.size() == 1, "failed recovery preserves current project");
 }
 
 void testCalculator()
@@ -629,6 +679,7 @@ int main(int argc, char *argv[])
     std::cerr << "tests: start\n";
     QCoreApplication application(argc, argv);
     testCalculator();
+    testRecoveryAndReferenceProjects();
     testDxf();
     std::cerr << "calculator: passed\n";
     testCalculatorBoundaries();

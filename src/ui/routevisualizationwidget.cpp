@@ -34,6 +34,14 @@ void RouteVisualizationWidget::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.fillRect(rect(), QColor(QStringLiteral("#0b1220")));
+    qint64 total = 0;
+    for (const auto &c : m_project.cables) total += std::max(0, c.quantity);
+    if (total > MaximumPreviewCables) {
+        painter.setPen(QColor(QStringLiteral("#fde68a")));
+        painter.drawText(QRectF(8, 4, width()-16, 30), Qt::AlignCenter,
+            tr("Podgląd: pierwsze %1 z %2 kabli. Obliczenia obejmują całą listę.")
+                .arg(MaximumPreviewCables).arg(total));
+    }
 
     const double widthMm = m_project.route.internalWidthMm;
     const double heightMm = m_project.route.internalHeightMm;
@@ -94,7 +102,7 @@ RouteVisualizationWidget::layoutCables(const QRectF &tray) const
 {
     const double scale = tray.width() / m_project.route.internalWidthMm;
     QVector<PlacedCable> result;
-    for (const auto &c : cableLayout(m_project)) {
+    for (const auto &c : cableLayout(m_project, MaximumPreviewCables)) {
         const auto &row = m_project.cables[c.row];
         result.append({QRectF(tray.left() + c.x * scale,
                              tray.bottom() - (c.y + c.diameter) * scale,

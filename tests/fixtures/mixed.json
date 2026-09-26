@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "originalFile": "",
+  "route": {
+    "projectName": "Wzorzec",
+    "internalWidthMm": 100,
+    "internalHeightMm": 50,
+    "maximumFillPercent": 40,
+    "fireLoadLimitMjPerM": 10,
+    "trayMassKgPerM": 2,
+    "coverMassKgPerM": 0.2,
+    "hangerBaseMassKg": 0.5,
+    "suspensionHeightM": 2,
+    "suspensionVerticalMassKgPerM": 0.3,
+    "supportSpacingM": 2
+  },
+  "cables": [
+    {
+      "manufacturer": "Test",
+      "designation": "Kabel A",
+      "quantity": 2,
+      "outerDiameterMm": 10,
+      "massKgPerKm": 100,
+      "fireLoadMjPerM": 1.5,
+      "fireLoadEstimated": false,
+      "source": "Dane syntetyczne"
+    },
+    {
+      "manufacturer": "Test",
+      "designation": "Kabel B",
+      "quantity": 1,
+      "outerDiameterMm": 20,
+      "massKgPerKm": 500,
+      "fireLoadMjPerM": 2.5,
+      "fireLoadEstimated": true,
+      "fireLoadBasis": "Wzorzec oszacowania",
+      "source": "Dane syntetyczne"
+    }
+  ],
+  "assembly": [
+    {
+      "quantity": 1,
+      "product": {
+        "id": "test",
+        "role": "route",
+        "name": "Trasa testowa",
+        "symbol": "TEST",
+        "catalogCode": "TEST",
+        "massKgPerUnit": 2,
+        "massUnit": "kg/m",
+        "widthMm": 100,
+        "heightMm": 50,
+        "lengthM": 1,
+        "sourceFile": "test-only.pdf",
+        "sourcePage": 1
+      }
+    }
+  ],
+  "expected": {
+    "fill": 12,
+    "mass": 0.7,
+    "total": 3.45,
+    "fire": 5.5
+  }
+}

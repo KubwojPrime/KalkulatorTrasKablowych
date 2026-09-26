@@ -11,6 +11,8 @@ class QLabel;
 class QLineEdit;
 class QTableView;
 class QTabWidget;
+class QTimer;
+class QCloseEvent;
 
 namespace ktk {
 
@@ -21,7 +23,7 @@ class MainWindow final : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr, const QString &sessionDirectory = {});
 
 private slots:
     void recalculate();
@@ -36,6 +38,20 @@ private slots:
     void showAbout();
 
 private:
+    friend struct MainWindowTest;
+    QString m_sessionDirectory;
+    void closeEvent(QCloseEvent *event) override;
+    bool confirmUnsaved();
+    void autosave();
+    void recoverProject();
+    QString recoveryPath() const;
+    QString exportLocation(const QString &name) const;
+    void rememberExport(const QString &path);
+    bool m_ready = false;
+    bool m_loading = false;
+    bool m_dirty = false;
+    bool m_autosavePending = false;
+    QTimer *m_autosaveTimer = nullptr;
     void buildUi();
     QWidget *buildProjectTab();
     QWidget *buildCablesTab();

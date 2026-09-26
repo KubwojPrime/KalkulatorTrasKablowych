@@ -65,6 +65,9 @@ function Set-KtkAuthenticodeSignature([string]$TargetPath) {
 function Test-KtkAuthenticodeSignature([string]$TargetPath) {
     if (-not $signingCertificate) { return }
     $signature = Get-AuthenticodeSignature -LiteralPath $TargetPath
+    if ($signature.Status -notin @('Valid', 'UnknownError', 'NotTrusted')) {
+        throw "Invalid Authenticode signature: $TargetPath ($($signature.Status))"
+    }
     if (-not $signature.SignerCertificate -or
         $signature.SignerCertificate.Thumbprint -ne $signingCertificate.Thumbprint) {
         throw "Unexpected Authenticode signer for: $TargetPath"
@@ -131,6 +134,12 @@ if (-not (Test-Path -LiteralPath $executable)) {
     throw "Missing executable: $executable"
 }
 Copy-Item -LiteralPath $executable -Destination $stageRoot
+$sourceCommit = & git -c "safe.directory=$projectRoot" -C $projectRoot rev-parse HEAD
+if ($LASTEXITCODE -ne 0) { throw 'Cannot identify package source commit.' }
+$sourceChanges = & git -c "safe.directory=$projectRoot" -C $projectRoot status --porcelain
+if ($LASTEXITCODE -ne 0) { throw 'Cannot identify package source status.' }
+@{ Version=$Version; Commit=$sourceCommit; Dirty=[bool]$sourceChanges } |
+    ConvertTo-Json | Set-Content -LiteralPath (Join-Path $stageRoot 'build-info.json') -Encoding utf8
 
 foreach ($file in @("EULA.txt", "CHANGELOG.md", "LICENSE.md", "README.md", "THIRD_PARTY_NOTICES.md")) {
     Copy-Item -LiteralPath (Join-Path $projectRoot $file) -Destination $stageRoot
@@ -138,7 +147,7 @@ foreach ($file in @("EULA.txt", "CHANGELOG.md", "LICENSE.md", "README.md", "THIR
 
 $docsDirectory = Join-Path $stageRoot "docs"
 New-Item -ItemType Directory -Path $docsDirectory -Force | Out-Null
-foreach ($file in @("fire-load-estimation.md", "baks-route-mass.md", "data-governance.md", "license-and-access.md")) {
+foreach ($file in @("fire-load-estimation.md", "baks-route-mass.md", "data-governance.md", "license-and-access.md", "third-party-rights.md")) {
     Copy-Item -LiteralPath (Join-Path $projectRoot "docs\$file") -Destination $docsDirectory
 }
 if ($signingCertificate) {
@@ -260,13 +269,31 @@ if (-not $SkipInstaller) {
     }
 
     $installerScript = Join-Path $projectRoot "installer\KalkulatorTrasKablowych.nsi"
+    # Embed an immutable, exact list of package-owned files. Never remove the
+    # installation tree recursively: users may have saved projects below it.
+    $uninstallInclude = Join-Path $buildRoot 'uninstall-files.nsh'
+    $uninstallLines = @('!macro RemoveInstalledFiles')
+    foreach ($entry in Get-ChildItem -LiteralPath $stageRoot -File -Recurse) {
+        $relative = $entry.FullName.Substring($stageRoot.Length + 1)
+        if ($relative.Contains('"') -or $relative.Contains('$') -or $relative.Contains('..')) {
+            throw "Unsafe package filename: $relative"
+        }
+        $uninstallLines += ('Delete "$INSTDIR\' + $relative + '"')
+    }
+    foreach ($entry in (Get-ChildItem -LiteralPath $stageRoot -Directory -Recurse | Sort-Object { $_.FullName.Length } -Descending)) {
+        $relative = $entry.FullName.Substring($stageRoot.Length + 1)
+        if ($relative.Contains('"') -or $relative.Contains('$') -or $relative.Contains('..')) { throw 'Unsafe package directory' }
+        $uninstallLines += ('RMDir "$INSTDIR\' + $relative + '"')
+    }
+    $uninstallLines += '!macroend'
+    Set-Content -LiteralPath $uninstallInclude -Value $uninstallLines -Encoding utf8
     $installerLicensePath = Join-Path $buildRoot "EULA-installer-utf16.txt"
     $installerLicenseText = Get-Content -Raw -Encoding utf8 `
         -LiteralPath (Join-Path $projectRoot "EULA.txt")
     Set-Content -LiteralPath $installerLicensePath `
         -Value $installerLicenseText -Encoding unicode
     & $makeNsis "/DAPP_VERSION=$Version" "/DSOURCE_DIR=$stageRoot" `
-        "/DOUTPUT_DIR=$releaseRoot" "/DLICENSE_FILE=$installerLicensePath" `
+        "/DOUTPUT_DIR=$releaseRoot" "/DLICENSE_FILE=$installerLicensePath" "/DUNINSTALL_FILES=$uninstallInclude" `
         $installerScript
     if ($LASTEXITCODE -ne 0) { throw "NSIS installer build failed." }
 

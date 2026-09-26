@@ -2,12 +2,14 @@
 
 ## Qt 6
 
-Projekt korzysta dynamicznie z modułów Qt Core, Gui, Widgets i Sql.
+Projekt korzysta dynamicznie z modułów Qt Core, Gui, Widgets i Sql. Paczka
+Windows zawiera również Qt Svg i wtyczki dobrane przez windeployqt.
 Qt jest dostępne na zasadach licencji komercyjnej albo odpowiednich licencji open
 source, w tym GNU Lesser General Public License v3. Sposób dystrybucji programu musi
 spełniać warunki wariantu wybranego przez właściciela projektu.
 
 Strona licencji: <https://www.qt.io/licensing/>
+Instrukcja wymiany bibliotek i źródła: `docs/third-party-rights.md`.
 
 W planowanej bezpłatnej dystrybucji własnościowej należy używać dynamicznego
 linkowania z modułami dostępnymi na LGPLv3, przekazać użytkownikowi wymagane

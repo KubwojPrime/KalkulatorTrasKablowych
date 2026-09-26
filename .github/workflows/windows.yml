@@ -7,7 +7,7 @@ on:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -74,7 +74,7 @@ jobs:
         shell: pwsh
         run: |
           $stableTag = "v$env:KTK_VERSION"
-          $earlyAccessPattern = "^v$([regex]::Escape($env:KTK_VERSION))-early-access\.[1-9][0-9]*$"
+          $earlyAccessPattern = "^v$([regex]::Escape($env:KTK_VERSION))-(early-access|rc)\.[1-9][0-9]*$"
           if ("${{ github.ref_name }}" -ne $stableTag -and
               "${{ github.ref_name }}" -notmatch $earlyAccessPattern) {
             throw "Tag ${{ github.ref_name }} does not match $stableTag or its early-access numbering."
@@ -90,15 +90,5 @@ jobs:
             release/SHA256SUMS-${{ env.KTK_VERSION }}.txt
           if-no-files-found: error
 
-      - name: Publish tagged GitHub release
-        if: github.ref == format('refs/tags/v{0}', env.KTK_VERSION)
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "v$env:KTK_VERSION" `
-            "release/KalkulatorTrasKablowych-$env:KTK_VERSION-win64.zip" `
-            "release/KalkulatorTrasKablowych-$env:KTK_VERSION-win64-setup.exe" `
-            "release/SHA256SUMS-$env:KTK_VERSION.txt" `
-            --title "Kalkulator Tras Kablowych $env:KTK_VERSION" `
-            --generate-notes
+      # CI artifacts are unsigned verification builds. Releases (including stable
+      # tags) are published only by scripts/publish-release.ps1 after signing.

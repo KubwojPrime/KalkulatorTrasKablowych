@@ -8,14 +8,19 @@
 - [x] Testy zgodności starszego schematu i odrzucania uszkodzonych XLSX.
 - [x] Test wydajności na pełnym katalogu około 25 tys. rekordów.
 - [x] Pisemna licencja offline bez zależności od serwera autoryzacji.
-- [ ] Zestaw referencyjnych projektów z ręcznie policzonymi wynikami (golden files).
+- [x] Trzy projekty referencyjne z niezależnie wyprowadzonymi wynikami i testem obiegu XLSX/DXF.
+- [x] Autosave, odzyskiwanie i ostrzeganie przed utratą pracy; pamięć folderu eksportu.
+- [x] Ograniczony podgląd dużych list bez obcinania obliczeń.
+- [x] Testy aktualizacji instalacji ze znacznikiem i bez niego oraz zachowania plików użytkownika.
+- [x] Blokada publikacji niepodpisanych artefaktów CI.
 - [x] Automatyczny test integralności źródeł i wygenerowanego katalogu w CI.
 - [ ] Test wszystkich głównych operacji GUI na Windows 10 i Windows 11.
 - [ ] Przegląd treści EULA przez prawnika przed dystrybucją komercyjną.
 - [x] Early Access: podpis cyfrowy EXE i instalatora samopodpisanym certyfikatem
   z jawnym odciskiem i instrukcją zaufania.
-- [ ] 1.0.0: zastąpić certyfikat samopodpisany certyfikatem publicznie zaufanym
-  albo jawnie zaakceptować ostrzeżenia Windows.
+- [x] Świadomie zachowany SSC i licencja offline zgodnie z decyzją autora.
+- [ ] Odbiór RC na docelowym Windows oraz otwarcie DXF w używanym CAD.
+- [ ] Potwierdzenie kompletu źródeł i licencji zależności do szerokiej dystrybucji (docs/third-party-rights.md).
 
 ## Procedura wydania
 
@@ -24,7 +29,8 @@
    `tools/verify_catalog_dataset.py`.
 3. Uruchomić kompilację Release, wszystkie testy i `scripts/package-windows.ps1`.
 4. Sprawdzić pliki ZIP, instalator i `SHA256SUMS-<wersja>.txt` na czystym Windows.
-5. Utworzyć tag `v<wersja>`. Workflow opublikuje artefakty w GitHub Releases.
+5. Utworzyć tag `v<wersja>` albo `v<wersja>-rc.<n>`, poczekać na CI i użyć
+   `scripts/publish-release.ps1` do publikacji podpisanych artefaktów.
 6. Po publikacji sprawdzić pobranie, instalację, import przykładowego projektu,
    obliczenia, eksport XLSX oraz deinstalację.
 

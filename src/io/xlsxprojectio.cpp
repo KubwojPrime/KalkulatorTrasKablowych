@@ -4,6 +4,8 @@
 #include <xlsxformat.h>
 
 #include <QFileInfo>
+#include <QSaveFile>
+#include <QBuffer>
 #include <QLocale>
 #include <QStringList>
 
@@ -363,7 +365,13 @@ bool XlsxProjectIo::exportProject(
             "trasa + pokrywa + (elementy stale + wysokosc zwieszenia "
             "* elementy pionowe) / rozstaw podpor"));
 
-    if (!document.saveAs(path)) {
+    QSaveFile output(path);
+    // QXlsx closes the device; QSaveFile must only be closed through commit().
+    // Stage the ZIP in memory, then atomically replace the destination.
+    QBuffer buffer;
+    if (!buffer.open(QIODevice::ReadWrite) || !document.saveAs(&buffer) ||
+        !output.open(QIODevice::WriteOnly) ||
+        output.write(buffer.data()) != buffer.data().size() || !output.commit()) {
         setError(errorMessage,
                  QStringLiteral("Nie udało się zapisać pliku XLSX: %1")
                      .arg(QFileInfo(path).fileName()));

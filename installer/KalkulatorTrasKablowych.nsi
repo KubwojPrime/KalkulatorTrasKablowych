@@ -17,6 +17,7 @@ SetCompressor /SOLID zlib
 !include "MUI2.nsh"
 !include "FileFunc.nsh"
 !include "LogicLib.nsh"
+!include "${UNINSTALL_FILES}"
 
 Var NoShortcuts
 
@@ -61,7 +62,13 @@ Function .onInit
   StrCpy $INSTDIR $R2
 
   no_previous_installation:
+  ; Respect an explicit /D= path even when a previous install is registered.
   ${GetParameters} $R0
+  ClearErrors
+  ${GetOptions} $R0 "/D=" $R2
+  IfErrors no_directory_override
+  StrCpy $INSTDIR $R2
+  no_directory_override:
   ClearErrors
   ${GetOptions} $R0 "/NO_SHORTCUTS=" $R1
   IfErrors no_shortcut_override
@@ -78,15 +85,30 @@ FunctionEnd
 Function ValidateInstallDirectory
   StrCpy $R9 "0"
   StrCmp $INSTDIR "" validate_done
-  IfFileExists "$INSTDIR\.ktk-install-root" validate_existing_install scan_directory
+  IfFileExists "$INSTDIR\KalkulatorTrasKablowych.exe" validate_existing_install scan_directory
 
   validate_existing_install:
-    ClearErrors
-    FileOpen $0 "$INSTDIR\.ktk-install-root" r
-    IfErrors scan_directory
-    FileRead $0 $1
-    FileClose $0
-    StrCmp $1 "KTK-INSTALL-ROOT-v1" directory_valid scan_directory
+    ; Identify the actual program, including older/portable installs without a marker.
+    ; A filename alone is insufficient: check embedded product and company metadata.
+    System::Call 'version::GetFileVersionInfoSizeW(w "$INSTDIR\KalkulatorTrasKablowych.exe", *i .r2) i .r3'
+    IntCmp $3 0 scan_directory scan_directory
+    System::Alloc $3
+    Pop $4
+    StrCmp $4 0 scan_directory
+    StrCpy $8 ""
+    StrCpy $1 ""
+    System::Call 'version::GetFileVersionInfoW(w "$INSTDIR\KalkulatorTrasKablowych.exe", i 0, i r3, p r4) i .r5'
+    StrCmp $5 0 free_version
+    System::Call 'version::VerQueryValueW(p r4, w "\StringFileInfo\041504b0\ProductName", *p .r6, *i .r7) i .r5'
+    StrCmp $5 0 free_version
+    System::Call '*$6(&w${NSIS_MAX_STRLEN} .r8)'
+    System::Call 'version::VerQueryValueW(p r4, w "\StringFileInfo\041504b0\CompanyName", *p .r6, *i .r7) i .r5'
+    StrCmp $5 0 free_version
+    System::Call '*$6(&w${NSIS_MAX_STRLEN} .r1)'
+    free_version:
+    System::Free $4
+    StrCmp $8 "Kalkulator Tras Kablowych" 0 scan_directory
+    StrCmp $1 "KubwojPrime" directory_valid scan_directory
 
   scan_directory:
     ClearErrors
@@ -190,5 +212,7 @@ Section "Uninstall"
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\KalkulatorTrasKablowych"
   DeleteRegKey HKLM "Software\KubwojPrime\KalkulatorTrasKablowych"
   Delete "$INSTDIR\.ktk-install-root"
-  RMDir /r "$INSTDIR"
+  !insertmacro RemoveInstalledFiles
+  Delete "$INSTDIR\Uninstall.exe"
+  RMDir "$INSTDIR"
 SectionEnd

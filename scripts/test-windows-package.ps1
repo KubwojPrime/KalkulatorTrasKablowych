@@ -100,6 +100,26 @@ if (-not [string]::IsNullOrWhiteSpace($InstallerPath)) {
         Write-Output "Existing empty directory installation test passed."
         Invoke-SmokeTest (Join-Path $installRoot "KalkulatorTrasKablowych.exe")
 
+        $userFile = Join-Path $installRoot 'moj-projekt.xlsx'
+        New-Item -ItemType Directory -Path $unsafeRoot -Force | Out-Null
+        Set-Content -LiteralPath (Join-Path $unsafeRoot 'keep.txt') -Value 'foreign folder'
+        $overrideCheck = Start-Process -FilePath $installer -ArgumentList @('/S','/NO_SHORTCUTS=1',"/D=$unsafeRoot") -WindowStyle Hidden -Wait -PassThru
+        if ($overrideCheck.ExitCode -eq 0 -or (Test-Path -LiteralPath (Join-Path $unsafeRoot 'KalkulatorTrasKablowych.exe'))) {
+            throw 'Explicit /D was ignored while an existing installation was registered.'
+        }
+        Write-Output 'Explicit destination override protection test passed.'
+        $userSubdir = Join-Path $installRoot 'docs\projekty-uzytkownika'
+        New-Item -ItemType Directory -Path $userSubdir -Force | Out-Null
+        Set-Content -LiteralPath $userFile -Value 'user project - keep'
+        Set-Content -LiteralPath (Join-Path $userSubdir 'rysunek.dxf') -Value 'user drawing - keep'
+        foreach ($legacy in @($false, $true)) {
+            if ($legacy) { Remove-Item -LiteralPath (Join-Path $installRoot '.ktk-install-root') -Force }
+            $upgrade = Start-Process -FilePath $installer -ArgumentList @('/S', '/NO_SHORTCUTS=1', "/D=$installRoot") -WindowStyle Hidden -Wait -PassThru
+            if ($upgrade.ExitCode -ne 0) { throw "Upgrade failed (legacy=$legacy)." }
+            if ((Get-Content -Raw -LiteralPath $userFile).Trim() -ne 'user project - keep') { throw 'Upgrade changed user data.' }
+        }
+        Write-Output 'Existing and markerless installation upgrade tests passed.'
+
         $uninstaller = Join-Path $installRoot "Uninstall.exe"
         if (-not (Test-Path -LiteralPath $uninstaller)) {
             throw "Installer did not create an uninstaller."
@@ -111,9 +131,20 @@ if (-not [string]::IsNullOrWhiteSpace($InstallerPath)) {
             throw "Silent uninstaller failed with exit code $($uninstallProcess.ExitCode)"
         }
 
+        if (-not (Test-Path -LiteralPath $userFile) -or
+            -not (Test-Path -LiteralPath (Join-Path $userSubdir 'rysunek.dxf')) -or
+            (Test-Path -LiteralPath (Join-Path $installRoot 'KalkulatorTrasKablowych.exe'))) {
+            throw 'Uninstall removed user files or left the application executable.'
+        }
+        Write-Output 'Uninstall user-file preservation test passed.'
+
         New-Item -ItemType Directory -Path $unsafeRoot -Force | Out-Null
         $sentinel = Join-Path $unsafeRoot "do-not-delete.txt"
         Set-Content -LiteralPath $sentinel -Value "installer safety test"
+        # Neither a matching filename nor a forged old marker identifies our app.
+        Copy-Item -LiteralPath "$env:WINDIR\System32\notepad.exe" -Destination (Join-Path $unsafeRoot 'KalkulatorTrasKablowych.exe')
+        Set-Content -LiteralPath (Join-Path $unsafeRoot '.ktk-install-root') -Value 'KTK-INSTALL-ROOT-v1' -NoNewline
+        $foreignHash = (Get-FileHash -LiteralPath (Join-Path $unsafeRoot 'KalkulatorTrasKablowych.exe')).Hash
         $unsafeInstallProcess = Start-Process -FilePath $installer `
             -ArgumentList @("/S", "/NO_SHORTCUTS=1", "/D=$unsafeRoot") `
             -WindowStyle Hidden -Wait -PassThru
@@ -121,7 +152,7 @@ if (-not [string]::IsNullOrWhiteSpace($InstallerPath)) {
             throw "Installer accepted a non-empty foreign directory."
         }
         if (-not (Test-Path -LiteralPath $sentinel) -or
-            (Test-Path -LiteralPath (Join-Path $unsafeRoot "KalkulatorTrasKablowych.exe"))) {
+            (Get-FileHash -LiteralPath (Join-Path $unsafeRoot 'KalkulatorTrasKablowych.exe')).Hash -ne $foreignHash) {
             throw "Installer changed a protected foreign directory."
         }
         Write-Output "Non-empty foreign directory protection test passed."

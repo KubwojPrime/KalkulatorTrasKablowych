@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 project(KalkulatorTrasKablowych
-    VERSION 0.7.0
+    VERSION 1.0.0
     DESCRIPTION "Kalkulator wypelnienia, masy i obciazenia ogniowego tras kablowych"
     LANGUAGES CXX
 )
@@ -68,6 +68,7 @@ endif()
 add_library(ktk_core STATIC
     src/domain/cablelayout.cpp
     src/io/dxfexport.cpp
+    src/io/projectrecovery.cpp
     src/domain/bakscatalog.cpp
     src/domain/bakscatalog.h
     src/domain/calculator.cpp
@@ -148,6 +149,7 @@ install(FILES
     docs/data-governance.md
     docs/fire-load-estimation.md
     docs/license-and-access.md
+    docs/third-party-rights.md
     DESTINATION docs
 )
 install(FILES
@@ -177,6 +179,7 @@ if(BUILD_TESTING AND KTK_BUILD_TESTS)
             resources/catalog-seed.json
     )
     target_include_directories(ktk_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+    target_compile_definitions(ktk_tests PRIVATE KTK_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures")
     target_link_libraries(ktk_tests PRIVATE
         ktk_core
         QXlsx::QXlsx
@@ -185,6 +188,16 @@ if(BUILD_TESTING AND KTK_BUILD_TESTS)
         Qt6::Sql
     )
     add_test(NAME core_and_xlsx COMMAND ktk_tests)
+    file(GLOB KTK_UI_TEST_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/ui/*.cpp")
+    add_executable(ktk_ui_tests tests/ui_session_tests.cpp ${KTK_UI_TEST_SOURCES}
+        src/data/catalogrepository.cpp src/io/xlsxprojectio.cpp)
+    target_include_directories(ktk_ui_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+    target_link_libraries(ktk_ui_tests PRIVATE ktk_core QXlsx::QXlsx Qt6::Widgets Qt6::Sql)
+    qt_add_resources(ktk_ui_tests "ktk_ui_test_resources" PREFIX "/"
+        BASE "${CMAKE_CURRENT_SOURCE_DIR}/resources"
+        FILES resources/baks-catalog.json resources/catalog-seed.json)
+    add_test(NAME gui_session COMMAND ktk_ui_tests)
+    set_tests_properties(gui_session PROPERTIES TIMEOUT 90)
     set_tests_properties(core_and_xlsx PROPERTIES TIMEOUT 120)
 
     add_test(
@@ -193,7 +206,7 @@ if(BUILD_TESTING AND KTK_BUILD_TESTS)
     )
     get_filename_component(KTK_QT_PREFIX "${Qt6_DIR}/../../.." ABSOLUTE)
     get_filename_component(KTK_COMPILER_BIN_DIR "${CMAKE_CXX_COMPILER}" DIRECTORY)
-    set_tests_properties(application_smoke PROPERTIES
+    set_tests_properties(application_smoke gui_session core_and_xlsx PROPERTIES
         ENVIRONMENT_MODIFICATION
             "PATH=path_list_prepend:${KTK_QT_PREFIX}/bin;PATH=path_list_prepend:${KTK_COMPILER_BIN_DIR};QT_QPA_PLATFORM=set:offscreen"
         TIMEOUT 90

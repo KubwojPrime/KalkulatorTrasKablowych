@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "originalFile": "",
+  "route": {
+    "projectName": "Wzorzec",
+    "internalWidthMm": 100,
+    "internalHeightMm": 50,
+    "maximumFillPercent": 40,
+    "fireLoadLimitMjPerM": 10,
+    "trayMassKgPerM": 1.2,
+    "coverMassKgPerM": 0.3,
+    "hangerBaseMassKg": 1,
+    "suspensionHeightM": 0.5,
+    "suspensionVerticalMassKgPerM": 0.4,
+    "supportSpacingM": 1.5
+  },
+  "cables": [],
+  "assembly": [],
+  "expected": {
+    "fill": 0,
+    "mass": 0,
+    "total": 2.3,
+    "fire": 0
+  }
+}
