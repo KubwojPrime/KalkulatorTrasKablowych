@@ -24,6 +24,7 @@ Var NoShortcuts
 Name "Kalkulator Tras Kablowych"
 OutFile "${OUTPUT_DIR}\KalkulatorTrasKablowych-${APP_VERSION}-win64-setup.exe"
 InstallDir "$PROGRAMFILES64\Kalkulator Tras Kablowych"
+InstallDirRegKey HKLM "Software\KubwojPrime\KalkulatorTrasKablowych" "InstallDir"
 RequestExecutionLevel admin
 ShowInstDetails show
 ShowUninstDetails show
@@ -57,18 +58,9 @@ VIAddVersionKey /LANG=1045 "LegalCopyright" "Copyright (c) 2026 Jakub"
 Function .onInit
   SetShellVarContext all
   SetRegView 64
-  ReadRegStr $R2 HKLM "Software\KubwojPrime\KalkulatorTrasKablowych" "InstallDir"
-  StrCmp $R2 "" no_previous_installation
-  StrCpy $INSTDIR $R2
-
-  no_previous_installation:
-  ; Respect an explicit /D= path even when a previous install is registered.
+  ; NSIS consumes /D= before .onInit. Preserve its initialized $INSTDIR;
+  ; manually reading the registry here would overwrite an explicit destination.
   ${GetParameters} $R0
-  ClearErrors
-  ${GetOptions} $R0 "/D=" $R2
-  IfErrors no_directory_override
-  StrCpy $INSTDIR $R2
-  no_directory_override:
   ClearErrors
   ${GetOptions} $R0 "/NO_SHORTCUTS=" $R1
   IfErrors no_shortcut_override
