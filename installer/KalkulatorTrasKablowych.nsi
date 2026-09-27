@@ -24,7 +24,6 @@ Var NoShortcuts
 Name "Kalkulator Tras Kablowych"
 OutFile "${OUTPUT_DIR}\KalkulatorTrasKablowych-${APP_VERSION}-win64-setup.exe"
 InstallDir "$PROGRAMFILES64\Kalkulator Tras Kablowych"
-InstallDirRegKey HKLM "Software\KubwojPrime\KalkulatorTrasKablowych" "InstallDir"
 RequestExecutionLevel admin
 ShowInstDetails show
 ShowUninstDetails show
@@ -58,8 +57,18 @@ VIAddVersionKey /LANG=1045 "LegalCopyright" "Copyright (c) 2026 Jakub"
 Function .onInit
   SetShellVarContext all
   SetRegView 64
-  ; NSIS consumes /D= before .onInit. Preserve its initialized $INSTDIR;
-  ; manually reading the registry here would overwrite an explicit destination.
+  ; NSIS removes /D= from $CMDLINE. Check the original Windows command line
+  ; before applying the remembered 64-bit registry location. Keep NSIS's parsed
+  ; $INSTDIR for an explicit /D= (including paths containing spaces).
+  System::Call 'kernel32::GetCommandLineW() w .r0'
+  ClearErrors
+  ${GetOptions} $0 "/D=" $R2
+  IfErrors use_registered_directory directory_initialized
+  use_registered_directory:
+  ReadRegStr $R2 HKLM "Software\KubwojPrime\KalkulatorTrasKablowych" "InstallDir"
+  StrCmp $R2 "" directory_initialized
+  StrCpy $INSTDIR $R2
+  directory_initialized:
   ${GetParameters} $R0
   ClearErrors
   ${GetOptions} $R0 "/NO_SHORTCUTS=" $R1

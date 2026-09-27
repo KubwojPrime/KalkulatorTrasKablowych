@@ -119,6 +119,12 @@ if (-not [string]::IsNullOrWhiteSpace($InstallerPath)) {
             if ((Get-Content -Raw -LiteralPath $userFile).Trim() -ne 'user project - keep') { throw 'Upgrade changed user data.' }
         }
         Write-Output 'Existing and markerless installation upgrade tests passed.'
+        $defaultUpgrade = Start-Process -FilePath $installer -ArgumentList @('/S', '/NO_SHORTCUTS=1') -WindowStyle Hidden -Wait -PassThru
+        $defaultDestination = Get-ItemPropertyValue -LiteralPath 'HKLM:\Software\KubwojPrime\KalkulatorTrasKablowych' -Name 'InstallDir'
+        if ($defaultUpgrade.ExitCode -ne 0 -or $defaultDestination -ne $installRoot) {
+            throw 'Upgrade without /D did not reuse the registered installation directory.'
+        }
+        Write-Output 'Registered default upgrade destination test passed.'
 
         $uninstaller = Join-Path $installRoot "Uninstall.exe"
         if (-not (Test-Path -LiteralPath $uninstaller)) {
