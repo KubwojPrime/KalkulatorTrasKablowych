@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "datasetVersion": "2026-07-24.1",
+  "generatedOn": "2026-07-24",
+  "sourceManifest": "source-materials/manifest.json",
+  "summary": {
+    "records": 25065,
+    "rawRecords": 27804,
+    "duplicatesRemoved": 2739,
+    "rejectedRows": 4,
+    "missingMassRecords": 28,
+    "missingFireLoadRecords": 24877,
+    "byManufacturer": {
+      "BITNER": 13525,
+      "CobiCabling": 28,
+      "ELPAR": 8616,
+      "TELE-FONIKA Kable": 2896
+    }
+  },
+  "sources": [
+    {
+      "sourceId": "telefonika-power-2026",
+      "file": "source-materials/telefonika/TFKable_Katalog_elektroenergetyczny_2026.pdf",
+      "role": "primary",
+      "parser": "anchored",
+      "pagesScanned": 153,
+      "rawRecords": 2648,
+      "note": ""
+    },
+    {
+      "sourceId": "telefonika-telecom-2025",
+      "file": "source-materials/telefonika/TFKable_Katalog_telekomunikacyjny_2025.pdf",
+      "role": "primary",
+      "parser": "anchored",
+      "pagesScanned": 76,
+      "rawRecords": 689,
+      "note": ""
+    },
+    {
+      "sourceId": "telefonika-cpr-2026",
+      "file": "source-materials/telefonika/TFKable_Przewodnik_CPR_2026.pdf",
+      "role": "supplemental",
+      "parser": "supplemental",
+      "pagesScanned": 0,
+      "rawRecords": 0,
+      "note": "Materiał pomocniczy: służy do kontroli kontekstu/CPR, nie tworzy samodzielnych wariantów bez średnicy i masy."
+    },
+    {
+      "sourceId": "elpar-power",
+      "file": "source-materials/elpar/ELPAR_Katalog_elektroenergetyczny.pdf",
+      "role": "primary",
+      "parser": "anchored",
+      "pagesScanned": 248,
+      "rawRecords": 3204,
+      "note": ""
+    },
+    {
+      "sourceId": "elpar-telecom",
+      "file": "source-materials/elpar/ELPAR_Katalog_telekomunikacyjny.pdf",
+      "role": "primary",
+      "parser": "anchored",
+      "pagesScanned": 140,
+      "rawRecords": 208,
+      "note": ""
+    },
+    {
+      "sourceId": "elpar-control-special",
+      "file": "source-materials/elpar/ELPAR_Katalog_sterownicze_sygnalizacyjne_specjalne.pdf",
+      "role": "primary",
+      "parser": "anchored",
+      "pagesScanned": 208,
+      "rawRecords": 4974,
+      "note": ""
+    },
+    {
+      "sourceId": "elpar-safe-halogen-free",
+      "file": "source-materials/elpar/ELPAR_Katalog_bezpieczne_bezhalogenowe.pdf",
+      "role": "primary",
+      "parser": "anchored",
+      "pagesScanned": 161,
+      "rawRecords": 2500,
+      "note": ""
+    },
+    {
+      "sourceId": "elpar-power-technical-parameters",
+      "file": "source-materials/elpar/ELPAR_Parametry_techniczne_kabli_elektroenergetycznych.pdf",
+      "role": "supplemental",
+      "parser": "supplemental",
+      "pagesScanned": 0,
+      "rawRecords": 0,
+      "note": "Materiał pomocniczy: służy do kontroli kontekstu/CPR, nie tworzy samodzielnych wariantów bez średnicy i masy."
+    },
+    {
+      "sourceId": "elpar-fire-safety-parameters",
+      "file": "source-materials/elpar/ELPAR_Parametry_bezpieczenstwa_pozarowego.pdf",
+      "role": "supplemental",
+      "parser": "supplemental",
+      "pagesScanned": 0,
+      "rawRecords": 0,
+      "note": "Materiał pomocniczy: służy do kontroli kontekstu/CPR, nie tworzy samodzielnych wariantów bez średnicy i masy."
+    },
+    {
+      "sourceId": "bitner-general-2025",
+      "file": "source-materials/bitner/BITNER_Katalog_kabli_i_przewodow_2025.pdf",
+      "role": "primary",
+      "parser": "bitner",
+      "pagesScanned": 583,
+      "rawRecords": 13525,
+      "note": ""
+    },
+    {
+      "sourceId": "bitner-bitlan-2025",
+      "file": "source-materials/bitner/BITNER_Ulotka_BiTLAN_2025.pdf",
+      "role": "supplemental",
+      "parser": "supplemental",
+      "pagesScanned": 0,
+      "rawRecords": 0,
+      "note": "Materiał pomocniczy: służy do kontroli kontekstu/CPR, nie tworzy samodzielnych wariantów bez średnicy i masy."
+    },
+    {
+      "sourceId": "cobicabling-catalog-pl",
+      "file": "source-materials/cobicabling/CobiCabling_Katalog_produktow_PL.pdf",
+      "role": "primary",
+      "parser": "cobi",
+      "pagesScanned": 140,
+      "rawRecords": 28,
+      "note": ""
+    },
+    {
+      "sourceId": "cobicabling-catalog-en-2025",
+      "file": "source-materials/cobicabling/CobiCabling_Product_Catalog_EN_2025.pdf",
+      "role": "primary",
+      "parser": "cobi",
+      "pagesScanned": 71,
+      "rawRecords": 28,
+      "note": ""
+    }
+  ],
+  "controlSamples": [
+    "TELE-FONIKA H05V-U 1 x 0,5 mm²: 2,0 mm / 8 kg/km",
+    "ELPAR AALXS 1 x 25 mm²: 10,8 mm / 126,2 kg/km",
+    "BITNER S30001: 3,4 mm / 16 kg/km",
+    "BITNER B50900: maks. wymiar 11,4 mm / 120 kg/km",
+    "BITNER BS1900: 24,7 mm / 815 kg/km (wiersz wielowariantowy)",
+    "BITNER IP4037: maks. 41,0 mm / 2925 kg/km (kod nałożony na nagłówek PDF)",
+    "BITNER IP4090: szerokość 16,2 mm / 169 kg/km",
+    "BITNER LP0185: 7,1 mm / 62 kg/km (masa przesunięta w siatce PDF)",
+    "BITNER B63877: 6,0 mm / 53 kg/km (przesunięta kolumna kodu)",
+    "CobiCabling C23-2511: maks. 8,7 mm / brak masy"
+  ],
+  "limitations": [
+    "Automatyczne rekordy mają verified=false do czasu ręcznej kontroli.",
+    "Wartości średnic opisane zakresem lub tolerancją są zapisywane jako maksimum.",
+    "Ciepło spalania dostępne dla części wariantów TELE-FONIKA w kWh/m przeliczono jednostkowo przez 3,6 na MJ/m; żadnej wartości nie wyprowadzono z CPR.",
+    "Materiały pomocnicze nie tworzą duplikatów wariantów z katalogów głównych."
+  ]
+}

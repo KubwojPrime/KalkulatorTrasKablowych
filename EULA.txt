@@ -1,0 +1,107 @@
+UMOWA LICENCYJNA UŻYTKOWNIKA KOŃCOWEGO (EULA)
+Kalkulator Tras Kablowych — wersja umowy z 26 września 2026 r.
+Copyright (c) 2026 Jakub / KubwojPrime. Wszelkie prawa zastrzeżone,
+z wyjątkiem praw do komponentów osób trzecich opisanych poniżej.
+
+1. Strony i przedmiot
+Licencjodawcą jest autor programu występujący jako Jakub / KubwojPrime,
+udzielający użytkownikowi lub wskazanej organizacji zgody na używanie programu.
+Indywidualne uzgodnienia pisemne, w tym wiadomość e-mail pozwalająca ustalić
+nadawcę i odbiorcę, określają odbiorcę, zakres i ewentualną odpłatność licencji.
+Program obejmuje aplikację, jej dokumentację i pliki pomocnicze. Katalogi,
+znaki towarowe i biblioteki zewnętrzne nie stają się własnością autora.
+
+2. Udzielenie licencji
+Autor udziela uprawnionemu odbiorcy niewyłącznej, nieprzenoszalnej licencji
+na instalację i używanie programu do własnych potrzeb, w tym pracy zawodowej
+i komercyjnego projektowania, w zakresie uzgodnionym z autorem. Dopuszcza się
+kopie zapasowe oraz instalacje wewnątrz uprawnionej organizacji zgodnie z tym
+uzgodnieniem. Licencja dotyczy kodu wykonywalnego; nie przenosi praw autorskich.
+Brak ustalenia opłaty nie tworzy obowiązku zapłaty ani automatycznej subskrypcji.
+
+3. Model oparty na zaufaniu i działanie offline
+Program nie wymaga klucza, konta ani serwera aktywacji. Nie ma licznika dni
+próbnych, telemetrii licencyjnej, automatycznego naliczania opłat ani zdalnego
+wyłącznika. Przestrzeganie warunków jest obowiązkiem umownym użytkownika.
+Techniczna możliwość uruchomienia kopii nie zastępuje zgody na jej używanie.
+Porównanie tego modelu do innych programów nie włącza ich regulaminów do umowy.
+
+4. Ograniczenia dotyczące własnego kodu autora
+Bez odrębnej zgody nie wolno odsprzedawać, sublicencjonować ani publicznie
+rozpowszechniać aplikacji, udostępniać jej jako usługi dla osób trzecich,
+publikować jej niepublicznego kodu ani rozpowszechniać zmodyfikowanych wersji.
+Nie wolno usuwać informacji o autorstwie i licencjach. Zakazy nie obejmują
+czynności dozwolonych bezwzględnie obowiązującym prawem ani uprawnień do
+komponentów zewnętrznych wskazanych w punkcie 8.
+
+5. Projekty i dane użytkownika
+Użytkownik zachowuje prawa do wprowadzonych danych, projektów i raportów.
+Może przekazywać wygenerowane XLSX, DXF i wyniki swoim klientom i współpracownikom.
+Program przechowuje projekty lokalnie. Automatyczna kopia odzyskiwania oraz
+ustawienia ostatniej lokalizacji zapisu są przechowywane w profilu użytkownika.
+Autosave nie stanowi systemu kopii zapasowych organizacji. Użytkownik odpowiada
+za dostęp do swojego konta, archiwizację oraz świadome usuwanie kopii roboczych.
+
+6. Dane katalogowe i przeznaczenie
+Dane producentów mogą pochodzić z automatycznej ekstrakcji. Dostępność rekordu
+nie oznacza potwierdzenia jego aktualności, kompletności ani ręcznej weryfikacji.
+Należy sprawdzać źródła i aktualne karty producentów. Oznaczenie gwiazdką (*)
+oznacza oszacowanie obciążenia ogniowego z materiałów i geometrii, a nie wynik
+badania producenta. Brak danych nie oznacza wartości zerowej.
+Program jest pomocą obliczeniową. Nie stanowi certyfikacji, uzgodnienia ppoż.,
+gwarancji nośności ani projektu wykonawczego. Rysunek pokazuje schemat układu.
+Ocena dopuszczalności rozwiązania, warunków montażu i zabezpieczeń należy do
+odpowiednio wykwalifikowanych osób. Prawa do katalogów i znaków producentów
+pozostają przy ich właścicielach; ta umowa nie udziela praw do ich redystrybucji.
+
+7. Gwarancje, odpowiedzialność i wsparcie
+W granicach dopuszczalnych przez prawo program jest dostarczany w aktualnym
+stanie, bez zapewnienia bezbłędności, nieprzerwanego działania czy przydatności
+do konkretnego zadania. Autor nie zobowiązuje się do określonego terminu
+napraw, wsparcia lub dostarczania nowych wersji, chyba że uzgodniono to pisemnie.
+Użytkownik weryfikuje dane wejściowe i wyniki przed zastosowaniem zawodowym.
+Ograniczenia nie wyłączają odpowiedzialności, której nie można wyłączyć
+na mocy obowiązujących przepisów, w szczególności za szkodę wyrządzoną umyślnie,
+ani bezwzględnie obowiązujących praw konsumenta. Umowa nie przenosi na użytkownika
+odpowiedzialności, którą przepisy bezwzględnie przypisują autorowi.
+
+8. Komponenty zewnętrzne i pierwszeństwo ich licencji
+Qt 6 (w tym dołączone moduły Core, Gui, Widgets, Sql i Svg oraz wtyczki) jest
+linkowane dynamicznie; użyte komponenty podlegają odpowiednim warunkom LGPLv3
+oraz licencjom ich zależności. QXlsx jest objęte MIT. Biblioteki GCC/MinGW
+podlegają własnym licencjom, w tym GCC Runtime Library Exception, a instalator
+korzysta z NSIS. Szczegóły i teksty: THIRD_PARTY_NOTICES.md oraz katalog licenses.
+LGPLv3 uzupełnia GPLv3; oba teksty są dostarczane w paczce.
+Niniejsza EULA nie zastępuje, nie ogranicza ani nie odwołuje praw wynikających
+z tych licencji. W razie sprzeczności dla danego komponentu pierwszeństwo ma
+jego licencja. W szczególności użytkownik może modyfikować i wymieniać biblioteki
+LGPL oraz wykonywać inżynierię wsteczną programu w zakresie potrzebnym do
+debugowania takich modyfikacji. Autor nie wymaga własnego podpisu cyfrowego
+dla zastępczych bibliotek i nie blokuje uruchomienia z kompatybilną wersją.
+Instrukcję wymiany i informacje o źródłach zawiera docs/third-party-rights.md.
+Modyfikacja biblioteki zewnętrznej sama w sobie nie jest naruszeniem tej EULA.
+Cofnięcie zgody na własną aplikację autora nie cofa niezależnych licencji
+do bibliotek zewnętrznych.
+
+9. Cofnięcie lub zakończenie licencji
+Użytkownik może zakończyć korzystanie w dowolnym czasie. Autor może cofnąć zgodę
+w formie pisemnej z podaniem zakresu i terminu zaprzestania używania, z
+uwzględnieniem indywidualnej umowy oraz obowiązujących przepisów. Po skutecznym
+zakończeniu licencji należy zaprzestać używania własnej aplikacji autora i
+usunąć jej kopie, poza kopiami wymaganymi przepisami lub niezależnymi licencjami.
+Użytkownik zachowuje swoje projekty i raporty. Nie stosuje się zdalnego kasowania.
+
+10. Aktualizacje i zmiany warunków
+Nowa wersja może zawierać zmiany działania i odrębne warunki przedstawione przed
+jej instalacją. Samo opublikowanie zmienionej EULA nie zmienia automatycznie
+warunków wcześniej udzielonej licencji. Instalowanie aktualizacji powinno być
+poprzedzone zabezpieczeniem projektów. Wersje Early Access i RC służą również
+wykrywaniu usterek i nie oznaczają zakończenia testów odbiorowych.
+
+11. Postanowienia końcowe
+Jeżeli postanowienie jest nieważne lub bezskuteczne, pozostałe postanowienia
+pozostają w mocy w zakresie dopuszczalnym przez prawo. Umowa nie wyłącza praw,
+których użytkownik nie może się skutecznie zrzec. Prawo właściwe i właściwość
+sądu wynikają z obowiązujących przepisów i skutecznych uzgodnień stron.
+Instalując program po zapoznaniu się z warunkami, użytkownik je akceptuje.
+W razie braku akceptacji należy zrezygnować z instalacji lub korzystania.

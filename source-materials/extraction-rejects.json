@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "datasetVersion": "2026-07-24.1",
+  "count": 4,
+  "items": [
+    {
+      "sourceId": "bitner-general-2025",
+      "page": 115,
+      "reason": "invalid-bitner-table-row",
+      "raw": "H63070 |  |  | "
+    },
+    {
+      "sourceId": "bitner-general-2025",
+      "page": 125,
+      "reason": "invalid-bitner-table-row",
+      "raw": "EM9076 |  |  | "
+    },
+    {
+      "sourceId": "bitner-general-2025",
+      "page": 389,
+      "reason": "invalid-bitner-table-row",
+      "raw": "S70282 | 5G0,75 | 106 | 151"
+    },
+    {
+      "sourceId": "bitner-general-2025",
+      "page": 390,
+      "reason": "invalid-bitner-table-row",
+      "raw": "S70353 | 5x0,75 | 106 | 151"
+    }
+  ]
+}

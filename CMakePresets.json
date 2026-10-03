@@ -1,0 +1,68 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "windows-debug",
+      "displayName": "Windows MinGW Debug",
+      "generator": "MinGW Makefiles",
+      "binaryDir": "${sourceDir}/build/debug",
+      "environment": {
+        "PATH": "C:/Qt/Tools/mingw1310_64/bin;C:/Qt/6.11.0/mingw_64/bin;$penv{PATH}"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_PREFIX_PATH": "C:/Qt/6.11.0/mingw_64",
+        "CMAKE_MAKE_PROGRAM": "C:/Qt/Tools/mingw1310_64/bin/mingw32-make.exe",
+        "CMAKE_CXX_COMPILER": "C:/Qt/Tools/mingw1310_64/bin/g++.exe",
+        "KTK_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "windows-release",
+      "displayName": "Windows MinGW Release",
+      "inherits": "windows-debug",
+      "binaryDir": "${sourceDir}/build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "KTK_BUILD_TESTS": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows-debug",
+      "configurePreset": "windows-debug"
+    },
+    {
+      "name": "windows-release",
+      "configurePreset": "windows-release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "windows-debug",
+      "configurePreset": "windows-debug",
+      "environment": {
+        "PATH": "C:/Qt/Tools/mingw1310_64/bin;C:/Qt/6.11.0/mingw_64/bin;$penv{PATH}"
+      },
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-release",
+      "configurePreset": "windows-release",
+      "environment": {
+        "PATH": "C:/Qt/Tools/mingw1310_64/bin;C:/Qt/6.11.0/mingw_64/bin;$penv{PATH}"
+      },
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

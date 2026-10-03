@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "originalFile": "",
+  "route": {
+    "projectName": "Wzorzec",
+    "internalWidthMm": 100,
+    "internalHeightMm": 50,
+    "maximumFillPercent": 40,
+    "fireLoadLimitMjPerM": 10,
+    "trayMassKgPerM": 0,
+    "coverMassKgPerM": 0,
+    "hangerBaseMassKg": 0,
+    "suspensionHeightM": 2,
+    "suspensionVerticalMassKgPerM": 0,
+    "supportSpacingM": 2
+  },
+  "cables": [
+    {
+      "manufacturer": "Test",
+      "designation": "Braki danych",
+      "quantity": 1,
+      "outerDiameterMm": 5
+    }
+  ],
+  "assembly": [],
+  "expected": {
+    "fill": 0.5,
+    "mass": 0,
+    "total": 0,
+    "fire": 0
+  }
+}

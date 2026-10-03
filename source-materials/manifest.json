@@ -1,0 +1,685 @@
+{
+  "schemaVersion": 1,
+  "generatedAtUtc": "2026-08-04T09:25:00Z",
+  "sourceCount": 30,
+  "totalBytes": 238119891,
+  "totalPages": 2208,
+  "verification": {
+    "pdfSignatureChecked": true,
+    "pdfInfoChecked": true,
+    "encryptedFiles": 0,
+    "textExtractionErrorsInSample": 0,
+    "visualSamples": [
+      {
+        "file": "source-materials/telefonika/TFKable_Katalog_elektroenergetyczny_2026.pdf",
+        "pdfPage": 12
+      },
+      {
+        "file": "source-materials/telefonika/TFKable_Katalog_elektroenergetyczny_2026.pdf",
+        "pdfPage": 81
+      },
+      {
+        "file": "source-materials/elpar/ELPAR_Katalog_elektroenergetyczny.pdf",
+        "pdfPage": 15
+      },
+      {
+        "file": "source-materials/bitner/BITNER_Katalog_kabli_i_przewodow_2025.pdf",
+        "pdfPage": 12
+      },
+      {
+        "file": "source-materials/cobicabling/CobiCabling_Product_Catalog_EN_2025.pdf",
+        "pdfPage": 6
+      },
+      {
+        "file": "source-materials/cobicabling/CobiCabling_Katalog_produktow_PL.pdf",
+        "pdfPage": 10
+      },
+      {
+        "file": "source-materials/baks/BAKS_Korytka_kablowe_2024.pdf",
+        "pdfPage": 16
+      },
+      {
+        "file": "source-materials/baks/BAKS_Korytka_kablowe_2024.pdf",
+        "pdfPage": 36
+      },
+      {
+        "file": "source-materials/baks/BAKS_Korytka_kablowe_2024.pdf",
+        "pdfPage": 59
+      },
+      {
+        "file": "source-materials/baks/BAKS_Korytka_kablowe_2024.pdf",
+        "pdfPage": 105
+      },
+      {
+        "file": "source-materials/baks/BAKS_Korytka_kablowe_2024.pdf",
+        "pdfPage": 126
+      },
+      {
+        "file": "source-materials/baks/BAKS_Korytka_kablowe_2024.pdf",
+        "pdfPage": 149
+      }
+    ],
+    "fireLoadFinding": "Dla części wariantów w katalogu elektroenergetycznym TELE-FONIKA znaleziono bezpośrednie ciepło spalania w kWh/m; aplikacja przelicza je jednostkowo przez 3,6 na MJ/m. Dla pozostałych wariantów brak pozostaje brakiem danych. CPR nie może zastępować tej wartości."
+  },
+  "sources": [
+    {
+      "id": "telefonika-power-2026",
+      "manufacturer": "TELE-FONIKA Kable",
+      "title": "Kable i przewody elektroenergetyczne - wydanie VIII",
+      "language": "pl",
+      "file": "source-materials/telefonika/TFKable_Katalog_elektroenergetyczny_2026.pdf",
+      "sourcePage": "https://www.tele-fonika.com/informacje-prasowe/katalogi",
+      "downloadUrl": "https://www.tele-fonika.com/storage/file/core_files/2026/4/29/85c6ab7b8b5e0923dc452c6d382c0217/kable-i-przewody-elektroenergetyczne-2026.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": null,
+      "contentType": "application/pdf",
+      "bytes": 7834350,
+      "pages": 153,
+      "sha256": "6d3333d29f0227dfe56828ea5c9003290897422d2ba197c473406725b47d4613",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "mass-kg-per-km",
+        "heat-of-combustion-kwh-per-m",
+        "cpr-class"
+      ],
+      "limitations": "Wartości opisane jako przybliżone należy przechowywać z takim oznaczeniem. Ciepło spalania występuje tylko dla części wariantów i jest przeliczane z kWh/m na MJ/m współczynnikiem 3,6."
+    },
+    {
+      "id": "telefonika-telecom-2025",
+      "manufacturer": "TELE-FONIKA Kable",
+      "title": "Kable telekomunikacyjne - edycja III",
+      "language": "pl",
+      "file": "source-materials/telefonika/TFKable_Katalog_telekomunikacyjny_2025.pdf",
+      "sourcePage": "https://www.tele-fonika.com/sektory-sprzedazy/telekomunikacja",
+      "downloadUrl": "https://www.tele-fonika.com/storage/file/core_files/2025/12/18/780541534c628e3dff8458791c7a6f7a/katalog-telekomunikacyjny-2025.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": null,
+      "contentType": "application/pdf",
+      "bytes": 6089104,
+      "pages": 76,
+      "sha256": "b34390118424ad9b4e0be80eaf6c5d69752fcaeecea747ccb593d4942a00a11d",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "mass-kg-per-km",
+        "cpr-class"
+      ],
+      "limitations": "Brak bezpośredniej wartości obciążenia ogniowego w MJ/m."
+    },
+    {
+      "id": "telefonika-cpr-2026",
+      "manufacturer": "TELE-FONIKA Kable",
+      "title": "Przewodnik kabli i przewodów objętych rozporządzeniem CPR - wydanie VII",
+      "language": "pl",
+      "file": "source-materials/telefonika/TFKable_Przewodnik_CPR_2026.pdf",
+      "sourcePage": "https://www.tele-fonika.com/informacje-prasowe/katalogi",
+      "downloadUrl": "https://www.tele-fonika.com/storage/file/core_files/2026/4/29/82611fe68b4e84b17aef8a1cf04bdf0a/przewodnik-kabli-i-przewodow-objetych-rozporzadzeniem-cpr.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": null,
+      "contentType": "application/pdf",
+      "bytes": 6270731,
+      "pages": 135,
+      "sha256": "d5ced59d124604a9d7a23e690bdfdfd5a5cbd9ddba6706179e5ecb8de886a808",
+      "evidenceFor": [
+        "cpr-class",
+        "cpr-product-scope"
+      ],
+      "limitations": "Przewodnik CPR nie jest źródłem kaloryczności w MJ/m."
+    },
+    {
+      "id": "elpar-power",
+      "manufacturer": "ELPAR",
+      "title": "Kable i przewody elektroenergetyczne",
+      "language": "pl-en",
+      "file": "source-materials/elpar/ELPAR_Katalog_elektroenergetyczny.pdf",
+      "sourcePage": "https://www.elpar.pl/dopobrania",
+      "downloadUrl": "https://www.elpar.pl/uploads/download/katalog_kable_i_przewody_elektroenergetyczne.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2024-11-05T14:47:06Z",
+      "contentType": "application/pdf",
+      "bytes": 5017926,
+      "pages": 248,
+      "sha256": "1738d2addb41d8c1e1efdc8af83222fab5fbfb5526d13a3d5e95f05a4c57272b",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "mass-kg-per-km"
+      ],
+      "limitations": "Katalog informuje, że dane mają charakter orientacyjny."
+    },
+    {
+      "id": "elpar-telecom",
+      "manufacturer": "ELPAR",
+      "title": "Kable i przewody telekomunikacyjne",
+      "language": "pl-en",
+      "file": "source-materials/elpar/ELPAR_Katalog_telekomunikacyjny.pdf",
+      "sourcePage": "https://www.elpar.pl/dopobrania",
+      "downloadUrl": "https://www.elpar.pl/uploads/download/katalog_kable_i_przewody_telekomunikacyjne.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2024-11-05T14:47:08Z",
+      "contentType": "application/pdf",
+      "bytes": 6419119,
+      "pages": 140,
+      "sha256": "f02fedb277fa8cb6cb118ffd5921ea42c6a6c8e49cc398fe38dc3979b5cca159",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "mass-kg-per-km"
+      ],
+      "limitations": "Brak bezpośredniej wartości obciążenia ogniowego w MJ/m."
+    },
+    {
+      "id": "elpar-control-special",
+      "manufacturer": "ELPAR",
+      "title": "Kable sterownicze, sygnalizacyjne oraz specjalne",
+      "language": "pl-en",
+      "file": "source-materials/elpar/ELPAR_Katalog_sterownicze_sygnalizacyjne_specjalne.pdf",
+      "sourcePage": "https://www.elpar.pl/dopobrania",
+      "downloadUrl": "https://www.elpar.pl/uploads/download/katalog_kable_sterownicze_sygnalizacyjne_oraz_specjalne.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2024-11-05T14:47:16Z",
+      "contentType": "application/pdf",
+      "bytes": 8106219,
+      "pages": 208,
+      "sha256": "926c10b5ced96e20391a098efa6df2418e54dad1315f754e34d272a0e91868d0",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "mass-kg-per-km"
+      ],
+      "limitations": "Wariant i przekrój muszą być identyfikowane dokładnie według tabeli."
+    },
+    {
+      "id": "elpar-safe-halogen-free",
+      "manufacturer": "ELPAR",
+      "title": "Kable bezpieczne i bezhalogenowe",
+      "language": "pl-en",
+      "file": "source-materials/elpar/ELPAR_Katalog_bezpieczne_bezhalogenowe.pdf",
+      "sourcePage": "https://www.elpar.pl/dopobrania",
+      "downloadUrl": "https://www.elpar.pl/uploads/download/katalog_kable_bezpieczne_i_bezhalogenowe.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2024-11-05T14:47:05Z",
+      "contentType": "application/pdf",
+      "bytes": 6447349,
+      "pages": 161,
+      "sha256": "9041afeb662bf87ed770b042061db5a660b10cd4558e0c1733d779c2a3977a98",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "mass-kg-per-km",
+        "fire-resistance",
+        "halogen-free-properties"
+      ],
+      "limitations": "Odporność ogniowa nie jest wartością kaloryczności w MJ/m."
+    },
+    {
+      "id": "elpar-power-technical-parameters",
+      "manufacturer": "ELPAR",
+      "title": "Parametry techniczne kabli elektroenergetycznych",
+      "language": "pl",
+      "file": "source-materials/elpar/ELPAR_Parametry_techniczne_kabli_elektroenergetycznych.pdf",
+      "sourcePage": "https://www.elpar.pl/dopobrania",
+      "downloadUrl": "https://www.elpar.pl/uploads/download/parametry_techniczne_kabli_elektroenergetycznych.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2026-03-04T14:21:43Z",
+      "contentType": "application/pdf",
+      "bytes": 4338890,
+      "pages": 44,
+      "sha256": "7a2915a238708bcbe82cbba6bb9fab1e84709c911485bcc1eb120d79f85b43f9",
+      "evidenceFor": [
+        "engineering-context",
+        "cable-selection"
+      ],
+      "limitations": "Materiał pomocniczy; parametry konkretnego wariantu należy potwierdzić w tabeli katalogowej."
+    },
+    {
+      "id": "elpar-fire-safety-parameters",
+      "manufacturer": "ELPAR",
+      "title": "Parametry techniczne bezpieczeństwa pożarowego oraz kabli bezhalogenowych",
+      "language": "pl",
+      "file": "source-materials/elpar/ELPAR_Parametry_bezpieczenstwa_pozarowego.pdf",
+      "sourcePage": "https://www.elpar.pl/dopobrania",
+      "downloadUrl": "https://www.elpar.pl/uploads/download/parametry_techniczne_bezpieczenstwa_pozarowego_oraz_kabli_bezhalogenowych.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2024-05-20T09:34:27Z",
+      "contentType": "application/pdf",
+      "bytes": 5419533,
+      "pages": 36,
+      "sha256": "cc08b275b42e8f5e7b3d8da64cd8f07b993332824d6f64c6263dd92d1768f973",
+      "evidenceFor": [
+        "fire-safety-context",
+        "halogen-free-properties"
+      ],
+      "limitations": "Nie znaleziono bezpośredniej wartości MJ/m; nie wolno wyprowadzać jej z CPR."
+    },
+    {
+      "id": "bitner-general-2025",
+      "manufacturer": "BITNER",
+      "title": "Katalog kabli i przewodów 2025",
+      "language": "pl",
+      "file": "source-materials/bitner/BITNER_Katalog_kabli_i_przewodow_2025.pdf",
+      "sourcePage": "https://bitner.com.pl/katalogi-i-ulotki/",
+      "downloadUrl": "https://bitner.com.pl/wp-content/uploads/2025/06/Katalog_Kabli_i_Przewodow.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2025-06-27T12:51:26Z",
+      "contentType": "application/pdf",
+      "bytes": 50806964,
+      "pages": 583,
+      "sha256": "62d96a1bb6af3c0f128bd37f0976382e02e781c49b9cb375218576d99aa331f6",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "mass-kg-per-km",
+        "cpr-class"
+      ],
+      "limitations": "Warstwa tekstowa ma miejscami niestandardowe kodowanie; dane tabelaryczne wymagają kontroli wizualnej."
+    },
+    {
+      "id": "bitner-bitlan-2025",
+      "manufacturer": "BITNER",
+      "title": "BiTLAN - kable do transmisji danych, dźwięku i obrazu",
+      "language": "pl",
+      "file": "source-materials/bitner/BITNER_Ulotka_BiTLAN_2025.pdf",
+      "sourcePage": "https://bitner.com.pl/katalogi-i-ulotki/",
+      "downloadUrl": "https://bitner.com.pl/wp-content/uploads/2025/06/Ulotka_BiTLAN.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2025-06-27T12:44:52Z",
+      "contentType": "application/pdf",
+      "bytes": 1876815,
+      "pages": 4,
+      "sha256": "6b9b605649f6f72b53df6126f5c7e27b976916ca80745d26b118975f17c7d5ba",
+      "evidenceFor": [
+        "telecommunication-product-family",
+        "cpr-class"
+      ],
+      "limitations": "Ulotka przeglądowa; wartości średnicy i masy należy pobierać z pełnego katalogu lub karty produktu."
+    },
+    {
+      "id": "cobicabling-catalog-pl",
+      "manufacturer": "CobiCabling",
+      "title": "Katalog produktów CobiCabling - wydanie 2024",
+      "language": "pl",
+      "file": "source-materials/cobicabling/CobiCabling_Katalog_produktow_PL.pdf",
+      "sourcePage": "https://cobicabling.com/pl",
+      "downloadUrl": "https://cobicabling.com/static-sites/15/katalog-produktow-cobicabling.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2025-06-23T13:19:40Z",
+      "contentType": "application/pdf",
+      "bytes": 11351916,
+      "pages": 140,
+      "sha256": "9574b47fa413ef1b55a89f0a390be603be25946dcdc57a9f82ca018d8dbd17dd",
+      "evidenceFor": [
+        "telecommunication-product-family",
+        "catalog-number",
+        "cpr-class"
+      ],
+      "limitations": "Starsze wydanie polskie; pierwszeństwo dla aktualniejszego katalogu angielskiego i kart produktu."
+    },
+    {
+      "id": "cobicabling-catalog-en-2025",
+      "manufacturer": "CobiCabling",
+      "title": "CobiCabling product catalog 2025",
+      "language": "en",
+      "file": "source-materials/cobicabling/CobiCabling_Product_Catalog_EN_2025.pdf",
+      "sourcePage": "https://cobicabling.com/en",
+      "downloadUrl": "https://cobicabling.com/static-sites/15/cobicabling-product-catalog.pdf",
+      "retrievedAtUtc": "2026-07-24T17:40:03Z",
+      "httpLastModified": "2025-08-05T13:18:37Z",
+      "contentType": "application/pdf",
+      "bytes": 24587072,
+      "pages": 71,
+      "sha256": "cdd57704d199f34d55525b8cd349e25dbe01b7f98980316a3162ed68fe17ea2a",
+      "evidenceFor": [
+        "outer-diameter-mm",
+        "catalog-number",
+        "cpr-class"
+      ],
+      "limitations": "Katalog nie zapewnia kompletnej masy kg/km ani kaloryczności MJ/m dla wszystkich pozycji."
+    },
+    {
+      "id": "baks-trays-2024",
+      "manufacturer": "BAKS",
+      "title": "Katalog 2024/25 - Korytka kablowe",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_Korytka_kablowe_2024.pdf",
+      "sourcePage": "https://www.baks.com.pl/wsparcie-techniczne/katalogi-do-pobrania/",
+      "downloadUrl": "https://www.baks.com.pl/wp-content/uploads/2015/08/KATALOG-2024_PL-01-Korytka-kablowe-low.pdf",
+      "retrievedAtUtc": "2026-07-24T21:06:00Z",
+      "httpLastModified": null,
+      "contentType": "application/pdf",
+      "bytes": 89342345,
+      "pages": 209,
+      "sha256": "dc4cc30c75774bf5095319172721cd25dfd5b0e05787f9b50bab3dd5d79ea982",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "cover-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Wbudowana baza obejmuje wybrane popularne warianty. Przed użyciem należy sprawdzić zgodność powłoki, nośności i rozstawu podpór z projektem."
+    },
+    {
+      "id": "baks-online-dkp-h60-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online DKP...H60N Drabinka",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_DKP_H60_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/dkph60n-drabinka_929.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/dkph60n-drabinka_929.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 339942,
+      "pages": 0,
+      "sha256": "5f754264681fe64ba8c5fe08a4eec6c39eafa7ee855cdf6f02dee4c8a1f11ecc",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    },
+    {
+      "id": "baks-online-dup-h100-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online DUP...H100N Drabinka",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_DUP_H100_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/duph100n-drabinka_1004.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/duph100n-drabinka_1004.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 326430,
+      "pages": 0,
+      "sha256": "2667c59820564515e88210f7df05e460f9901634c5b46c61b9d4336638943acc",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    },
+    {
+      "id": "baks-online-pkl-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online PKL... Pokrywa korytka",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_PKL_pokrywy_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/pkl-pokrywa-korytka_4267.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/pkl-pokrywa-korytka_4267.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 150997,
+      "pages": 0,
+      "sha256": "be956db47614d5e9f446ac337ea1e9ed23f6c8b841df74c056dd189aeb976ce4",
+      "evidenceFor": [
+        "cover-mass-kg-per-m",
+        "catalog-number"
+      ],
+      "limitations": "Migawka karty online; zgodność pokrywy z konkretnym systemem trasy należy potwierdzić w dokumentacji montażowej."
+    },
+    {
+      "id": "baks-online-ws-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online WS... Wysięgnik",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_WS_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/ws-wysignik_1366.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/ws-wysignik_1366.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 175965,
+      "pages": 0,
+      "sha256": "a88b934bc093297064c9de767cdfa609d319310638d0b23676e8f670194f33e9",
+      "evidenceFor": [
+        "component-mass-kg-per-piece",
+        "catalog-number"
+      ],
+      "limitations": "Masa elementu nie zastępuje kontroli dopuszczalnego obciążenia i sposobu zamocowania."
+    },
+    {
+      "id": "baks-online-wpl-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online WPL... Wysięgnik",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_WPL_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/wpl-wysignik_1358.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/wpl-wysignik_1358.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 175313,
+      "pages": 0,
+      "sha256": "b2da585cd772d8a8983424199fc01e242450050fe453cb9a49883c1aa84a396e",
+      "evidenceFor": [
+        "component-mass-kg-per-piece",
+        "catalog-number"
+      ],
+      "limitations": "Masa elementu nie zastępuje kontroli dopuszczalnego obciążenia i sposobu zamocowania."
+    },
+    {
+      "id": "baks-online-wws-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online WWS/WWSO Wysięgnik wzmocniony",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_WWS_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/wws-wwso-wysignik-wzmocniony_1357.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/wws-wwso-wysignik-wzmocniony_1357.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 217584,
+      "pages": 0,
+      "sha256": "ee7aca667d43d52d7065def89e65c2ece5b72403217a5f770b2ab5806892956a",
+      "evidenceFor": [
+        "component-mass-kg-per-piece",
+        "catalog-number"
+      ],
+      "limitations": "Masa elementu nie zastępuje kontroli dopuszczalnego obciążenia i sposobu zamocowania."
+    },
+    {
+      "id": "baks-online-psddn-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online PSDDN Podstawa sufitowa",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_PSDDN_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/psddn-podstawa-sufitowa-_2683.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/psddn-podstawa-sufitowa-_2683.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 111870,
+      "pages": 0,
+      "sha256": "53c300ab836f0f8e8fb0adc20b74c0913da5d0034c0c2e6f905af95a51d10926",
+      "evidenceFor": [
+        "component-mass-kg-per-piece",
+        "catalog-number"
+      ],
+      "limitations": "Masa elementu nie zastępuje doboru konstrukcyjnego kompletnego zawieszenia."
+    },
+    {
+      "id": "baks-online-wpv-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online WPV Wieszak pręta",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_WPV_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/wpv-wieszak-prta_1447.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/wpv-wieszak-prta_1447.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 165625,
+      "pages": 0,
+      "sha256": "58e77a4af07e56f14c6eb813abdc0525c8d9be6ee7c81f9f9293ec5118d76083",
+      "evidenceFor": [
+        "component-mass-kg-per-piece",
+        "catalog-number"
+      ],
+      "limitations": "Masa elementu nie zastępuje doboru konstrukcyjnego kompletnego zawieszenia."
+    },
+    {
+      "id": "baks-online-pgm-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online PGM Pręt gwintowany",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_PGM_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/pgm-prt-gwintowany_1596.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/pgm-prt-gwintowany_1596.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 259006,
+      "pages": 0,
+      "sha256": "c33255a38003dcae9ce24979815b37ee5f318f1347fc3e09e7daa8079d993c6b",
+      "evidenceFor": [
+        "component-mass-kg-per-piece",
+        "component-length",
+        "catalog-number"
+      ],
+      "limitations": "Aplikacja dzieli masę katalogową odcinka przez jego długość i mnoży przez wysokość zwieszenia oraz liczbę prętów."
+    },
+    {
+      "id": "baks-online-zs-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online ZS/ZSO Zacisk śrubowy",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_ZS_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/zs-zso-zacisk-rubowy-komplet_1847.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/zs-zso-zacisk-rubowy-komplet_1847.html",
+      "retrievedAtUtc": "2026-07-24T21:16:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 130676,
+      "pages": 0,
+      "sha256": "d9e6711412a77834acd22e8691563d3baa86dc9713cad911b1a77fdbbd82265f",
+      "evidenceFor": [
+        "component-mass-kg-per-piece",
+        "catalog-number"
+      ],
+      "limitations": "Do zestawu należy dodać rzeczywistą liczbę zacisków przypadającą na jeden punkt podparcia."
+    },
+    {
+      "id": "baks-online-kcj-h42-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online KCJ...H42 Korytko",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_KCJ_H42_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/kcjh42-korytko_94.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/kcjh42-korytko_94.html",
+      "retrievedAtUtc": "2026-08-04T09:25:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 373551,
+      "pages": 0,
+      "sha256": "fc323f8c6742e05065694856a962010dfa736eb7bb9e749568c03d3b90df24ed",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    },
+    {
+      "id": "baks-online-kcj-h50-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online KCJ...H50 Korytko",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_KCJ_H50_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/kcjh50-korytko_192.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/kcjh50-korytko_192.html",
+      "retrievedAtUtc": "2026-08-04T09:25:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 396281,
+      "pages": 0,
+      "sha256": "44b779f77f41fae4999025c2a73909ab97ee5938b03a3607ec1f20b58db81273",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    },
+    {
+      "id": "baks-online-kcj-h60-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online KCJ/KCOJ...H60 Korytko",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_KCJ_H60_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/kcj-kcoj-korytko_307.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/kcj-kcoj-korytko_307.html",
+      "retrievedAtUtc": "2026-08-04T09:25:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 423061,
+      "pages": 0,
+      "sha256": "a4be9a846dc00d5935a24a73f1eb9d40332fbdd3540f7891e8e2335a4c8e5e67",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    },
+    {
+      "id": "baks-online-kcj-h80-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online KCJ...H80 Korytko",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_KCJ_H80_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/kcjh80-korytko_431.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/kcjh80-korytko_431.html",
+      "retrievedAtUtc": "2026-08-04T09:25:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 352593,
+      "pages": 0,
+      "sha256": "173e241aabf75393dade759c3dc0b5fa1634e09c4b6f6255b2f078ef6d565d00",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    },
+    {
+      "id": "baks-online-kcj-h100-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online KCJ...H100 Korytko",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_KCJ_H100_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/kcjh100-korytko_522.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/kcjh100-korytko_522.html",
+      "retrievedAtUtc": "2026-08-04T09:25:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 355876,
+      "pages": 0,
+      "sha256": "3fc2dcbc8e86c64720da5bab7443446f08729f1e71791eacf6167570df6c114d",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    },
+    {
+      "id": "baks-online-kcj-h110-2026",
+      "manufacturer": "BAKS",
+      "title": "Karta online KCJ...H110 Korytko",
+      "language": "pl",
+      "file": "source-materials/baks/BAKS_online_KCJ_H110_2026.html",
+      "sourcePage": "https://katalog.baks.com.pl/produkty/kcjh110-korytko-_2009.html",
+      "downloadUrl": "https://katalog.baks.com.pl/produkty/kcjh110-korytko-_2009.html",
+      "retrievedAtUtc": "2026-08-04T09:25:00Z",
+      "httpLastModified": null,
+      "contentType": "text/html",
+      "bytes": 256788,
+      "pages": 0,
+      "sha256": "a2cf012765a1ca67f92e5d9c8b791950f33d93926b61ca8935fcb3e364197f8e",
+      "evidenceFor": [
+        "route-mass-kg-per-m",
+        "catalog-number",
+        "nominal-route-dimensions"
+      ],
+      "limitations": "Migawka karty online z dnia pobrania; dobór nośności wymaga osobnej kontroli wykresów producenta."
+    }
+  ]
+}
