@@ -11,6 +11,8 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
+#include <QLineEdit>
+#include <QSignalBlocker>
 #include <QPushButton>
 #include <QTableWidget>
 #include <QTableWidgetItem>
@@ -174,7 +176,15 @@ void BaksAssemblyDialog::buildUi()
 
     auto *continuousGroup = new QGroupBox(tr("Elementy ciągłe"), this);
     auto *continuousForm = new QFormLayout(continuousGroup);
+    m_routeSearch = new QLineEdit(continuousGroup);
+    m_routeSearch->setObjectName(QStringLiteral("baksRouteSearch"));
+    m_routeSearch->setPlaceholderText(tr("np. KCJ200H60, KCJ 300 H60 lub 161020"));
+    m_routeSearch->setClearButtonEnabled(true);
+    m_routeResults = new QLabel(continuousGroup);
+    continuousForm->addRow(tr("Szukaj trasy:"), m_routeSearch);
+    continuousForm->addRow(QString(), m_routeResults);
     m_routeCombo = new QComboBox(continuousGroup);
+    m_routeCombo->setObjectName(QStringLiteral("baksRouteCombo"));
     m_routeCombo->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
     m_routeCombo->setMinimumContentsLength(46);
     m_coverCombo = new QComboBox(continuousGroup);
@@ -234,6 +244,7 @@ void BaksAssemblyDialog::buildUi()
     layout->addWidget(buttons);
 
     connect(addButton, &QPushButton::clicked, this, &BaksAssemblyDialog::addComponent);
+    connect(m_routeSearch, &QLineEdit::textChanged, this, &BaksAssemblyDialog::populateRouteOptions);
     connect(
         removeButton,
         &QPushButton::clicked,
@@ -260,13 +271,26 @@ void BaksAssemblyDialog::buildUi()
 
 void BaksAssemblyDialog::populateRouteOptions()
 {
+    const QString selected = m_routeCombo->currentData().toString();
+    const QSignalBlocker blocker(m_routeCombo);
     m_routeCombo->clear();
     m_routeCombo->addItem(tr("— brak / masa ręczna —"), QString());
+    int matches = 0;
+    bool keptSelection = false;
     for (const auto &product : m_catalog) {
         if (product.role == QStringLiteral("route")) {
-            m_routeCombo->addItem(productLabel(product), product.id);
+            const bool match = BaksCatalog::matchesSearch(product, m_routeSearch->text());
+            if (match) ++matches;
+            if (match || product.id == selected) {
+                m_routeCombo->addItem(productLabel(product)
+                    + (!match ? tr(" (wybrana — poza filtrem)") : QString()), product.id);
+                keptSelection |= !match;
+            }
         }
     }
+    selectById(m_routeCombo, selected);
+    m_routeResults->setText(tr("Znaleziono tras: %1").arg(matches)
+        + (keptSelection ? tr(". Zachowano wybraną trasę spoza wyników.") : QString()));
 }
 
 void BaksAssemblyDialog::populateCoverOptions(const QString &preferredId)

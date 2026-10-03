@@ -1,4 +1,7 @@
 #include "ui/mainwindow.h"
+#include "ui/baksassemblydialog.h"
+#include "domain/bakscatalog.h"
+#include <QComboBox>
 #include "ui/theme.h"
 #include "ui/cabletablemodel.h"
 #include "io/projectrecovery.h"
@@ -23,6 +26,29 @@ static void check(bool value, const char *label) {
 namespace ktk {
 struct MainWindowTest {
     static void run(const QString &dir) {
+        {
+            const auto catalog = BaksCatalog::load();
+            BaksAssemblyDialog dialog(catalog, {}, 1.0, 1.5);
+            auto *search = dialog.findChild<QLineEdit*>(QStringLiteral("baksRouteSearch"));
+            auto *combo = dialog.findChild<QComboBox*>(QStringLiteral("baksRouteCombo"));
+            check(search && combo, "BAKS search controls");
+            const int fullCount = combo->count();
+            search->setText(QStringLiteral("KCJ200H60"));
+            check(combo->count() == 2 && dialog.assemblyItems().isEmpty(), "BAKS filter does not auto select");
+            combo->setCurrentIndex(1);
+            const auto selected = dialog.assemblyItems().first().product.id;
+            search->setText(QStringLiteral("KCJ300H60"));
+            check(combo->count() == 3, "BAKS 300 result and preserved selection");
+            check(dialog.assemblyItems().first().product.id == selected, "BAKS filtering preserves assembly");
+            const int next = combo->findData(QStringLiteral("baks-kcj-kcoj300h60-3"));
+            check(next > 0, "BAKS KCJ300H60 alias found");
+            combo->setCurrentIndex(next);
+            search->setText(QStringLiteral("no-such-product"));
+            check(combo->count() == 2 && dialog.assemblyItems().first().product.widthMm == 300,
+                "BAKS no matches preserves selected route");
+            search->clear();
+            check(combo->count() == fullCount, "BAKS clear restores full list");
+        }
         MainWindow w(nullptr, dir);
         QApplication::processEvents();
         w.show();

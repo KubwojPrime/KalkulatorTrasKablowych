@@ -5,6 +5,8 @@ wersjonowania semantycznego.
 
 ## [Niewydane]
 
+- Wyszukiwanie tras BAKS po symbolu, aliasach KCJ/KCOJ, nazwie i kodzie katalogowym; bez zmiany dobranego zestawu podczas filtrowania.
+
 - Poprawiona struktura DXF 2007: kompletne tabele, bloki, układy i właściciele obiektów.
 - Niezależna kontrola DXF przed naprawą przez czytnik oraz audyt geometrii i polskich opisów.
 

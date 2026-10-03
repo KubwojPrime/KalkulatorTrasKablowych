@@ -11,6 +11,7 @@ namespace ktk {
 
 class BaksCatalog final {
 public:
+    [[nodiscard]] static bool matchesSearch(const BaksProduct &product, const QString &query);
     [[nodiscard]] static QVector<BaksProduct> load(
         QString *errorMessage = nullptr);
     [[nodiscard]] static BaksMassSummary summarize(

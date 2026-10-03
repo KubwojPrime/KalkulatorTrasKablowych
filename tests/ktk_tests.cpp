@@ -277,6 +277,11 @@ void testBaksCatalog()
     require(bracket.has_value(), "BAKS bracket");
     require(rod.has_value(), "BAKS rod");
     require(kcjH60.has_value(), "BAKS KCJ H60 route");
+    require(ktk::BaksCatalog::matchesSearch(*kcjH60, "KCJ200H60"), "BAKS short family alias");
+    require(ktk::BaksCatalog::matchesSearch(*kcjH60, "kcj 200 h60"), "BAKS token search");
+    require(ktk::BaksCatalog::matchesSearch(*kcjH60, "161020"), "BAKS catalog code search");
+    require(ktk::BaksCatalog::matchesSearch(*kcjH60, "KCOJ-200-H60/3"), "BAKS separator search");
+    require(!ktk::BaksCatalog::matchesSearch(*kcjH60, "KCJ300H60"), "BAKS wrong width excluded");
     require(kcjH80.has_value(), "BAKS KCJ H80 route");
     require(kcjH110.has_value(), "BAKS KCJ H110 route");
     requireNear(route->massKgPerUnit, 0.74, "BAKS KGR100 mass");

@@ -7,6 +7,7 @@
 class QComboBox;
 class QDoubleSpinBox;
 class QLabel;
+class QLineEdit;
 class QTableWidget;
 
 namespace ktk {
@@ -49,6 +50,8 @@ private:
     double m_supportSpacingM = 1.5;
 
     QComboBox *m_routeCombo = nullptr;
+    QLineEdit *m_routeSearch = nullptr;
+    QLabel *m_routeResults = nullptr;
     QComboBox *m_coverCombo = nullptr;
     QComboBox *m_componentCombo = nullptr;
     QDoubleSpinBox *m_quantity = nullptr;

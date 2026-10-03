@@ -5,6 +5,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSet>
+#include <QRegularExpression>
 
 #include <algorithm>
 
@@ -164,6 +165,34 @@ std::optional<BaksProduct> BaksCatalog::findById(
         return std::nullopt;
     }
     return *iterator;
+}
+
+bool BaksCatalog::matchesSearch(const BaksProduct &product, const QString &query)
+{
+    auto normalized = [](QString text) {
+        text = text.toCaseFolded().normalized(QString::NormalizationForm_D);
+        QString result;
+        for (QChar c : text) {
+            if (c == QChar(0x0142)) c = QLatin1Char('l');
+            if (c.isLetterOrNumber()) result += c;
+        }
+        return result;
+    };
+    QStringList fields{product.symbol, product.name, product.catalogCode, QStringLiteral("BAKS")};
+    // Expand shared family prefixes, e.g. KCJ/KCOJ200H60/3 -> KCJ200H60/3.
+    const auto match = QRegularExpression(QStringLiteral("^([A-Za-z]+(?:/[A-Za-z]+)+)([0-9].*)$")).match(product.symbol);
+    if (match.hasMatch()) {
+        for (const auto &family : match.captured(1).split(QLatin1Char('/')))
+            fields.append(family + match.captured(2));
+    }
+    for (auto &field : fields) field = normalized(field);
+    const auto tokens = query.split(QRegularExpression(QStringLiteral("\\s+")), Qt::SkipEmptyParts);
+    for (const auto &token : tokens) {
+        const auto needle = normalized(token);
+        if (!needle.isEmpty() && std::none_of(fields.cbegin(), fields.cend(),
+            [&](const QString &field) { return field.contains(needle); })) return false;
+    }
+    return true;
 }
 
 QString BaksCatalog::roleLabel(const QString &role)
