@@ -3,7 +3,7 @@
 Wszystkie istotne zmiany projektu są opisywane w tym pliku. Projekt używa
 wersjonowania semantycznego.
 
-## [Niewydane]
+## [1.0.0-rc.2] - 2026-10-03
 
 - Wyszukiwanie tras BAKS po symbolu, aliasach KCJ/KCOJ, nazwie i kodzie katalogowym; bez zmiany dobranego zestawu podczas filtrowania.
 

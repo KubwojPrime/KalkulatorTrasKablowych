@@ -36,6 +36,12 @@ struct MainWindowTest {
             search->setText(QStringLiteral("KCJ200H60"));
             check(combo->count() == 2 && dialog.assemblyItems().isEmpty(), "BAKS filter does not auto select");
             combo->setCurrentIndex(1);
+            const auto screenshot = qEnvironmentVariable("KTK_TEST_BAKS_SCREENSHOT");
+            if (!screenshot.isEmpty()) {
+                dialog.show();
+                QApplication::processEvents();
+                check(dialog.grab().save(screenshot), "save BAKS inspection screenshot");
+            }
             const auto selected = dialog.assemblyItems().first().product.id;
             search->setText(QStringLiteral("KCJ300H60"));
             check(combo->count() == 3, "BAKS 300 result and preserved selection");

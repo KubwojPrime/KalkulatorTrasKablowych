@@ -4,6 +4,47 @@
 
 Interfejs programu wykorzystuje spójny motyw ciemny o wysokim kontraście.
 
+## Pobierz i uruchom
+
+**Aktualne wydanie: 1.0.0-rc.2 — kandydat do wersji stabilnej (prerelease).**
+
+- [Pobierz instalator Windows x64](https://github.com/KubwojPrime/KalkulatorTrasKablowych/releases/download/v1.0.0-rc.2/KalkulatorTrasKablowych-1.0.0-win64-setup.exe)
+- [Pobierz wersję przenośną ZIP](https://github.com/KubwojPrime/KalkulatorTrasKablowych/releases/download/v1.0.0-rc.2/KalkulatorTrasKablowych-1.0.0-win64.zip)
+- [Opis RC2, certyfikat i sumy SHA-256](https://github.com/KubwojPrime/KalkulatorTrasKablowych/releases/tag/v1.0.0-rc.2)
+- [Historia zmian](CHANGELOG.md) · [Zgłoś problem](https://github.com/KubwojPrime/KalkulatorTrasKablowych/issues/new/choose)
+
+Wymagany jest 64-bitowy Windows 10 lub 11. Paczki zawierają potrzebne biblioteki;
+nie trzeba instalować Qt, Pythona ani programu CAD. Instalator wymaga uprawnień
+administratora. ZIP należy rozpakować w całości przed uruchomieniem EXE.
+
+EXE i instalator mają podpis samopodpisanym certyfikatem (SSC), a nie certyfikatem
+publicznego wystawcy. Windows/SmartScreen może ostrzegać o nieznanym wydawcy.
+Przed uruchomieniem sprawdź pochodzenie paczki, podpis i sumy kontrolne według
+[instrukcji weryfikacji](docs/early-access-signature.md). Nie wyłączaj ochrony systemu.
+
+Przy aktualizacji zamknij aplikację i wskaż jej dotychczasowy katalog.
+Wykonaj wcześniej kopię własnych projektów XLSX. RC2 zawiera poprawkę struktury DXF
+oraz wyszukiwanie tras BAKS; pliki DXF zapisane starszą wersją wyeksportuj ponownie.
+Numer techniczny EXE pozostaje 1.0.0, a numer kandydata rozróżnia tag wydania.
+
+## Szybki start
+
+1. W zakładce **Parametry trasy** podaj wymiary wewnętrzne i progi.
+2. Opcjonalnie wybierz **Dobierz zestaw z katalogu BAKS**. Pole **Szukaj trasy**
+   przyjmuje np. `KCJ200H60`, `KCJ 300 H60`, nazwę lub numer katalogowy `161020`.
+   Obsługuje wspólne oznaczenia KCJ/KCOJ i nie zmienia wybranego zestawu przy filtrowaniu.
+3. W **Liście kablowej** dobierz producenta, wariant i ilość kabli; sprawdź brakujące dane.
+4. W **Wynikach i przekroju** odczytaj wyniki, a następnie wyeksportuj XLSX lub DXF.
+   Do późniejszej pracy z projektem użyj XLSX — DXF jest eksportem rysunku i tabeli.
+
+## Podgląd programu
+
+![Parametry trasy w ciemnym interfejsie](docs/images/application.png)
+
+![Wyszukiwanie tras BAKS po skróconym symbolu](docs/images/baks-search.png)
+
+## Funkcje
+
 Natywna aplikacja Windows do obliczania:
 
 - wypełnienia trasy według konserwatywnego wzoru `Σ(ilość × D²)`;
@@ -221,6 +262,11 @@ Szczegóły opisano w
 
 ## Licencja i dostęp
 
+Warunki używania programu: [EULA](EULA.txt) i [licencja aplikacji](LICENSE.md).
+Publiczne repozytorium nie oznacza udzielenia licencji open source na aplikację.
+Licencje bibliotek pozostają odrębne: [informacje o zależnościach](THIRD_PARTY_NOTICES.md)
+oraz [prawa dotyczące bibliotek zewnętrznych](docs/third-party-rights.md).
+
 Aplikacja działa całkowicie offline. Nie ma serwera aktywacyjnego, telemetrii ani
 technicznej blokady zainstalowanej kopii. Dostęp jest udzielany i może być
 cofnięty pisemnie na zasadach `EULA.txt`. Model i jego ograniczenia opisano w
@@ -236,6 +282,18 @@ zgodność commita paczki z tagiem i zielony wynik CI. Wariant `-ValidateOnly`
 wykonuje te kontrole bez publikacji.
 
 ## Status odpowiedzialności
+
+RC2 nie jest deklaracją gotowości produkcyjnej ani certyfikacją obliczeń ppoż.
+Pozostałe punkty odbioru opisuje [checklista wydania](docs/release-checklist.md).
+Katalogi zawierają automatycznie pozyskane rekordy wymagające weryfikacji;
+wyniki szacowane i brakujące dane należy sprawdzić w kartach producentów.
+Znak graficzny ma status roboczy — jego odrębność od istniejących marek nie została
+potwierdzona formalnym badaniem.
+
+Problemy zgłaszaj przez [GitHub Issues](https://github.com/KubwojPrime/KalkulatorTrasKablowych/issues).
+Podaj wersję z tagu wydania, system, kroki odtworzenia i komunikat błędu.
+Dla DXF podaj także nazwę i wersję CAD/przeglądarki. Nie publikuj danych klienta;
+dołącz zanonimizowany przykład, jeśli jest potrzebny.
 
 Program jest narzędziem wspierającym projektowanie. Nie zastępuje oceny projektanta,
 rzeczoznawcy ds. zabezpieczeń przeciwpożarowych ani sprawdzenia aktualnych kart
