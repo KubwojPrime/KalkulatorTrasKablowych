@@ -63,7 +63,13 @@ jobs:
 
       - name: Test
         shell: pwsh
-        run: ctest --test-dir build/ci --output-on-failure
+        run: |
+          $env:KTK_TEST_DXF_OUTPUT = Join-Path $env:RUNNER_TEMP 'ktk-export.dxf'
+          ctest --test-dir build/ci --output-on-failure
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m pip install ezdxf==1.4.4
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/dxf_support.py validate $env:KTK_TEST_DXF_OUTPUT
 
       - name: Package portable application and installer
         shell: pwsh

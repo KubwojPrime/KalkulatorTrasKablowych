@@ -12,6 +12,7 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QMessageBox>
+#include <QIcon>
 
 int main(int argc, char *argv[])
 {
@@ -24,10 +25,15 @@ int main(int argc, char *argv[])
     QApplication::setApplicationVersion(QString::fromUtf8(KTK_APP_VERSION));
     QApplication::setStyle(QStyleFactory::create(QStringLiteral("Fusion")));
     ktk::Theme::applyDark(application);
+    QApplication::setWindowIcon(QIcon(QStringLiteral(":/branding/app-icon.png")));
 
     if (application.arguments().contains(QStringLiteral("--smoke-test"))
         || qEnvironmentVariableIntValue("KTK_SMOKE_TEST") == 1) {
         QTemporaryDir smokeDirectory;
+        if (QApplication::windowIcon().pixmap(32, 32).isNull()) {
+            qCritical() << "application icon is missing";
+            return 33;
+        }
         if (!smokeDirectory.isValid()) {
             qCritical() << "cannot create smoke-test directory";
             return 30;

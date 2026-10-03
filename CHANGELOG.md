@@ -3,6 +3,14 @@
 Wszystkie istotne zmiany projektu są opisywane w tym pliku. Projekt używa
 wersjonowania semantycznego.
 
+## [Niewydane]
+
+- Poprawiona struktura DXF 2007: kompletne tabele, bloki, układy i właściciele obiektów.
+- Niezależna kontrola DXF przed naprawą przez czytnik oraz audyt geometrii i polskich opisów.
+
+- Logo „Moduł” w oknie programu, oknie informacji, ikonie EXE i instalatorze.
+- Wielorozmiarowa ikona Windows (16–256 px), jasne tło zapewniające kontrast.
+
 ## [1.0.0-rc.1] - 2026-09-26
 
 - Autosave z odzyskiwaniem projektu, zachowaniem BAKS i niedokończonych edycji.

@@ -54,6 +54,7 @@ if(WIN32)
                 -i "${CMAKE_CURRENT_BINARY_DIR}/generated/app.rc"
                 -o "${KTK_VERSION_RESOURCE}"
             DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/generated/app.rc"
+                "${CMAKE_CURRENT_SOURCE_DIR}/resources/branding/app.ico"
             VERBATIM
         )
         set_source_files_properties(
@@ -114,6 +115,8 @@ qt_add_resources(KalkulatorTrasKablowych "ktk_resources"
     FILES
         resources/baks-catalog.json
         resources/catalog-seed.json
+        resources/branding/app-icon.png
+        resources/dxf-template.txt
 )
 
 target_include_directories(KalkulatorTrasKablowych PRIVATE
@@ -177,6 +180,7 @@ if(BUILD_TESTING AND KTK_BUILD_TESTS)
         FILES
             resources/baks-catalog.json
             resources/catalog-seed.json
+            resources/dxf-template.txt
     )
     target_include_directories(ktk_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
     target_compile_definitions(ktk_tests PRIVATE KTK_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures")
@@ -195,7 +199,7 @@ if(BUILD_TESTING AND KTK_BUILD_TESTS)
     target_link_libraries(ktk_ui_tests PRIVATE ktk_core QXlsx::QXlsx Qt6::Widgets Qt6::Sql)
     qt_add_resources(ktk_ui_tests "ktk_ui_test_resources" PREFIX "/"
         BASE "${CMAKE_CURRENT_SOURCE_DIR}/resources"
-        FILES resources/baks-catalog.json resources/catalog-seed.json)
+        FILES resources/baks-catalog.json resources/catalog-seed.json resources/branding/app-icon.png resources/dxf-template.txt)
     add_test(NAME gui_session COMMAND ktk_ui_tests)
     set_tests_properties(gui_session PROPERTIES TIMEOUT 90)
     set_tests_properties(core_and_xlsx PROPERTIES TIMEOUT 120)

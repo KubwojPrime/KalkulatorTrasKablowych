@@ -1,5 +1,7 @@
 # Kalkulator Tras Kablowych
 
+<img src="resources/branding/app-icon.png" alt="Logo aplikacji" width="96" height="96">
+
 Interfejs programu wykorzystuje spójny motyw ciemny o wysokim kontraście.
 
 Natywna aplikacja Windows do obliczania:

@@ -448,7 +448,8 @@ void MainWindow::showAbout()
     QMessageBox::about(
         this,
         tr("O programie"),
-        tr("<h3>Kalkulator Tras Kablowych</h3>"
+        tr("<p><img src=\":/branding/app-icon.png\" width=\"80\" height=\"80\"></p>"
+           "<h3>Kalkulator Tras Kablowych</h3>"
            "<p>Wersja %1</p>"
            "<p>Wypełnienie jest liczone jako "
            "<b>Σ(ilość × D²) / (szerokość × wysokość)</b>.</p>"
@@ -465,6 +466,15 @@ void MainWindow::buildUi()
     m_tabs->addTab(buildProjectTab(), tr("1. Parametry trasy"));
     m_tabs->addTab(buildCablesTab(), tr("2. Lista kablowa"));
     m_tabs->addTab(buildResultsTab(), tr("3. Wyniki i przekrój"));
+    auto *brand = new QLabel(m_tabs);
+    brand->setObjectName(QStringLiteral("applicationLogo"));
+    auto logoPixmap = QPixmap(QStringLiteral(":/branding/app-icon.png")).scaled(
+        64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    logoPixmap.setDevicePixelRatio(2.0);
+    brand->setPixmap(logoPixmap);
+    brand->setContentsMargins(8, 2, 8, 2);
+    brand->setAccessibleName(tr("Logo aplikacji"));
+    m_tabs->setCornerWidget(brand, Qt::TopRightCorner);
     setCentralWidget(m_tabs);
     buildMenus();
     statusBar()->showMessage(tr("Gotowy"));

@@ -2,6 +2,7 @@
 #include "domain/cablelayout.h"
 #include "domain/calculator.h"
 #include <QSaveFile>
+#include <QFile>
 #include <QTextStream>
 #include <QLocale>
 #include <cmath>
@@ -38,44 +39,40 @@ bool DxfExport::write(const QString &path, const ProjectData &p, QString *error)
                 return fail(QStringLiteral("Nieprawidłowa masa lub obciążenie ogniowe kabla."));
     }
     if (count > 100000) return fail(QStringLiteral("Eksport obsługuje maksymalnie 100 000 kabli."));
+    // A complete R2007 document is required by strict CAD importers. Do not
+    // mix R12 table records with modern entities or depend on reader repairs.
+    QFile base(QStringLiteral(":/dxf-template.txt"));
+    if (!base.open(QIODevice::ReadOnly))
+        return fail(QStringLiteral("Brak szablonu dokumentu DXF."));
+    auto document = QString::fromUtf8(base.readAll());
+    document.replace(QStringLiteral("\r\n"), QStringLiteral("\n"));
+    const auto sections = document.split(QStringLiteral("__KTK_ENTITIES__"));
+    if (sections.size() != 2 || !sections[0].contains(QStringLiteral("__KTK_HANDSEED__")))
+        return fail(QStringLiteral("Nieprawidłowy szablon dokumentu DXF."));
+    // Template handles are below 0x10000. Reserve a seed above all geometry,
+    // labels and table entries (ten objects per cable-list row, plus margins).
+    const quint64 nextSeed = 0x10000 + 2 * count + 10 * p.cables.size() + 1000;
+    auto prefix = sections[0];
+    prefix.replace(QStringLiteral("__KTK_HANDSEED__"), QString::number(nextSeed, 16).toUpper());
     QSaveFile file(path);
     if (!file.open(QIODevice::WriteOnly)) return fail(file.errorString());
     QTextStream out(&file);
     out.setEncoding(QStringConverter::Utf8);
     out.setLocale(QLocale::c());
     out.setRealNumberPrecision(12);
-    quint64 handle = 16;
+    quint64 handle = 0x10000;
+    out << prefix;
     auto pair = [&](int code, const auto &v) {
         out << code << '\n' << v << '\n';
         if (code == 0) {
             QString value;
             QTextStream stream(&value);
             stream << v;
-            if (QStringList{"TABLE", "LTYPE", "LAYER", "STYLE", "LINE", "TEXT", "CIRCLE"}.contains(value))
-                out << "5\n" << QString::number(handle++, 16).toUpper() << '\n';
+            if (QStringList{"LINE", "TEXT", "CIRCLE"}.contains(value))
+                out << "5\n" << QString::number(handle++, 16).toUpper()
+                    << "\n330\n17\n"; // Model-space BLOCK_RECORD in template.
         }
     };
-    pair(0, "SECTION"); pair(2, "HEADER");
-    pair(9, "$ACADVER"); pair(1, "AC1021");
-    pair(9, "$DWGCODEPAGE"); pair(3, "ANSI_1252");
-    pair(9, "$INSUNITS"); pair(70, 4);
-    pair(9, "$MEASUREMENT"); pair(70, 1);
-    pair(0, "ENDSEC"); pair(0, "SECTION"); pair(2, "TABLES");
-    pair(0, "TABLE"); pair(2, "LTYPE"); pair(100, "AcDbSymbolTable"); pair(70, 1);
-    pair(0, "LTYPE"); pair(2, "CONTINUOUS"); pair(70, 0); pair(3, "Solid line");
-    pair(72, 65); pair(73, 0); pair(40, 0); pair(0, "ENDTAB");
-    pair(0, "TABLE"); pair(2, "LAYER"); pair(100, "AcDbSymbolTable"); pair(70, 6);
-    for (const auto &layer : {"0", "TRASA", "KABLE", "PRZEPELNIENIE", "OPISY", "TABELA"}) {
-        pair(0, "LAYER"); pair(2, layer); pair(70, 0);
-        pair(62, QString::fromLatin1(layer) == QStringLiteral("PRZEPELNIENIE") ? 1 : 7);
-        pair(6, "CONTINUOUS");
-    }
-    pair(0, "ENDTAB");
-    pair(0, "TABLE"); pair(2, "STYLE"); pair(100, "AcDbSymbolTable"); pair(70, 1);
-    pair(0, "STYLE"); pair(2, "STANDARD"); pair(70, 0); pair(40, 0);
-    pair(41, 1); pair(50, 0); pair(71, 0); pair(42, 2.5);
-    pair(3, "arial.ttf"); pair(4, ""); pair(0, "ENDTAB");
-    pair(0, "ENDSEC"); pair(0, "SECTION"); pair(2, "ENTITIES");
     auto line = [&](double x1, double y1, double x2, double y2, const char *layer) {
         pair(0, "LINE"); pair(100, "AcDbEntity"); pair(8, layer);
         pair(100, "AcDbLine"); pair(10, x1); pair(20, y1); pair(30, 0);
@@ -84,7 +81,7 @@ bool DxfExport::write(const QString &path, const ProjectData &p, QString *error)
     auto text = [&](double x, double y, double size, const QString &s, const char *layer) {
         pair(0, "TEXT"); pair(100, "AcDbEntity"); pair(8, layer);
         pair(100, "AcDbText"); pair(10, x); pair(20, y); pair(30, 0);
-        pair(40, size); pair(1, cadText(s)); pair(7, "STANDARD");
+        pair(40, size); pair(1, cadText(s)); pair(7, "Standard");
         pair(100, "AcDbText");
     };
     line(0, 0, w, 0, "TRASA"); line(0, 0, 0, h, "TRASA");
@@ -139,7 +136,7 @@ bool DxfExport::write(const QString &path, const ProjectData &p, QString *error)
     line(x, tableTop, x, bottom, "TABELA");
     text(0, bottom - 8, 2.5, QStringLiteral("* Obciążenie na podstawie materiału izolacji/powłoki (oszacowanie)."), "OPISY");
     text(0, bottom - 15, 2.5, QStringLiteral("Brak danych nie oznacza zera. Wynik ogniowy wymaga weryfikacji projektowej."), "OPISY");
-    pair(0, "ENDSEC"); pair(0, "EOF");
+    out << sections[1];
     out.flush();
     if (out.status() != QTextStream::Ok || !file.commit()) return fail(file.errorString());
     return true;

@@ -1,4 +1,5 @@
 #include "ui/mainwindow.h"
+#include "ui/theme.h"
 #include "ui/cabletablemodel.h"
 #include "io/projectrecovery.h"
 #include <QApplication>
@@ -8,6 +9,7 @@
 #include <QMessageBox>
 #include <QAbstractButton>
 #include <QLineEdit>
+#include <QLabel>
 #include <QTimer>
 #include <QEventLoop>
 #include <QFileInfo>
@@ -24,6 +26,13 @@ struct MainWindowTest {
         MainWindow w(nullptr, dir);
         QApplication::processEvents();
         w.show();
+        const auto *logo = w.findChild<QLabel*>(QStringLiteral("applicationLogo"));
+        check(logo && !logo->pixmap().isNull(), "application logo loaded");
+        const auto screenshot = qEnvironmentVariable("KTK_TEST_SCREENSHOT");
+        if (!screenshot.isEmpty()) {
+            QApplication::processEvents();
+            check(w.grab().save(screenshot), "save UI inspection screenshot");
+        }
         check(!w.m_dirty, "initial project clean");
         w.m_projectName->setText(QStringLiteral("Projekt odzyskiwany"));
         w.addCustomCable();
@@ -87,6 +96,7 @@ struct MainWindowTest {
 int main(int argc, char **argv) {
     QApplication::setAttribute(Qt::AA_DontUseNativeDialogs);
     QApplication app(argc, argv);
+    ktk::Theme::applyDark(app);
     QTemporaryDir dir;
     QCoreApplication::setOrganizationName("KTK-session-test");
     QCoreApplication::setApplicationName("session-test");

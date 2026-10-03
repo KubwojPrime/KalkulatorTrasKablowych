@@ -75,6 +75,16 @@ void testDxf()
     const auto data = file.readAll();
     file.close();
     require(data.count("0\nCIRCLE\n") == 3, "DXF circles");
+    require(data.contains("100\nAcDbSymbolTableRecord\n")
+        && data.contains("100\nAcDbLayerTableRecord\n")
+        && data.contains("100\nAcDbLinetypeTableRecord\n")
+        && data.contains("100\nAcDbTextStyleTableRecord\n"), "DXF modern table subclasses");
+    require(data.contains("2\nBLOCK_RECORD\n") && data.contains("2\nBLOCKS\n")
+        && data.contains("2\nOBJECTS\n") && data.contains("2\n*Model_Space\n")
+        && data.contains("2\n*Paper_Space\n"), "DXF complete drawing structure");
+    require(!data.contains("__KTK_"), "DXF template fully expanded");
+    const int entityCount = data.count("0\nLINE\n") + data.count("0\nCIRCLE\n") + data.count("0\nTEXT\n");
+    require(data.count("330\n17\n") >= entityCount, "DXF model-space ownership");
     require(data.contains(QStringLiteral("YKYżo").toUtf8()) && data.contains("1.250*"), "DXF unicode and estimate");
     require(data.contains("brak danych") && data.contains("$INSUNITS\n70\n4"), "DXF missing data and mm");
     p.cables[0].outerDiameterMm = 0;

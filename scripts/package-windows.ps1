@@ -1,6 +1,7 @@
 param(
     [string]$Preset = "windows-release",
     [string]$BuildDirectory = "",
+    [string]$OutputDirectory = "release",
     [string]$Version = "",
     [string]$SigningCertificateThumbprint = "",
     [string]$TimestampServer = "http://timestamp.digicert.com",
@@ -19,7 +20,7 @@ if ([string]::IsNullOrWhiteSpace($BuildDirectory)) {
 } else {
     $buildRoot = [System.IO.Path]::GetFullPath((Join-Path $projectRoot $BuildDirectory))
 }
-$releaseRoot = [System.IO.Path]::GetFullPath((Join-Path $projectRoot "release"))
+$releaseRoot = [System.IO.Path]::GetFullPath((Join-Path $projectRoot $OutputDirectory))
 
 $signingCertificate = $null
 if (-not [string]::IsNullOrWhiteSpace($SigningCertificateThumbprint)) {

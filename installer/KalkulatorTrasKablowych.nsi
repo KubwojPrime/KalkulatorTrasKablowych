@@ -37,6 +37,8 @@ VIAddVersionKey /LANG=1045 "FileDescription" "Instalator Kalkulatora Tras Kablow
 VIAddVersionKey /LANG=1045 "LegalCopyright" "Copyright (c) 2026 Jakub"
 
 !define MUI_ABORTWARNING
+!define MUI_ICON "..\resources\branding\app.ico"
+!define MUI_UNICON "..\resources\branding\app.ico"
 !define MUI_COMPONENTSPAGE_SMALLDESC
 !define MUI_FINISHPAGE_RUN "$INSTDIR\KalkulatorTrasKablowych.exe"
 !insertmacro MUI_PAGE_WELCOME
